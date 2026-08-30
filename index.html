@@ -1250,19 +1250,29 @@ function grausPermitidos(){
 function pontosAtributo(){
   const a = S.atr;
   const gasto = ATRS.reduce((s,k) => s + (a[k] - 1), 0);
-  const zerado = ATRS.some(k => a[k] === 0);
+  const zerados = ATRS.filter(k => a[k] === 0).length;
+  const zerado = zerados > 0;
   const marcos = [20,50,80,95].filter(n => S.nex >= n).length;
   const total = 4 + (zerado ? 1 : 0) + marcos;
-  return {gasto, total, sobra: total - gasto, zerado, marcos};
+  return {gasto, total, sobra: total - gasto, zerado, zerados, marcos};
 }
-function tetoAtributo(){ return [20,50,80,95].some(n => S.nex >= n) ? 5 : 3; }
+function tetoAtributo(){
+  const marcos = [20,50,80,95].filter(n => S.nex >= n).length;
+  return Math.min(3 + marcos, 5);                                 // 3 na criação, +1 por marco, teto 5
+}
 
 /* Perícias concedidas por origem e classe (para as etiquetas O / C) */
 function fontesPericias(){
   const src = {};
   origemAtual().p.forEach(id => { if(PER_MAP[id]) src[id] = "O"; });
   const C = classeAtual();
-  C.fixas.forEach(op => { if(op.length === 1 && PER_MAP[op[0]]) src[op[0]] = "C"; });
+  C.fixas.forEach(op => {
+    if(op.length === 1){ if(PER_MAP[op[0]]) src[op[0]] = "C"; return; }
+    /* par de opções (Luta ou Pontaria, Fortitude ou Reflexos): a primeira treinada e ainda
+       não creditada consome a escolha, então ela não pesa nas perícias livres. */
+    const escolha = op.find(id => PER_MAP[id] && !src[id] && S.per[id] && S.per[id].grau !== "Leigo");
+    if(escolha) src[escolha] = "C";
+  });
   return src;
 }
 function conflitoOrigemClasse(){
@@ -1282,8 +1292,10 @@ function contaTreinadas(){
     else livres++;
   });
   const C = classeAtual();
+  const escolhasClasse = C.fixas.length;
   return {
     origem, classeFixa, livres, acimaTreinado,
+    classeFixaTotal: escolhasClasse, classeFixaFalta: Math.max(0, escolhasClasse - classeFixa),
     origemTotal: origemAtual().p.length || (origemAtual().livres || 0),
     livresTotal: C.livres + S.atr.intelecto,
     grauLote: C.grauBase + S.atr.intelecto,
@@ -1346,16 +1358,23 @@ function aplicarDano(v, tipo){
   if(!v) return;
   const M = maxes();
   if(tipo === "mental"){
+    const rdM = derived().rdMental;                                  // Eu Já Sabia — resistência = Intelecto
+    const dano = Math.max(0, v - rdM);
+    const nota = rdM ? " (RD mental " + rdM + " → " + dano + ")" : "";
     const sanAtual = cur("san");
+    if(!dano){
+      logAdd("Dano mental " + v + nota + " · totalmente absorvido");
+      render(); save(); return;
+    }
     if(sanAtual === 0){
       const antes = cur("pv");
-      setCur("pv", antes - v);
+      setCur("pv", antes - dano);
       if(cur("pv") === 0 && antes > 0) S.morrendo = true;
-      logAdd("Dano mental " + v + " com SAN 0 → subtraído dos PV (" + antes + " → " + cur("pv") + ")");
+      logAdd("Dano mental " + v + nota + " com SAN 0 → subtraído dos PV (" + antes + " → " + cur("pv") + ")");
     }else{
-      const novo = Math.max(0, sanAtual - v);
+      const novo = Math.max(0, sanAtual - dano);
       setCur("san", novo);
-      logAdd("Dano mental " + v + " → SAN " + sanAtual + " → " + novo + (novo === 0 ? " · Enlouquecendo" : ""));
+      logAdd("Dano mental " + v + nota + " → SAN " + sanAtual + " → " + novo + (novo === 0 ? " · Enlouquecendo" : ""));
       if(novo === 0) logAdd("SAN 0: condição Pasmo por 1 rodada e rolagem na Tabela de Efeitos de Loucura.");
     }
     render(); save(); return;
@@ -1484,7 +1503,8 @@ function renderAgente(){
       '<div class="av">' + v + '</div>' +
       '<div class="adice">' + (v === 0 ? "2d20 pior" : v + "d20 melhor") + '</div>';
     const ctrl = el("div","ctrl");
-    const bMinus = el("button", null, "−"); bMinus.disabled = v <= 0; bMinus.setAttribute("aria-label","Reduzir " + ATR_LABEL[k]);
+    const podeZerar = v > 1 || P.zerados === 0;                     // um único atributo pode chegar a 0
+    const bMinus = el("button", null, "−"); bMinus.disabled = v <= 0 || !podeZerar; bMinus.setAttribute("aria-label","Reduzir " + ATR_LABEL[k]);
     const bPlus  = el("button", null, "+"); bPlus.disabled = v >= teto; bPlus.setAttribute("aria-label","Aumentar " + ATR_LABEL[k]);
     bMinus.onclick = () => { S.atr[k] = Math.max(0, v - 1); render(); save(); };
     bPlus.onclick  = () => { S.atr[k] = Math.min(teto, v + 1); render(); save(); };
@@ -1495,8 +1515,9 @@ function renderAgente(){
   const notes = $("#attrNotes"); notes.innerHTML = "";
   if(P.sobra > 0) notes.append(notice("warn","Atenção","Ainda há " + P.sobra + " ponto(s) de atributo para distribuir."));
   if(P.sobra < 0) notes.append(notice("bad","Inválido","Você distribuiu " + (-P.sobra) + " ponto(s) além do permitido."));
-  if(P.zerado) notes.append(notice("","Nota","Um atributo em 0 concedeu +1 ponto. Testes com esse atributo rolam 2d20 e mantêm o pior resultado."));
-  if(P.marcos) notes.append(notice("ok","Marcos","Os marcos de aumento de atributo já alcançados somam +" + P.marcos + " ponto(s); o teto por marco é 5."));
+  if(P.zerado) notes.append(notice("","Nota","Um atributo em 0 concedeu +1 ponto. Testes com esse atributo rolam 2d20 e mantêm o pior resultado. Só um atributo pode ser reduzido a 0."));
+  if(P.zerados > 1) notes.append(notice("bad","Inválido","Apenas um atributo pode ser reduzido a 0 na criação; há " + P.zerados + " zerados e apenas um deles concede o ponto extra."));
+  if(P.marcos) notes.append(notice("ok","Marcos","Os marcos de aumento de atributo já alcançados somam +" + P.marcos + " ponto(s). Cada marco eleva o teto em +1: o teto atual é " + teto + " (máximo 5)."));
 
   /* origem e classe */
   const C = classeAtual(), O = origemAtual(), oc = $("#ocBox"); oc.innerHTML = "";
@@ -1558,9 +1579,10 @@ function renderAgente(){
   $("#skCount").innerHTML = "livres <b>" + T.livres + "/" + T.livresTotal + "</b> · acima de treinado <b>" + T.acimaTreinado + "</b>";
   const sn = $("#skNotes"); sn.innerHTML = "";
   const fixasEscolha = C.fixas.filter(x => x.length > 1);
-  if(fixasEscolha.length) sn.append(notice("","Classe",
+  if(fixasEscolha.length) sn.append(notice(T.classeFixaFalta ? "warn" : "ok","Classe",
     C.nome + " também escolhe: " + fixasEscolha.map(op => op.map(i => PER_MAP[i].nome).join(" ou ")).join(" · ") +
-    ". Marque-as como Treinado — elas não entram na conta de perícias livres abaixo."));
+    ". Marque-as como Treinado — elas não entram na conta de perícias livres abaixo." +
+    (T.classeFixaFalta ? " Faltam " + T.classeFixaFalta + " escolha(s)." : "")));
   sn.append(notice("", "Livres", "Perícias livres desta classe: " + C.livres + " + Intelecto (" + S.atr.intelecto + ") = <b>" + T.livresTotal + "</b>. Você marcou " + T.livres + " fora das concedidas por origem e classe.", true));
   if(T.lotes) sn.append(notice("ok","Grau de Treinamento",
     "Nos NEX 35% e 70% você eleva o grau de <b>" + T.grauLote + "</b> perícias já treinadas (" + C.grauBase + " + Intelecto) por marco. Marcos disponíveis: <b>" + T.lotes + "</b>.", true));
@@ -1580,10 +1602,11 @@ function notice(kind, label, html, isHtml){
 function renderNex(){
   const C = classeAtual();
   $("#fPerNex").checked = !!S.perNexAttr;
-  $("#perNexNote").innerHTML = '<span class="ni">Regra</span><span>A tabela da especificação lista o ganho por NEX como <b>+' +
-    C.incPV + ' PV, +' + C.incPE + ' PE, +' + C.incSAN + ' SAN</b>, mas a nota de ganho retroativo só faz sentido se <b>Vigor</b> e <b>Presença</b> ' +
-    'entrarem em cada faixa — que é como o livro básico apresenta a progressão. Com a opção ligada, o cálculo usa <b>' +
-    C.incPV + ' + Vigor</b> por faixa de PV e <b>' + C.incPE + ' + Presença</b> por faixa de PE, recalculando tudo de forma retroativa. Desligue para seguir a tabela ao pé da letra.</span>';
+  $("#perNexNote").innerHTML = '<span class="ni">Regra</span><span>Pelo livro básico, cada faixa de NEX concede <b>' +
+    C.incPV + ' + Vigor</b> de PV e <b>' + C.incPE + ' + Presença</b> de PE, além de <b>+' + C.incSAN +
+    ' SAN</b> — é o que a opção ligada calcula, de forma retroativa em todas as faixas já alcançadas. ' +
+    'Desligue apenas se a sua mesa usar a variante sem atributo, em que o ganho é <b>+' + C.incPV + ' PV, +' +
+    C.incPE + ' PE</b> fixos por faixa.</span>';
 
   const t = $("#nexTable");
   let h = '<thead><tr><th>NEX</th><th class="n">PE/turno</th><th class="n">PV</th><th class="n">PE</th><th class="n">SAN</th><th class="n">DT base</th><th>Marco</th></tr></thead><tbody>';
@@ -2452,8 +2475,8 @@ function renderCriar(){
     const b = el("button","pick");
     b.setAttribute("aria-pressed", String(novo.classe === k));
     b.innerHTML = '<b>' + C.nome + '</b><span class="st">PV ' + C.pv + ' + Vigor · PE ' + C.pe +
-      ' + Presença · SAN ' + C.san + '<br>por NEX: +' + C.incPV + ' PV, +' + C.incPE + ' PE, +' + C.incSAN +
-      ' SAN<br>' + (C.livres + " perícia(s) livre(s) + Intelecto") + '</span>';
+      ' + Presença · SAN ' + C.san + '<br>por NEX: +' + C.incPV + ' + Vigor PV, +' + C.incPE +
+      ' + Presença PE, +' + C.incSAN + ' SAN<br>' + (C.livres + " perícia(s) livre(s) + Intelecto") + '</span>';
     b.onclick = () => { novo.classe = k; renderCriar(); };
     cb.append(b);
   });
@@ -2485,11 +2508,12 @@ function renderCriar(){
       '</div><div class="adice">' + (v === 0 ? "2d20 pior" : v + "d20 melhor") + '</div>';
     const ctrl = el("div","ctrl");
     const menos = el("button",null,"−"), mais = el("button",null,"+");
-    menos.disabled = v <= 0; mais.disabled = v >= 3;
+    const podeZerar = v > 1 || pv.P.zerados === 0;                  // um único atributo pode chegar a 0
+    menos.disabled = v <= 0 || !podeZerar; mais.disabled = v >= pv.teto;
     menos.setAttribute("aria-label","Reduzir " + ATR_LABEL[k]);
     mais.setAttribute("aria-label","Aumentar " + ATR_LABEL[k]);
     menos.onclick = () => { novo.atr[k] = Math.max(0, v - 1); renderCriar(); };
-    mais.onclick  = () => { novo.atr[k] = Math.min(3, v + 1); renderCriar(); };
+    mais.onclick  = () => { novo.atr[k] = Math.min(pv.teto, v + 1); renderCriar(); };
     ctrl.append(menos, mais); c.append(ctrl); ab.append(c);
   });
 
