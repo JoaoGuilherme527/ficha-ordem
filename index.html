@@ -966,6 +966,100 @@
       color: var(--ink-3)
     }
 
+
+    /* ---------- aba perícias ---------- */
+    .tag.carga {
+      color: var(--pe);
+      border-color: var(--pe)
+    }
+
+    .tag.kit {
+      color: var(--morte);
+      border-color: var(--morte)
+    }
+
+    .chip.bad {
+      color: var(--bad);
+      border-color: var(--bad)
+    }
+
+    .perdet {
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      background: var(--surface)
+    }
+
+    .perdet+.perdet {
+      margin-top: 8px
+    }
+
+    .perdet[open] {
+      border-color: var(--line-strong)
+    }
+
+    .perdet>summary {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 9px 12px;
+      cursor: pointer;
+      list-style: none;
+      border-radius: var(--r-sm);
+    }
+
+    .perdet>summary::-webkit-details-marker {
+      display: none
+    }
+
+    .perdet>summary:hover {
+      background: var(--surface-2)
+    }
+
+    .perdet .pnome {
+      font-family: var(--disp);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--ink);
+      margin-right: 2px
+    }
+
+    .perdet[open]>summary {
+      border-bottom: 1px solid var(--line);
+      border-radius: var(--r-sm) var(--r-sm) 0 0
+    }
+
+    .usos {
+      display: grid;
+      gap: 10px
+    }
+
+    .uso {
+      border-left: 2px solid var(--line-strong);
+      padding-left: 10px
+    }
+
+    .uso .uh {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 2px
+    }
+
+    .uso .uh b {
+      font-family: var(--disp);
+      font-size: 13px
+    }
+
+    .uso .ureq {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .02em;
+      color: var(--ink-3);
+      text-transform: uppercase
+    }
+
     /* ---------- roller ---------- */
     .dice {
       display: flex;
@@ -1786,6 +1880,7 @@
       <button role="tab" id="tab-agente" aria-selected="true" aria-controls="p-agente">Agente</button>
       <button role="tab" id="tab-nex" aria-selected="false" aria-controls="p-nex">Progressão<span class="tnum"
           id="tnNex"></span></button>
+      <button role="tab" id="tab-pericias" aria-selected="false" aria-controls="p-pericias">Perícias</button>
       <button role="tab" id="tab-rolagem" aria-selected="false" aria-controls="p-rolagem">Rolagem</button>
       <button role="tab" id="tab-sessao" aria-selected="false" aria-controls="p-sessao">Sessão</button>
       <button role="tab" id="tab-ref" aria-selected="false" aria-controls="p-ref">Referência</button>
@@ -2101,6 +2196,26 @@
               <div class="grow"></div><span class="chip" id="trilhaChip"></span>
             </header>
             <div class="pad stack" id="trilhaBox"></div>
+          </div>
+        </section>
+
+        <!-- ---------- PERÍCIAS ---------- -->
+        <section id="p-pericias" role="tabpanel" aria-labelledby="tab-pericias" hidden>
+          <div class="card">
+            <header>
+              <h3>Usando perícias</h3>
+              <div class="grow"></div><span class="chip">Capítulo 2</span>
+            </header>
+            <div class="pad stack" id="perGeral"></div>
+          </div>
+
+          <div class="card">
+            <header>
+              <h3>Descrição das perícias</h3>
+              <div class="grow"></div><span class="chip" id="perCount"></span>
+              <input type="text" id="perBusca" placeholder="filtrar perícia ou uso…" style="max-width:220px">
+            </header>
+            <div class="pad stack" id="perDescBox"></div>
           </div>
         </section>
 
@@ -2425,12 +2540,12 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
 
     const PERICIAS = [
       ["acrobacia", "Acrobacia", "agilidade", false],
-      ["adestramento", "Adestramento", "presenca", false],
-      ["artes", "Artes", "presenca", false],
+      ["adestramento", "Adestramento", "presenca", true],
+      ["artes", "Artes", "presenca", true],
       ["atletismo", "Atletismo", "forca", false],
       ["atualidades", "Atualidades", "intelecto", false],
       ["ciencias", "Ciências", "intelecto", true],
-      ["crime", "Crime", "agilidade", false],
+      ["crime", "Crime", "agilidade", true],
       ["diplomacia", "Diplomacia", "presenca", false],
       ["enganacao", "Enganação", "presenca", false],
       ["fortitude", "Fortitude", "vigor", false],
@@ -2440,14 +2555,14 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       ["intuicao", "Intuição", "presenca", false],
       ["investigacao", "Investigação", "intelecto", false],
       ["luta", "Luta", "forca", false],
-      ["medicina", "Medicina", "intelecto", true],
+      ["medicina", "Medicina", "intelecto", false],
       ["ocultismo", "Ocultismo", "intelecto", true],
       ["percepcao", "Percepção", "presenca", false],
       ["pilotagem", "Pilotagem", "agilidade", true],
       ["pontaria", "Pontaria", "agilidade", false],
       ["profissao", "Profissão", "intelecto", true],
       ["reflexos", "Reflexos", "agilidade", false],
-      ["religiao", "Religião", "presenca", false],
+      ["religiao", "Religião", "presenca", true],
       ["sobrevivencia", "Sobrevivência", "intelecto", false],
       ["tatica", "Tática", "intelecto", true],
       ["tecnologia", "Tecnologia", "intelecto", true],
@@ -2455,6 +2570,233 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
     ];
     const PER_MAP = {}; PERICIAS.forEach(p => PER_MAP[p[0]] = { id: p[0], nome: p[1], atr: p[2], treinoObrig: p[3] });
     const GRAUS = { Leigo: 0, Treinado: 5, Veterano: 10, Expert: 15 };
+
+    /* ---------------------------------------------------------------------
+       PERÍCIAS — descrição completa (Capítulo 2 do livro básico)
+       Cada entrada: d = texto de abertura · u = usos [nome, requisito, texto]
+       carga = aplica penalidade de carga · kit = exige kit de perícia
+       nota  = observação de regra · box = quadro de interpretação do livro
+       --------------------------------------------------------------------- */
+    const PER_GRAU_TAB = [
+      ["Destreinado", "+0", "Você não recebe bônus. Perícias marcadas como “somente treinada” não podem ser usadas."],
+      ["Treinado", "+5", "O grau inicial concedido por origem, classe e pelo poder Treinamento em Perícia."],
+      ["Veterano", "+10", "Disponível a partir do NEX 35%, elevando perícias já treinadas."],
+      ["Expert", "+15", "Disponível a partir do NEX 70%, elevando perícias já veteranas."]
+    ];
+
+    const PER_USO_GERAL = [
+      ["Como se testa", "O mestre define a perícia e a DT. Você rola 1d20 por ponto no atributo-base da perícia (mais dados de bônus, menos dados de penalidade), fica com o <b>maior</b> resultado e soma seu bônus de perícia. Igual ou acima da DT é sucesso. Com atributo-base 0 você rola 2d20 e fica com o <b>menor</b>."],
+      ["Atributo-base", "É o atributo normalmente usado com a perícia. A critério do mestre, um teste pode usar outro atributo — por exemplo, uma Diplomacia que dependa mais de legislação do que de lábia pode ser testada com Intelecto."],
+      ["Somente treinada", "Quando a palavra <b>treinada</b> aparece após o nome da perícia, você só pode usá-la se for treinado nela. Alguns usos específicos também exigem um grau mínimo (treinado, veterano ou expert)."],
+      ["Penalidade de carga", "Quando a palavra <b>carga</b> aparece após o nome da perícia, você aplica sua penalidade de carga total ao teste."],
+      ["Kit de perícia", "Alguns usos exigem ferramentas. Sem o kit apropriado você ainda pode usar a perícia, mas sofre <b>–5</b> no teste."]
+    ];
+
+    const PER_DESC = {
+      acrobacia: {
+        carga: true,
+        d: "Você consegue fazer proezas acrobáticas.",
+        u: [
+          ["Amortecer Queda", "Veterano · DT 15 · reação", "Quando cai, você pode gastar uma reação e fazer um teste de Acrobacia para reduzir o dano. Se passar, reduz o dano da queda em 1d6, mais 1d6 para cada 5 pontos pelos quais o resultado do teste exceder a DT. Se reduzir o dano a zero, você cai de pé."],
+          ["Equilíbrio", "Um teste por ação de movimento", "Se estiver andando por superfícies precárias, você precisa fazer testes de Acrobacia para não cair. Se passar, avança metade do seu deslocamento. Se falhar, não avança. Se falhar por 5 ou mais, cai. A DT é 10 para piso escorregadio, 15 para uma superfície estreita (como o topo de um muro) e 20 para uma superfície muito estreita (como uma corda esticada). Você pode sofrer –O no teste para avançar seu deslocamento total. Enquanto se equilibra você fica desprevenido e, se sofrer dano, deve fazer um novo teste; se falhar, cai."],
+          ["Escapar", "Ação completa", "Você pode escapar de amarras. A DT é igual ao resultado do teste de Agilidade de quem o amarrou +10, se estiver preso por cordas, ou 30, se estiver preso por algemas."],
+          ["Levantar-se Rapidamente", "Treinado · DT 20", "Se estiver caído, você pode fazer um teste de Acrobacia para ficar de pé. Você precisa ter uma ação de movimento disponível. Se passar, se levanta como uma ação livre. Se falhar, gasta sua ação de movimento e continua caído."],
+          ["Passar por Espaço Apertado", "Treinado · DT 25 · ação completa", "Você se espreme por lugares estreitos, por onde apenas sua cabeça normalmente passaria, e avança metade do deslocamento."],
+          ["Passar por Inimigo", "Parte do movimento", "Você atravessa um espaço ocupado por um inimigo. Faça um teste de Acrobacia oposto ao teste de Acrobacia, Iniciativa ou Luta do oponente (o que for melhor). Se passar, atravessa; se falhar, não atravessa e sua ação de movimento termina. Um espaço ocupado por um inimigo conta como terreno difícil."]
+        ]
+      },
+      adestramento: {
+        d: "Você sabe lidar com animais.",
+        u: [
+          ["Acalmar Animal", "DT 25 · ação completa", "Você acalma um animal nervoso ou agressivo. Isso permite controlar um touro furioso ou convencer um cão de guarda a não atacá-lo."],
+          ["Cavalgar", "Parte do movimento", "Você pode andar a cavalo. Montar exige uma ação de movimento, mas você pode montar como ação livre com um teste contra DT 20 (se falhar por 5 ou mais, cai no chão). Terreno plano não exige testes; passar por obstáculos ou andar em terreno acidentado, sim. A DT é 15 para obstáculos pequenos ou terreno ruim (estrada esburacada) e 20 para obstáculos grandes ou terreno muito ruim (floresta à noite). Se falhar, cai da montaria e sofre 1d6 pontos de dano."],
+          ["Galopar", "Ação completa", "Estando a cavalo, faça um teste de Adestramento. Você avança um número de quadrados de 1,5m igual ao seu deslocamento (modificado pela montaria) mais o resultado do teste. Só é possível em linha reta e fora de terreno difícil."],
+          ["Manejar Animal", "DT 15 · ação de movimento", "Você faz um animal realizar uma tarefa para a qual foi treinado. Isso permite usar Adestramento como Pilotagem para veículos de tração animal, como carroças."]
+        ]
+      },
+      artes: {
+        d: "Você sabe se expressar com diversas formas de arte, como música, dança, escrita, pintura, atuação e outras.",
+        u: [
+          ["Impressionar", "Alguns minutos a algumas horas", "Faça um teste de Artes oposto pelo teste de Vontade de quem você está tentando impressionar. Se passar, recebe +2 em testes de perícia originalmente baseadas em Presença contra essa pessoa na mesma cena. Se falhar, sofre –2 nesses testes e não pode tentar de novo na mesma cena. Contra uma plateia, o mestre faz um único teste usando o melhor bônus do grupo."]
+        ]
+      },
+      atletismo: {
+        d: "Você pode realizar façanhas atléticas.",
+        u: [
+          ["Corrida", "Ação completa", "Você avança um número de quadrados de 1,5m igual ao seu deslocamento mais o resultado do teste. Por exemplo, com deslocamento 9m (6 quadrados) e 15 no teste, avança 21 quadrados. Só em linha reta e fora de terreno difícil. Você pode correr por um número de rodadas igual ao seu Vigor; depois disso, faça um teste de Fortitude por rodada (DT 5 +5 por teste anterior) ou fica fatigado."],
+          ["Escalar", "Ação de movimento", "Se passar, avança metade do seu deslocamento. Se falhar, não avança. Se falhar por 5 ou mais, cai. A DT é 10 para superfícies com apoios para pés e mãos (um barranco com raízes), 15 para um portão ou árvore, 20 para um muro ou parede com reentrâncias e 25 para um muro ou parede liso (um prédio). Você pode sofrer –O no teste para avançar seu deslocamento total. Enquanto escala você fica desprevenido e, se sofrer dano, deve refazer o teste ou cai. Se um ser adjacente estiver escalando e cair, você pode tentar pegá-lo com um teste contra a DT da superfície +5 — falhando por 5 ou mais, você também cai."],
+          ["Natação", "Ação de movimento por rodada", "Na água, você precisa de um teste por rodada para não afundar. A DT é 10 para água calma, 15 para agitada e 20 ou mais para tempestuosa. Se passar, avança metade do deslocamento; se falhar, boia sem avançar; se falhar por 5 ou mais, afunda. Uma segunda ação de movimento na mesma rodada permite outro teste. Submerso, você prende a respiração por um número de rodadas igual ao seu Vigor; depois disso, um teste de Fortitude por rodada (DT 5 +5 por teste anterior) — falhando, você se afoga (é reduzido a 0 PV e fica morrendo). Este uso sofre penalidade de carga."],
+          ["Saltar", "Parte do movimento", "Para um salto longo, a DT é 5 por quadrado de 1,5m (DT 10 para 3m, 15 para 4,5m, 20 para 6m e assim por diante). Para um salto em altura, a DT é 15 por quadrado de 1,5m (30 para 3m). Você precisa de pelo menos 6m para pegar impulso; sem esse espaço, a DT aumenta em +5."]
+        ]
+      },
+      atualidades: {
+        d: "Você é um conhecedor de assuntos gerais, como política, esporte e entretenimento, e pode responder dúvidas relativas a esses assuntos. A DT é 15 para informações comuns, como o nome do autor de um livro, 20 para informações específicas, como a história do fundador de uma empresa, e 25 para informações quase desconhecidas, como uma lenda urbana já esquecida.",
+        u: []
+      },
+      ciencias: {
+        d: "Você estudou diversos campos científicos, como matemática, física, química e biologia, e pode responder dúvidas relativas a esses assuntos. Questões simples, como a composição química de uma substância conhecida, não exigem teste. Questões complexas, como detalhes sobre o funcionamento de um procedimento científico específico, exigem um teste contra DT 20. Questões envolvendo campos experimentais, como avaliar a capacidade de proteção de uma liga metálica recém-criada, exigem um teste contra DT 30.",
+        u: [],
+        box: "Personagens treinados em Ciências conhecem diversas áreas acadêmicas, mas você pode escolher ser especializado em um campo específico. Isso não faz diferença mecânica na ficha, mas ajuda a interpretar o agente — um matemático pode analisar uma cena de crime por padrões estatísticos, por exemplo."
+      },
+      crime: {
+        carga: true, kit: true,
+        d: "Você sabe exercer atividades ilícitas.",
+        u: [
+          ["Arrombar", "Kit · ação completa", "Você abre uma fechadura trancada. A DT é 20 para fechaduras comuns (porta de um apartamento), 25 para fechaduras reforçadas (porta de uma loja) e 30 para fechaduras avançadas (cofre de um banco)."],
+          ["Furto", "DT 20 · ação padrão", "Você pega um objeto de outra pessoa, ou planta um objeto nas posses dela. Se passar, consegue o que queria. A vítima tem direito a um teste de Percepção (DT igual ao resultado do seu teste de Crime); se passar, percebe sua tentativa, tenha você conseguido ou não."],
+          ["Ocultar", "Ação padrão", "Você esconde um objeto em você mesmo. Faça um teste de Crime oposto pelo teste de Percepção de qualquer um que possa vê-lo. Quem revistar você recebe +10 no teste de Percepção."],
+          ["Sabotar", "Veterano · kit · 1d4+1 ações completas", "Você desabilita um dispositivo. Uma ação simples, como desativar um alarme, tem DT 20; uma ação complexa, como sabotar uma pistola para que exploda ao disparar, tem DT 30. Falhando por 5 ou mais, algo sai errado (o alarme dispara, você acha que a arma está sabotada mas ela ainda funciona…). Você pode sofrer –O no teste para fazê-lo como uma ação completa."]
+        ],
+        nota: "Os usos arrombar e sabotar exigem um kit de perícia. Sem ele, você sofre –5 no teste."
+      },
+      diplomacia: {
+        d: "Você convence pessoas com lábia e argumentação.",
+        u: [
+          ["Acalmar", "Treinado · DT 20 · ação padrão", "Você estabiliza um personagem adjacente que esteja enlouquecendo, fazendo com que ele fique com Sanidade 1. A DT aumenta em +5 para cada vez que ele já tiver sido acalmado na cena."],
+          ["Mudar Atitude", "1 minuto", "Faça um teste de Diplomacia oposto pelo teste de Vontade do alvo. Se passar, muda a atitude dele em uma categoria para cima ou para baixo, à sua escolha; passando por 10 ou mais, em até duas categorias. Se falhar por 5 ou mais, a atitude muda uma categoria na direção oposta. Você pode sofrer –OO no teste para fazê-lo como ação completa (para evitar uma briga, por exemplo). Só é possível mudar a atitude de uma mesma pessoa uma vez por dia."],
+          ["Persuasão", "DT 20 · um minuto ou mais", "Você convence uma pessoa a fazer alguma coisa, como responder a uma pergunta ou prestar um favor. Se for custoso (emprestar um carro) você sofre –5; se for perigoso (cometer um crime) sofre –10 ou falha automaticamente. A critério do mestre, o teste pode ser oposto pela Vontade da pessoa."]
+        ],
+        nota: "Categorias de atitude — Prestativo (+5 em persuasão), Amistoso, Indiferente (padrão), Inamistoso (–5 em persuasão) e Hostil (falha automática em persuasão)."
+      },
+      enganacao: {
+        kit: true,
+        d: "Você manipula pessoas com blefes e trapaças.",
+        u: [
+          ["Disfarce", "Treinado · kit · ao menos 10 minutos", "Você muda sua aparência ou a de outra pessoa. Faça um teste oposto pelo teste de Percepção de quem prestar atenção no disfarçado. Se o disfarce é de uma pessoa específica, quem a conhece recebe +10 no teste de Percepção. Sem o kit, você sofre –5 no teste."],
+          ["Falsificação", "Veterano", "Você falsifica um documento. Faça um teste oposto pelo teste de Percepção de quem examinar o documento. Se o documento é muito complexo, ou inclui uma assinatura ou carimbo específico, você sofre –OO no teste."],
+          ["Fintar", "Treinado · ação padrão", "Faça um teste de Enganação oposto a um teste de Reflexos de um ser em alcance curto. Se passar, ele fica desprevenido contra seu próximo ataque, se realizado até o fim de seu próximo turno."],
+          ["Insinuação", "DT 20", "Você fala algo para alguém sem que outras pessoas entendam. Se passar, o receptor entende sua mensagem; falhando por 5 ou mais, ele entende algo diferente. Outras pessoas podem fazer um teste de Intuição oposto ao seu teste para captar o recado."],
+          ["Intriga", "DT 20 · ao menos um dia", "Você espalha uma fofoca. Intrigas muito improváveis (convencer o povo de que o delegado é um ET) têm DT 30. Alguém pode investigar a fonte da fofoca com um teste de Investigação contra DT igual ao resultado do seu teste."],
+          ["Mentir", "—", "Você faz uma pessoa acreditar em algo que não é verdade. Seu teste é oposto pelo teste de Intuição da vítima. Mentiras muito implausíveis impõem –OO no teste."]
+        ]
+      },
+      fortitude: {
+        d: "Você usa esta perícia para testes de resistência contra efeitos que exigem vitalidade, como doenças e venenos. A DT é determinada pelo efeito. Você também usa Fortitude para manter o fôlego quando está correndo ou sem respirar: a DT é 5 +5 por teste anterior (veja a perícia Atletismo).",
+        u: []
+      },
+      furtividade: {
+        carga: true,
+        d: "Você sabe ser discreto e sorrateiro.",
+        u: [
+          ["Esconder-se", "Ação livre, no fim do turno", "Faça um teste de Furtividade oposto pelos testes de Percepção de qualquer um que possa notá-lo; todos que falharem não conseguem percebê-lo (você tem camuflagem total contra eles). Você só pode se esconder ao terminar o turno em um lugar onde isso seja possível (atrás de uma porta, num quarto escuro, no meio de uma multidão…). Se tiver se movido no turno, sofre –O (mover-se até metade do deslocamento evita a penalidade). Se tiver atacado ou feito outra ação muito chamativa, sofre –OOO."],
+          ["Seguir", "—", "Faça um teste oposto ao teste de Percepção da pessoa seguida. Você sofre –5 em um lugar sem esconderijos ou sem movimento, como um descampado ou rua deserta. A vítima recebe +5 se estiver tomando precauções para não ser seguida. Se passar, segue a pessoa até o destino; se falhar, ela o percebe na metade do caminho."]
+        ]
+      },
+      iniciativa: {
+        d: "Esta perícia determina sua velocidade de reação. Quando uma cena de ação começa, cada ser envolvido faz um teste de Iniciativa. Eles então agem em ordem decrescente dos resultados.",
+        u: []
+      },
+      intimidacao: {
+        d: "Você pode assustar ou coagir outras pessoas. Todos os usos de Intimidação são efeitos de medo.",
+        u: [
+          ["Assustar", "Treinado · ação padrão", "Faça um teste oposto pelo teste de Vontade de uma pessoa em alcance curto. Se passar, ela fica abalada pelo resto da cena (não cumulativo). Se passar por 10 ou mais, ela fica apavorada por uma rodada e então abalada pelo resto da cena."],
+          ["Coagir", "Um minuto ou mais", "Faça um teste oposto pelo teste de Vontade de uma pessoa adjacente. Se passar, ela obedece uma ordem sua (fazer uma pequena tarefa, deixar você passar por um lugar que protegia etc.). Se a ordem for perigosa ou contrária à natureza dela, ela recebe +5 no teste ou passa automaticamente. Este uso deixa a pessoa hostil contra você."]
+        ]
+      },
+      intuicao: {
+        d: "Esta perícia mede sua empatia e “sexto sentido”.",
+        u: [
+          ["Perceber Mentira", "—", "Você descobre se alguém está mentindo (veja a perícia Enganação)."],
+          ["Pressentimento", "Treinado · DT 20", "Você analisa uma pessoa, para ter uma ideia de sua índole ou caráter, ou uma situação, para perceber qualquer fato estranho (se os habitantes de uma cidadezinha estão agindo de forma esquisita, por exemplo). O uso apenas indica se há algo anormal; para descobrir a causa, veja Investigação."]
+        ]
+      },
+      investigacao: {
+        d: "Você sabe como descobrir pistas e informações.",
+        u: [
+          ["Interrogar", "De uma hora até um dia", "Você descobre informações perguntando ou ficando de ouvidos atentos em um lugar movimentado. Informações gerais (“quem é o dono desse bar?”) não exigem teste. Informações restritas, que poucas pessoas conhecem, têm DT 20. Informações confidenciais, ou que podem colocar em risco quem falar sobre elas, têm DT 30."],
+          ["Procurar", "De uma ação completa até um dia", "Você examina um local. A DT é 15 para um item discreto ou no meio de uma bagunça, mas não necessariamente escondido; 20 para um item escondido (cofre atrás de um quadro, documento no fundo falso de uma gaveta); 30 para um item muito bem escondido (passagem secreta ativada por um botão, documento escrito com tinta invisível)."]
+        ]
+      },
+      luta: {
+        d: "Você usa Luta para fazer ataques corpo a corpo. A DT é a Defesa do alvo. Se acertar, causa dano de acordo com a arma utilizada. Veja o Capítulo 4 para as regras completas de ataque.",
+        u: []
+      },
+      medicina: {
+        kit: true,
+        d: "Você sabe tratar ferimentos, doenças e venenos.",
+        u: [
+          ["Primeiros Socorros", "DT 20 · ação padrão", "Um personagem adjacente que esteja morrendo e inconsciente perde essas condições e fica com 1 PV. A DT aumenta em +5 para cada vez que ele já tiver sido estabilizado na cena."],
+          ["Cuidados Prolongados", "Veterano · DT 20 · interlúdio", "Durante uma cena de interlúdio, você pode gastar uma de suas ações para tratar até um ser por ponto de Intelecto. Se passar, eles recuperam o dobro dos PV pela ação dormir neste interlúdio."],
+          ["Necropsia", "Treinado · DT 20 · dez minutos", "Você examina um cadáver para determinar a causa e o momento aproximado da morte. Causas raras ou extraordinárias, como um veneno exótico ou uma maldição, têm DT +10."],
+          ["Tratamento", "Treinado · ação completa", "Você ajuda a vítima de uma doença ou veneno com efeito contínuo. Faça um teste contra a DT da doença ou veneno; se passar, o paciente recebe +5 em seu próximo teste de Fortitude contra esse efeito."]
+        ],
+        nota: "Esta perícia exige um kit; sem ele você sofre –5 no teste. Você pode usar Medicina em si mesmo, mas sofre –O no teste."
+      },
+      ocultismo: {
+        d: "Você estudou o paranormal.",
+        u: [
+          ["Identificar Criatura", "Ação completa", "Você analisa uma criatura paranormal que possa ver. A DT é igual à DT para resistir à Presença Perturbadora da criatura. Se passar, descobre uma característica dela, como um poder ou vulnerabilidade, e outra a cada 5 pontos pelos quais superar a DT. Falhando por 5 ou mais, tira uma conclusão errada."],
+          ["Identificar Item Amaldiçoado", "DT 20 · ação de interlúdio", "Você estuda um item amaldiçoado e identifica seus poderes ou qual ritual o objeto contém. Você pode sofrer –OO no teste para fazê-lo como ação completa."],
+          ["Identificar Ritual", "DT 10 +5 por círculo · reação", "Quando alguém lança um ritual, você pode descobrir qual é observando seus gestos, palavras e componentes."],
+          ["Informação", "—", "Você responde dúvidas relativas ao Outro Lado, objetos amaldiçoados, fenômenos paranormais, runas, profecias etc. Questões simples não exigem teste; questões complexas exigem DT 20; mistérios e enigmas, DT 30."]
+        ],
+        box: "Personagens treinados em Ocultismo não são necessariamente ocultistas nem conseguem conjurar rituais. Podem ser apenas estudiosos do assunto, com conhecimento de manifestações paranormais registradas no passado e a capacidade de comparar o que estudaram com o que encontram."
+      },
+      percepcao: {
+        d: "Você nota coisas usando os sentidos.",
+        u: [
+          ["Observar", "—", "Você vê coisas discretas ou escondidas. A DT varia de 15, para coisas difíceis de ver (um livro específico em uma estante), a 30, para coisas quase invisíveis (uma gota de sangue em uma folha no meio de uma floresta à noite). Para pessoas ou coisas escondidas, a DT é o resultado do teste de Furtividade ou Crime feito para esconder. Você também pode ler lábios (DT 20)."],
+          ["Ouvir", "—", "Uma conversa casual próxima tem DT 0 — você passa automaticamente, a menos que haja penalidade. Ouvir pessoas sussurrando tem DT 15; ouvir do outro lado de uma porta aumenta a DT em +5. Você pode ouvir mesmo dormindo, sofrendo –OO no teste; um sucesso faz você acordar. Perceber seres que não possam ser vistos tem DT 20, ou +10 no teste de Furtividade do ser, o que for maior — e mesmo passando você ainda sofre as penalidades normais por lutar sem ver o inimigo."]
+        ]
+      },
+      pilotagem: {
+        d: "Você sabe operar veículos terrestres e aquáticos, como motos, carros e lanchas. Pilotar gasta uma ação de movimento por turno. Situações comuns (dirigir em uma estrada, velejar em clima tranquilo) não exigem teste. Situações ruins (estrada de chão sem iluminação, velejar em chuva ou ventania) exigem um teste por turno contra DT 15. Situações terríveis (terreno acidentado, velejar durante uma tempestade) exigem um teste por turno contra DT 25.",
+        u: [],
+        nota: "Com grau de treinamento veterano nesta perícia você também pode pilotar veículos aéreos, como aviões e helicópteros."
+      },
+      pontaria: {
+        d: "Você usa Pontaria para fazer ataques à distância. A DT é a Defesa do alvo. Se acertar, causa dano de acordo com a arma utilizada. Veja o Capítulo 4 para as regras completas de ataque.",
+        u: []
+      },
+      profissao: {
+        d: "Você sabe exercer uma profissão específica, como advogado, engenheiro, jornalista ou publicitário. Converse com o mestre para definir os detalhes da sua profissão e que tipos de testes você pode fazer com ela — um advogado pode usar Profissão para argumentar com a polícia, enquanto um administrador pode investigar os documentos de uma corporação.",
+        u: [
+          ["Rendimentos", "Passivo", "Um personagem treinado nesta perícia possui seus próprios rendimentos ou, caso não trabalhe mais, uma reserva de capital. Isso permite começar cada missão com um item adicional além dos fornecidos pela Ordem: categoria I se você for treinado, categoria II se veterano e categoria III se expert."]
+        ]
+      },
+      reflexos: {
+        d: "Você usa esta perícia para testes de resistência contra efeitos que exigem reação rápida, como armadilhas e explosões. A DT é determinada pelo efeito. Você também usa Reflexos para evitar fintas (veja Enganação).",
+        u: []
+      },
+      religiao: {
+        d: "Você possui conhecimento sobre teologia e as diversas religiões do mundo.",
+        u: [
+          ["Acalmar", "DT 20", "Você pode usar Religião como Diplomacia para acalmar um personagem que esteja enlouquecendo."],
+          ["Informação", "—", "Você responde dúvidas relativas a mitos, profecias, relíquias sagradas etc. A DT é 10 para questões simples, 20 para questões complexas e 30 para mistérios e enigmas."],
+          ["Rito", "Veterano · DT 20", "Você realiza uma cerimônia religiosa (batizado, casamento, funeral…)."]
+        ]
+      },
+      sobrevivencia: {
+        d: "Você pode se guiar em regiões selvagens e evitar perigos da natureza.",
+        u: [
+          ["Acampamento", "Treinado", "Você consegue abrigo e alimento nos ermos, caçando, pescando, colhendo frutos etc. A DT depende do terreno: 15 para campo aberto, 20 para mata fechada e 25 para regiões extremas, como desertos, pântanos ou montanhas. Regiões áridas ou estéreis e clima ruim (neve, tempestade etc.) impõem –5 cumulativo. Se passar, você e seu grupo podem usar as ações de interlúdio alimentar-se e dormir mesmo estando ao relento."],
+          ["Identificar Animal", "Treinado · DT 20 · ação completa", "Você identifica um animal exótico. Funciona como o uso identificar criatura da perícia Ocultismo."],
+          ["Orientar-se", "Um teste por dia", "Um personagem viajando em regiões selvagens precisa de um teste por dia para avançar; a DT depende do terreno (veja acampamento). Se passar, avança seu deslocamento normal; se falhar, metade; se falhar por 5 ou mais, se perde e não avança pelo dia inteiro. Num grupo, escolhe-se um guia — outros treinados podem ajudá-lo, mas se mais de um quiser testar por si só, todos rolam em segredo e os jogadores decidem qual guia seguir antes de ver os resultados."],
+          ["Rastrear", "Treinado · um teste por dia", "Você identifica e segue rastros. A DT é 15 para um grupo grande ou um único ser em solo macio (lama, neve); 20 para um ser em solo comum (grama, terra); 25 para um ser em solo duro (estrada, piso de interiores). Visibilidade precária ou clima ruim (noite, chuva, neblina) impõem –O. Enquanto rastreia, seu deslocamento é reduzido à metade. Se falhar, pode tentar de novo gastando mais um dia; porém, a cada dia desde a criação dos rastros, a DT aumenta em +1."]
+        ]
+      },
+      tatica: {
+        d: "Você recebeu educação militar.",
+        u: [
+          ["Analisar Terreno", "DT 20 · ação de movimento", "Você observa o campo de batalha. Se passar, descobre uma vantagem, como cobertura, camuflagem ou terreno elevado, se houver."],
+          ["Plano de Ação", "Veterano · DT 20 · ação padrão", "Você orienta um aliado em alcance médio. Se passar, fornece +5 na Iniciativa dele. Se isso fizer com que um aliado que ainda não agiu nesta rodada fique com Iniciativa maior que a sua, ele age imediatamente após seu turno; nas próximas rodadas, ele age de acordo com a nova ordem."]
+        ]
+      },
+      tecnologia: {
+        kit: true,
+        d: "Você possui conhecimentos avançados de eletrônica e informática. Usos cotidianos, como mexer em um computador ou celular, não exigem treinamento nem testes — a perícia serve para usos avançados, como reprogramar um sistema de vigilância ou invadir um servidor seguro.",
+        u: [
+          ["Falsificação", "Veterano", "Como o uso de Enganação, mas apenas para documentos eletrônicos."],
+          ["Hackear", "1d4+1 ações completas", "Você invade um computador protegido. A DT é 15 para computadores pessoais, 20 para redes profissionais e 25 para grandes servidores corporativos, governamentais ou militares. Você pode sofrer –O no teste para fazê-lo como ação completa. Se falhar, não pode tentar novamente até ter alguma informação nova que ajude na invasão, como um nome de usuário ou senha; falhando por 5 ou mais, pode ser rastreado pelos administradores do sistema. Uma vez dentro, alterar ou deletar arquivos, corromper aplicativos ou bloquear outros usuários pode exigir novos testes, a critério do mestre."],
+          ["Localizar Arquivo", "Varia com o sistema", "Você procura um arquivo específico em um computador ou rede a que tenha acesso (sem acesso, primeiro é preciso hackear). Uma ação completa e DT 15 para um computador pessoal; 1d4+1 ações completas e DT 20 para uma rede pequena; 1d6+2 ações completas e DT 25 para uma rede corporativa ou governamental. Para procurar informações públicas na internet, use Investigação."],
+          ["Operar Dispositivo", "Kit · 1d4+1 ações completas", "Você opera um dispositivo eletrônico complexo: acessar câmeras remotamente, destravar fechaduras eletrônicas, ativar ou desativar alarmes etc. A DT é 15 para aparelhos comuns, 20 para equipamento profissional e 25 para sistemas protegidos. Você pode sofrer –O no teste para fazê-lo como ação completa. Sem o kit, sofre –5."]
+        ]
+      },
+      vontade: {
+        d: "Você usa esta perícia para testes de resistência contra efeitos que exigem determinação, como intimidação e rituais que afetam a mente. A DT é determinada pelo efeito. Você também usa Vontade para conjurar rituais em condições adversas (veja o Capítulo 5).",
+        u: []
+      }
+    };
 
     const ORIGENS = [
       { n: "Acadêmico", r: "2–8", p: ["ciencias", "investigacao"], pn: "Saber é Poder", pt: "Gaste 2 PE para receber +5 em um teste que use Intelecto (declarado antes de rolar)." },
@@ -2932,6 +3274,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       renderRail();
       renderAgente();
       renderNex();
+      renderPericias();
       renderRolagem();
       renderSessao();
     }
@@ -3207,6 +3550,75 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       }
     }
 
+    /* ---------- Perícias (descrição do Capítulo 2) ---------- */
+    function renderPericias() {
+      const gu = $("#perGeral");
+      if (!gu.dataset.done) {
+        gu.dataset.done = "1";
+        PER_USO_GERAL.forEach(([a, b]) => gu.append(notice("", a, b, true)));
+        const t = el("div", "tscroll");
+        t.innerHTML = '<table><thead><tr><th>Grau de treinamento</th><th class="n">Bônus</th><th>Quando</th></tr></thead><tbody>' +
+          PER_GRAU_TAB.map(([g, b, q]) => '<tr><td><b>' + esc(g) + '</b></td><td class="n">' + esc(b) +
+            '</td><td class="rules">' + esc(q) + '</td></tr>').join("") + '</tbody></table>';
+        gu.append(t);
+      }
+
+      const src = fontesPericias(), box = $("#perDescBox");
+      box.innerHTML = "";
+      PERICIAS.forEach(([id, nome, atr, obrig]) => {
+        const D = PER_DESC[id] || { d: "", u: [] };
+        const st = S.per[id], bon = bonusPericia(id);
+        const usos = D.u || [];
+
+        const det = el("details", "perdet");
+        det.dataset.busca = (nome + " " + ATR_LABEL[atr] + " " + D.d + " " +
+          usos.map(u => u[0] + " " + u[2]).join(" ") + " " + (D.nota || "") + " " + (D.box || "")).toLowerCase();
+
+        const tags = ['<span class="tag">' + ATR_ABBR[atr] + '</span>'];
+        if (obrig) tags.push('<span class="tag t">Treinada</span>');
+        if (D.carga) tags.push('<span class="tag carga">Carga</span>');
+        if (D.kit) tags.push('<span class="tag kit">Kit</span>');
+        if (src[id]) tags.push('<span class="tag ' + src[id].toLowerCase() + '">' + src[id] + '</span>');
+
+        const bloq = obrig && st.grau === "Leigo";
+        const est = '<span class="chip' + (bloq ? " bad" : "") + '">' + esc(st.grau) + ' <b>' + sgn(bon) + '</b></span>';
+
+        let corpo = '<div class="pad stack">';
+        if (bloq) corpo += '<div class="notice warn"><span class="ni">Uso restrito</span><span>Você está Leigo em ' +
+          esc(nome) + ' e esta perícia só pode ser usada se treinada.</span></div>';
+        corpo += '<p class="rules">' + esc(D.d) + '</p>';
+        if (usos.length) corpo += '<div class="usos">' + usos.map(([un, ur, ut]) =>
+          '<div class="uso"><div class="uh"><b>' + esc(un) + '</b>' +
+          (ur && ur !== "—" ? '<span class="ureq">' + esc(ur) + '</span>' : "") +
+          '</div><div class="rules">' + esc(ut) + '</div></div>').join("") + '</div>';
+        if (D.nota) corpo += '<div class="notice"><span class="ni">Nota</span><span>' + esc(D.nota) + '</span></div>';
+        if (D.box) corpo += '<div class="notice"><span class="ni">Interpretação</span><span>' + esc(D.box) + '</span></div>';
+        corpo += '<div class="btnrow"><button class="btn ghost sm" data-perroll="' + id + '">Rolar ' + esc(nome) + '</button></div>';
+        corpo += '</div>';
+
+        det.innerHTML = '<summary><span class="pnome">' + esc(nome) + '</span>' + tags.join("") +
+          '<span class="grow" style="flex:1"></span>' + est + '</summary>' + corpo;
+        box.append(det);
+      });
+
+      box.querySelectorAll("[data-perroll]").forEach(b => b.onclick = () => {
+        const sel = $("#rSkill");
+        if (sel) { sel.value = b.dataset.perroll; renderRolagem(); }
+        $("#tab-rolagem").click();
+      });
+      filtrarPericias();
+    }
+
+    function filtrarPericias() {
+      const inp = $("#perBusca"), q = inp ? inp.value.trim().toLowerCase() : "";
+      let n = 0;
+      $$("#perDescBox .perdet").forEach(d => {
+        const on = !q || d.dataset.busca.includes(q);
+        d.hidden = !on; if (on) n++;
+      });
+      $("#perCount").textContent = n + " de " + PERICIAS.length;
+    }
+
     /* ---------- Rolagem ---------- */
     let rBonusDice = 0, rPenDice = 0;
     function renderRolagem() {
@@ -3343,10 +3755,10 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
 
       const nr = $("#notasRegras"); nr.innerHTML = "";
       [
-        ["Atributo-base das perícias", "A especificação define o motor de rolagem (rolar dados iguais ao atributo, manter o maior) mas não traz a tabela de qual atributo governa cada perícia. Essa associação foi preenchida pelas regras do livro básico — confira e ajuste com seu mestre se sua mesa usar outra."],
+        ["Atributo-base das perícias", "A especificação define o motor de rolagem (rolar dados iguais ao atributo, manter o maior) mas não trazia a tabela de qual atributo governa cada perícia. A associação, os marcadores de perícia somente treinada, de penalidade de carga e de kit vêm da Tabela 2.1 do livro básico e estão detalhados na aba <b>Perícias</b>."],
         ["Ganho de PV e PE por NEX", "A tabela 4.1 lista apenas os valores fixos (+4/+2/+3 e equivalentes), mas a nota de ganho retroativo pressupõe que Vigor e Presença entrem em cada faixa. A ficha usa a leitura retroativa por padrão, com uma chave para desligá-la na aba Progressão."],
         ["Sanidade do Cultista Arrependido", "“Sanidade inicial reduzida à metade” é aplicada sobre a Sanidade inicial da classe; a progressão por NEX é somada normalmente depois."],
-        ["Perícias com uso restrito", "Ciências, Medicina, Ocultismo, Pilotagem, Profissão, Tática e Tecnologia estão marcadas com <b>T</b>: só podem ser usadas se treinadas. A habilidade Eclético do Especialista contorna essa restrição."],
+        ["Perícias com uso restrito", "Pela Tabela 2.1 do livro básico, as perícias <i>somente treinada</i> são Adestramento, Artes, Ciências, Crime, Ocultismo, Pilotagem, Profissão, Religião, Tática e Tecnologia — marcadas com <b>T</b>. Medicina <b>não</b> é uma delas (exige apenas kit). A habilidade Eclético do Especialista contorna essa restrição."],
         ["Tabela de Efeitos de Loucura", "A especificação manda rolar 1d20 na tabela ao chegar a 0 de Sanidade, mas não reproduz as entradas. A ficha rola o d20 e registra o resultado; consulte a tabela no livro."],
         ["Rituais e poderes paranormais", "O catálogo de rituais e de poderes paranormais não faz parte da especificação, então a ficha acompanha apenas o círculo liberado e o limite de PE por turno."]
       ].forEach(([a, b]) => nr.append(notice("", a, b, true)));
@@ -3609,6 +4021,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
     }
 
     function bindBusca() {
+      $("#perBusca").oninput = filtrarPericias;
       $("#armaBusca").oninput = e => {
         const q = e.target.value.trim().toLowerCase();
         $$("#armasTable tbody tr").forEach(tr => {

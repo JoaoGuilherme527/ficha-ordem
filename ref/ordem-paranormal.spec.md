@@ -138,10 +138,194 @@ Regras de Perda de Razão (SAN == 0):Ao cair para 0 de Sanidade, o agente entra 
 --------------------------------------------------------------------------------
 7.3 Condições e Aplicação de Modificadores DinâmicosO sistema deve monitorar as condições aplicadas ao personagem e alterar seus atributos e defesas automaticamente:Desprevenido: Personagem sofre -5 na Defesa e não pode realizar reações físicas.Caído: Sofre penalidade de -2 dados (-OO) em testes de ataque corpo a corpo. Recebe -5 na Defesa contra ataques corpo a corpo, mas ganha +5 na Defesa contra ataques à distância.Abalado: Personagem sofre penalidade de -1 dado (-O) em todos os seus testes de perícia e atributos.Apavorado: Fica sob descontrole mental e deve gastar todas as suas ações para fugir da fonte de medo. Sofre -2 dados (-OO) em testes.Agarrado: Fica desprevenido e imóvel. Sofre -1 dado (-O) em testes de ataque e só pode atacar usando armas leves.Fatigado: Não pode correr ou dar carga. Sofre -1 dado (-O) em testes de Força, Agilidade e Vigor.Exausto: Sofre as mesmas penalidades de fatigado, mas duplicadas para -2 dados (-OO) nos testes correspondentes.
 --------------------------------------------------------------------------------
-8. Estrutura do Inventário, Capacidade de Carga e Patentes8.1 Capacidade de Carga (Espaços)Por padrão, o total de espaços que um agente pode carregar é calculado por: $$\text{Espaços de Carga} = \text{Força} \times 5$$Se o agente possuir o poder Inventário Otimizado (Técnico), a fórmula torna-se: $$\text{Espaços de Carga} = (\text{Força} + \text{Intelecto}) \times 5$$Itens Pesados: Proteções leves, armas de duas mãos e malas pesadas ocupam 2 espaços cada. Proteções pesadas ocupam 5 espaços. Itens comuns ocupam 1 espaço. Itens miúdos ocupam 0 espaços (limite de carga geral).
+8. Estrutura do Inventário, Capacidade de Carga e Patentes8.1 Capacidade de Carga (Espaços)Por padrão, o total de espaços que um agente pode carregar é calculado por: $$\text{Espaços de Carga} = \text{Força} \times 5$$Se o agente possuir o poder Inventário Otimizado (Técnico), a fórmula torna-se: $$\text{Espaços de Carga} = (\text{Força} + \text{Intelecto}) \times 5$$Itens Pesados: Proteções leves, armas de duas mãos e malas pesadas ocupam 2 espaços cada. Proteções pesadas ocupam 5 espaços. Itens comuns ocupam 1 espaço. Itens miúdos ocupam 0 espaços (limite de carga geral). Itens extremamente pesados ou volumosos, como uma pessoa (um agente inconsciente, por exemplo), ocupam 10 espaços. Recipientes cuja única função seja carregar outro item (um coldre, por exemplo) não ocupam espaço próprio; recipientes com benefício próprio, como uma bandoleira, ocupam espaço conforme a descrição.Força 0: o limite não é 0 e sim 2 espaços.Sobrecarga: ultrapassar o limite deixa o agente sobrecarregado — –5 na Defesa, –5 em todos os testes de perícia marcados com penalidade de carga (Acrobacia, Crime e Furtividade, além do uso natação de Atletismo) e deslocamento reduzido em 3m. O limite absoluto é o dobro da capacidade: um agente com Força 2 carrega até 10 espaços sem penalidade, até 20 sobrecarregado, e nunca mais que 20.
 --------------------------------------------------------------------------------
 8.2 Patentes, Limite de Categoria e CréditoA patente do agente limita a quantidade de itens especiais que a Ordem disponibiliza no início de cada missão:PatentePontos de Prestígio (PP)Limite de CréditoCategoria ICategoria IICategoria IIICategoria IVRecruta0 a 19 PPBaixo2 itens---Operador20 a 49 PPMédio3 itens1 item--Agente Especial50 a 99 PPMédio3 itens2 itens1 item-Oficial de Operações100 a 199 PPAlto3 itens3 itens2 itens1 itemAgente de Elite200+ PPIlimitado3 itens3 itens3 itens2 itensMecânica de Validação de Categoria: Itens sem categoria (Categoria 0) podem ser selecionados de forma ilimitada, respeitando apenas o limite de espaços de carga do inventário. Cada modificação ou maldição aplicada a uma arma, proteção ou acessório aumenta a Categoria do item em +1 cumulativo.
 --------------------------------------------------------------------------------
 9. Catálogo de Armas, Munições e ModificaçõesO sistema de combate e acompanhamento deve validar os ataques com base nas estatísticas das armas:9.1 Catálogo de Armas Oficiais (Tabela 3.3)ArmaCategoriaDanoCríticoAlcanceTipo de DanoEspaçoPropriedades / NotasFaca01d419CurtoCorte1Arma ágil, arremessável.Punhal01d4x3-Perfuração1Arma ágil, usada por cultistas.Bastão01d6x2-Impacto1Usada com uma mão.Machete01d619-Corte1Usada com uma mão.Lança01d6x2CurtoPerfuração1Pode ser arremessada.Cajado01d6x2-Impacto2Usada com duas mãos, arma ágil.Arco01d6x3MédioPerfuração2Arma de disparo, duas mãos.Besta01d819MédioPerfuração2Arma de disparo, duas mãos.PistolaI1d1218CurtoBalístico1Arma de fogo leve.RevólverI2d619/x3CurtoBalístico1Arma de fogo leve.Fuzil de CaçaI2d819/x3MédioBalístico2Arma de fogo, duas mãos.SubmetralhadoraI2d619/x3CurtoBalístico1Arma automática.EspingardaI4d6x3CurtoBalístico2Dano cai pela metade em alcance médio.Fuzil de AssaltoII2d1019/x3MédioBalístico2Arma automática.Fuzil PrecisãoIII2d1019/x3LongoBalístico2+5 de margem de ameaça ao mirar (se veterano).KatanaI1d1019-Corte2Arma ágil. Uma mão se for veterano em Luta.MotosserraI3d6x2-Corte2Role dado extra se rolar 6 no dano. -1 dado em testes.
 --------------------------------------------------------------------------------
 9.2 Catálogo de Modificações Oficiais (Tabela 3.5)Cada modificação aplicada a um item aumenta sua Categoria de Prestígio em +1 (ex: Katana Categoria I + Certeira = Katana Categoria II).Modificações de Armas Brancas / Disparo:Certeira: +2 nos testes de ataque.Cruel: +2 em rolagens de dano.Discreta: +5 em testes de Crime para ocultar; reduz em 1 o espaço ocupado.Perigosa: Aumenta a margem de ameaça da arma em +2.Tática: Permite sacar/guardar a arma como uma ação livre.Modificações de Armas de Fogo:Alongada: +2 nos testes de ataque.Calibre Grosso: Aumenta o dano em +1 dado do mesmo tipo (ex: 2d6 -> 3d6).Compensador: Anula a penalidade de ataque por disparar rajadas com armas automáticas.Ferrolho Automático: A arma se torna automática.Mira Laser: Aumenta a margem de ameaça em +2.Mira Telescópica: Aumenta a categoria de alcance da arma em um passo e viabiliza Ataque Furtivo em qualquer alcance.Silenciador: Reduz em 2 dados a penalidade de Furtividade para se esconder após realizar um disparo.Modificações de Munição:Dum Dum: Aumenta o multiplicador de crítico em +1 (ex: x3 -> x4).Explosiva: Disparos causam dano extra de +2d6 de impacto.
+--------------------------------------------------------------------------------
+
+10. Catálogo de Perícias (Capítulo 2 do livro básico)
+
+10.1 Motor de Teste de Perícia
+
+O teste de perícia é o teste de atributo descrito em 6.1 acrescido do bônus de perícia. Sequência canônica que o sistema deve executar: (1) o jogador declara a ação; (2) o mestre define qual perícia se aplica e uma DT; (3) rola-se 1d20 por ponto no atributo-base da perícia — mais dados de bônus, menos dados de penalidade, conforme 6.2 — e mantém-se o **maior** resultado (com atributo-base 0, rolam-se 2d20 e mantém-se o **menor**); (4) soma-se o bônus de perícia ao dado selecionado; (5) resultado igual ou maior que a DT é sucesso.
+
+Bônus por grau de treinamento (o único componente do bônus além de itens e habilidades):
+
+| Grau | Bônus | Liberação |
+| --- | --- | --- |
+| Destreinado (Leigo) | +0 | Estado inicial de toda perícia |
+| Treinado | +5 | Concedido por origem, classe, Intelecto e pelo poder Treinamento em Perícia |
+| Veterano | +10 | A partir do NEX 35%, elevando uma perícia já treinada |
+| Expert | +15 | A partir do NEX 70%, elevando uma perícia já veterana |
+
+Três marcadores modificam o uso de uma perícia e devem ser validados pelo sistema:
+
+- **Somente treinada.** A perícia não pode ser usada com grau Destreinado. Alguns *usos* individuais também exigem grau mínimo (treinado, veterano ou expert), indicado na tabela 10.3. A habilidade Eclético (Especialista) permite gastar 2 PE para tratar uma perícia não treinada como treinada, contornando a restrição.
+- **Penalidade de carga.** O teste sofre a penalidade de carga total do agente (ver 8.1). Vale para Acrobacia, Crime e Furtividade, e ainda para o uso *natação* de Atletismo, que sofre penalidade de carga apesar de Atletismo não ser marcada.
+- **Kit de perícia.** O uso exige ferramentas. Sem o kit apropriado o teste ainda pode ser feito, com **–5**.
+
+Escolha do mestre: a critério do mestre um teste pode usar um atributo diferente do atributo-base (por exemplo, uma Diplomacia que dependa de conhecimento de legislação pode ser testada com Intelecto). O sistema deve permitir sobrescrever o atributo de um teste pontual sem alterar o cadastro da perícia.
+
+--------------------------------------------------------------------------------
+
+10.2 Tabela 2.1 — Atributo-base e Marcadores
+
+Esta é a tabela normativa. Divergências entre implementação e esta tabela são bug. Atenção a dois pontos historicamente errados: **Medicina não é somente treinada** (exige apenas kit) e **Adestramento, Artes, Crime e Religião são somente treinadas**.
+
+| Perícia | Atributo-base | Somente treinada | Carga | Kit |
+| --- | --- | --- | --- | --- |
+| Acrobacia | Agilidade | — | Sim | — |
+| Adestramento | Presença | Sim | — | — |
+| Artes | Presença | Sim | — | — |
+| Atletismo | Força | — | — | — |
+| Atualidades | Intelecto | — | — | — |
+| Ciências | Intelecto | Sim | — | — |
+| Crime | Agilidade | Sim | Sim | Sim |
+| Diplomacia | Presença | — | — | — |
+| Enganação | Presença | — | — | Sim |
+| Fortitude | Vigor | — | — | — |
+| Furtividade | Agilidade | — | Sim | — |
+| Iniciativa | Agilidade | — | — | — |
+| Intimidação | Presença | — | — | — |
+| Intuição | Presença | — | — | — |
+| Investigação | Intelecto | — | — | — |
+| Luta | Força | — | — | — |
+| Medicina | Intelecto | — | — | Sim |
+| Ocultismo | Intelecto | Sim | — | — |
+| Percepção | Presença | — | — | — |
+| Pilotagem | Agilidade | Sim | — | — |
+| Pontaria | Agilidade | — | — | — |
+| Profissão | Intelecto | Sim | — | — |
+| Reflexos | Agilidade | — | — | — |
+| Religião | Presença | Sim | — | — |
+| Sobrevivência | Intelecto | — | — | — |
+| Tática | Intelecto | Sim | — | — |
+| Tecnologia | Intelecto | Sim | — | Sim |
+| Vontade | Presença | — | — | — |
+
+--------------------------------------------------------------------------------
+
+10.3 Usos de Perícia (DTs, requisitos de grau e custo de ação)
+
+Formato: **Uso** — requisito de grau / DT / custo de ação — efeito mecânico. Perícias sem usos nomeados resolvem-se por um único teste contra a DT indicada na descrição.
+
+**Acrobacia (Agi, carga).** Proezas acrobáticas.
+- *Amortecer Queda* — veterano, DT 15, reação — reduz o dano da queda em 1d6, +1d6 a cada 5 pontos acima da DT; zerando o dano, cai de pé.
+- *Equilíbrio* — um teste por ação de movimento — DT 10 piso escorregadio, 15 superfície estreita, 20 superfície muito estreita. Sucesso avança metade do deslocamento; falha não avança; falha por 5+ derruba. Pode sofrer –1d20 para avançar o deslocamento total. Enquanto se equilibra fica desprevenido e, ao sofrer dano, refaz o teste ou cai.
+- *Escapar* — ação completa — DT = teste de Agilidade de quem amarrou +10 (cordas) ou 30 (algemas).
+- *Levantar-se Rapidamente* — treinado, DT 20 — consome a ação de movimento; sucesso converte o levantar em ação livre, falha mantém caído.
+- *Passar por Espaço Apertado* — treinado, DT 25, ação completa — avança metade do deslocamento.
+- *Passar por Inimigo* — parte do movimento — teste oposto ao melhor entre Acrobacia, Iniciativa e Luta do oponente. O espaço conta como terreno difícil.
+
+**Adestramento (Pre, somente treinada).** Lidar com animais.
+- *Acalmar Animal* — DT 25, ação completa.
+- *Cavalgar* — parte do movimento — montar como ação livre exige DT 20 (falha por 5+ derruba); obstáculos pequenos/terreno ruim DT 15, obstáculos grandes/terreno muito ruim DT 20; falhar derruba e causa 1d6 de dano.
+- *Galopar* — ação completa — avança (deslocamento da montaria + resultado do teste) quadrados de 1,5m, só em linha reta e fora de terreno difícil.
+- *Manejar Animal* — DT 15, ação de movimento — permite usar Adestramento como Pilotagem para veículos de tração animal.
+
+**Artes (Pre, somente treinada).** Expressão artística.
+- *Impressionar* — minutos a horas — oposto pela Vontade do alvo; sucesso dá +2 em testes de perícia originalmente baseados em Presença contra ele na cena, falha impõe –2 e proíbe nova tentativa na cena. Contra uma plateia, um único teste com o melhor bônus.
+
+**Atletismo (For).** Façanhas atléticas.
+- *Corrida* — ação completa — avança (deslocamento + resultado) quadrados de 1,5m, só em linha reta e fora de terreno difícil; suporta um número de rodadas igual ao Vigor, depois exige Fortitude DT 5 (+5 cumulativo) por rodada ou fica fatigado.
+- *Escalar* — ação de movimento — DT 10 apoios para pés e mãos, 15 portão ou árvore, 20 muro com reentrâncias, 25 parede lisa. Sucesso avança metade do deslocamento; falha por 5+ derruba. Pode sofrer –1d20 para avançar o deslocamento total. Fica desprevenido; ao sofrer dano refaz o teste ou cai. Segurar um ser que cai: DT da superfície +5; falha por 5+ derruba os dois.
+- *Natação* — ação de movimento por rodada, **sofre penalidade de carga** — DT 10 água calma, 15 agitada, 20+ tempestuosa. Falha por 5+ submerge. Submerso, prende a respiração por rodadas iguais ao Vigor; depois, Fortitude DT 5 (+5 cumulativo) por rodada ou se afoga (reduzido a 0 PV e morrendo).
+- *Saltar* — parte do movimento — salto longo DT 5 por quadrado de 1,5m; salto em altura DT 15 por quadrado. Sem 6m de impulso, DT +5.
+
+**Atualidades (Int).** Conhecimentos gerais. DT 15 informação comum, 20 específica, 25 quase desconhecida.
+
+**Ciências (Int, somente treinada).** Campos científicos. Questão simples não exige teste; complexa DT 20; campo experimental DT 30.
+
+**Crime (Agi, somente treinada, carga, kit).** Atividades ilícitas.
+- *Arrombar* — kit, ação completa — DT 20 fechadura comum, 25 reforçada, 30 avançada.
+- *Furto* — DT 20, ação padrão — a vítima tem direito a Percepção contra DT igual ao resultado do teste de Crime e percebe a tentativa mesmo que ela falhe.
+- *Ocultar* — ação padrão — oposto pela Percepção de quem possa ver; quem revista recebe +10.
+- *Sabotar* — veterano, kit, 1d4+1 ações completas — DT 20 ação simples, 30 ação complexa; falha por 5+ produz um resultado enganoso. Pode sofrer –1d20 para fazê-lo em uma ação completa.
+
+**Diplomacia (Pre).** Lábia e argumentação.
+- *Acalmar* — treinado, DT 20, ação padrão — estabiliza um personagem adjacente que esteja enlouquecendo, deixando-o com Sanidade 1; DT +5 por vez já acalmado na cena.
+- *Mudar Atitude* — 1 minuto — oposto pela Vontade; sucesso move 1 categoria, +10 move até 2, falha por 5+ move 1 categoria na direção oposta. Uma vez por dia por pessoa. Pode sofrer –2d20 para fazê-lo em ação completa.
+- *Persuasão* — DT 20, 1 minuto ou mais — pedido custoso –5; pedido perigoso –10 ou falha automática.
+- Categorias de atitude: Prestativo (+5 em persuasão), Amistoso, Indiferente (padrão), Inamistoso (–5), Hostil (falha automática em persuasão).
+
+**Enganação (Pre, kit para disfarce).** Blefes e trapaças.
+- *Disfarce* — treinado, kit, ao menos 10 minutos — oposto pela Percepção; quem conhece a pessoa imitada recebe +10.
+- *Falsificação* — veterano — oposto pela Percepção de quem examina; documento complexo ou com assinatura/carimbo específico impõe –2d20.
+- *Fintar* — treinado, ação padrão — oposto pelos Reflexos de um ser em alcance curto; sucesso deixa o alvo desprevenido contra o próximo ataque até o fim do próximo turno.
+- *Insinuação* — DT 20 — falha por 5+ transmite mensagem errada; terceiros podem captar com Intuição oposta.
+- *Intriga* — DT 20 (30 se muito improvável), ao menos um dia — rastrear a fonte exige Investigação contra DT igual ao resultado da intriga.
+- *Mentir* — oposto pela Intuição da vítima; mentira muito implausível impõe –2d20.
+
+**Fortitude (Vig).** Teste de resistência contra efeitos de vitalidade (doenças, venenos); DT definida pelo efeito. Também sustenta fôlego: DT 5 (+5 por teste anterior).
+
+**Furtividade (Agi, carga).** Discrição.
+- *Esconder-se* — ação livre no fim do turno — oposto pela Percepção; quem falhar não o percebe (camuflagem total). Ter se movido impõe –1d20 (evitável movendo-se até metade do deslocamento); ter atacado ou feito ação chamativa impõe –3d20.
+- *Seguir* — oposto pela Percepção do alvo — –5 em local sem esconderijos ou movimento; alvo precavido recebe +5. Falha faz o alvo perceber na metade do caminho.
+
+**Iniciativa (Agi).** Teste no início da cena de ação; a ordem de turnos é decrescente pelos resultados.
+
+**Intimidação (Pre).** Todos os usos são efeitos de medo.
+- *Assustar* — treinado, ação padrão — oposto pela Vontade em alcance curto; sucesso deixa abalado pelo resto da cena (não cumulativo); +10 deixa apavorado por 1 rodada e então abalado.
+- *Coagir* — 1 minuto ou mais — oposto pela Vontade de alvo adjacente; ordem perigosa ou contrária à natureza dele concede +5 ou sucesso automático na resistência. Deixa a pessoa hostil.
+
+**Intuição (Pre).** Empatia e sexto sentido.
+- *Perceber Mentira* — oposto ao teste de Enganação.
+- *Pressentimento* — treinado, DT 20 — indica apenas que há algo anormal; a causa exige Investigação.
+
+**Investigação (Int).** Pistas e informações.
+- *Interrogar* — de 1 hora a 1 dia — informação geral sem teste, restrita DT 20, confidencial DT 30.
+- *Procurar* — de 1 ação completa a 1 dia — DT 15 item discreto, 20 escondido, 30 muito bem escondido.
+
+**Luta (For).** Ataque corpo a corpo; DT = Defesa do alvo.
+
+**Medicina (Int, kit).** Ferimentos, doenças e venenos. Exige kit (–5 sem ele) e sofre –1d20 quando usada em si mesmo.
+- *Primeiros Socorros* — DT 20, ação padrão — remove morrendo e inconsciente de um adjacente, deixando-o com 1 PV; DT +5 por vez já estabilizado na cena.
+- *Cuidados Prolongados* — veterano, DT 20, ação de interlúdio — trata até 1 ser por ponto de Intelecto; os tratados recuperam o dobro de PV pela ação dormir neste interlúdio.
+- *Necropsia* — treinado, DT 20, 10 minutos — causa e momento da morte; causa rara ou extraordinária DT +10.
+- *Tratamento* — treinado, ação completa — teste contra a DT da doença/veneno; sucesso dá +5 no próximo teste de Fortitude da vítima contra o efeito.
+
+**Ocultismo (Int, somente treinada).** Estudo do paranormal. Ser treinado não implica conjurar rituais.
+- *Identificar Criatura* — ação completa — DT igual à DT para resistir à Presença Perturbadora da criatura; revela 1 característica, +1 a cada 5 pontos acima da DT; falha por 5+ produz conclusão errada.
+- *Identificar Item Amaldiçoado* — DT 20, ação de interlúdio — pode sofrer –2d20 para fazê-lo em ação completa.
+- *Identificar Ritual* — DT 10 +5 por círculo, reação — identifica o ritual pelos gestos, palavras e componentes.
+- *Informação* — questão simples sem teste, complexa DT 20, mistério DT 30.
+
+**Percepção (Pre).** Sentidos.
+- *Observar* — DT 15 a 30 conforme a discrição do alvo; contra algo escondido, DT = resultado do teste de Furtividade ou Crime usado para esconder. Ler lábios DT 20.
+- *Ouvir* — conversa casual próxima DT 0; sussurro DT 15; do outro lado de uma porta DT +5; dormindo –2d20 (sucesso acorda). Perceber ser invisível: DT 20 ou Furtividade dele +10, o que for maior — as penalidades por lutar sem ver permanecem.
+
+**Pilotagem (Agi, somente treinada).** Veículos terrestres e aquáticos; 1 ação de movimento por turno. Situação comum sem teste; ruim DT 15 por turno; terrível DT 25 por turno. **Veterano** libera veículos aéreos.
+
+**Pontaria (Agi).** Ataque à distância; DT = Defesa do alvo.
+
+**Profissão (Int, somente treinada).** Profissão específica definida com o mestre.
+- *Rendimentos* — passivo — o agente começa cada missão com 1 item adicional além dos fornecidos pela Ordem: categoria I se treinado, II se veterano, III se expert. Esse item soma-se ao limite de categoria da patente (ver 8.2).
+
+**Reflexos (Agi).** Teste de resistência contra efeitos de reação rápida (armadilhas, explosões); DT definida pelo efeito. Também resiste a fintas.
+
+**Religião (Pre, somente treinada).** Teologia e religiões.
+- *Acalmar* — DT 20 — usa Religião no lugar de Diplomacia para acalmar quem esteja enlouquecendo.
+- *Informação* — DT 10 simples, 20 complexa, 30 mistério.
+- *Rito* — veterano, DT 20 — cerimônia religiosa.
+
+**Sobrevivência (Int).** Regiões selvagens.
+- *Acampamento* — treinado — DT 15 campo aberto, 20 mata fechada, 25 região extrema; região árida ou clima ruim impõe –5 cumulativo. Sucesso libera as ações de interlúdio alimentar-se e dormir ao relento para o grupo.
+- *Identificar Animal* — treinado, DT 20, ação completa — como identificar criatura (Ocultismo).
+- *Orientar-se* — 1 teste por dia — DT pelo terreno (como acampamento); sucesso avança o deslocamento normal, falha metade, falha por 5+ perde o dia. Em grupo escolhe-se um guia; testes concorrentes são rolados em segredo e os jogadores escolhem o guia antes de ver os resultados.
+- *Rastrear* — treinado, 1 teste por dia — DT 15 grupo grande ou solo macio, 20 solo comum, 25 solo duro; visibilidade ou clima ruim impõe –1d20. Deslocamento reduzido à metade; DT +1 por dia desde a criação dos rastros.
+
+**Tática (Int, somente treinada).** Educação militar.
+- *Analisar Terreno* — DT 20, ação de movimento — revela uma vantagem do campo (cobertura, camuflagem, terreno elevado).
+- *Plano de Ação* — veterano, DT 20, ação padrão — +5 na Iniciativa de um aliado em alcance médio; se isso o colocar acima do conjurador e ele ainda não tiver agido na rodada, age imediatamente após o turno dele e mantém a nova ordem nas rodadas seguintes.
+
+**Tecnologia (Int, somente treinada, kit para operar dispositivo).** Eletrônica e informática avançada; usos cotidianos não exigem treinamento nem teste.
+- *Falsificação* — veterano — como Enganação, mas só para documentos eletrônicos.
+- *Hackear* — 1d4+1 ações completas — DT 15 computador pessoal, 20 rede profissional, 25 grande servidor corporativo/governamental/militar. Pode sofrer –1d20 para fazê-lo em ação completa. Falha bloqueia novas tentativas até obter informação nova; falha por 5+ permite rastreamento pelos administradores.
+- *Localizar Arquivo* — 1 ação completa e DT 15 (computador pessoal), 1d4+1 ações completas e DT 20 (rede pequena), 1d6+2 ações completas e DT 25 (rede corporativa ou governamental). Só vale para sistemas privados; informação pública na internet usa Investigação.
+- *Operar Dispositivo* — kit, 1d4+1 ações completas — DT 15 aparelho comum, 20 equipamento profissional, 25 sistema protegido. Pode sofrer –1d20 para fazê-lo em ação completa.
+
+**Vontade (Pre).** Teste de resistência contra efeitos que exigem determinação (intimidação, rituais mentais); DT definida pelo efeito. Também usada para conjurar rituais em condições adversas.
