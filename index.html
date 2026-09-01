@@ -986,6 +986,71 @@
       color: var(--accent-ink)
     }
 
+    /* ---------- aba de usuários (mestre) ---------- */
+    .tabs.inline {
+      background: none;
+      padding: 0;
+      margin-bottom: 14px
+    }
+
+    .ucard+.ucard {
+      margin-top: 12px
+    }
+
+    .ucard>header {
+      gap: 10px
+    }
+
+    .uav {
+      width: 30px;
+      height: 30px;
+      border-radius: 100px;
+      object-fit: cover;
+      flex: 0 0 auto;
+      border: 1px solid var(--line)
+    }
+
+    .uav.ph {
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      font-family: var(--disp);
+      font-size: 13px;
+      color: var(--ink-2)
+    }
+
+    .uinfo h3 {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap
+    }
+
+    .pres {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      color: var(--ink-3);
+      white-space: nowrap
+    }
+
+    .pres i {
+      width: 7px;
+      height: 7px;
+      border-radius: 100px;
+      background: var(--line-strong);
+      flex: 0 0 auto
+    }
+
+    .pres.on {
+      color: var(--ok)
+    }
+
+    .pres.on i {
+      background: var(--ok)
+    }
+
     /* ---------- aba perícias ---------- */
     .tag.carga {
       color: var(--pe);
@@ -1978,7 +2043,18 @@
           <button class="btn primary" id="novoBtn">Novo agente</button>
         </div>
       </div>
-      <div id="listaBox"></div>
+      <div class="tabs inline" role="tablist" id="listaTabs">
+        <button role="tab" id="ltab-agentes" aria-selected="true" aria-controls="lp-agentes">Agentes</button>
+        <button role="tab" id="ltab-users" aria-selected="false" aria-controls="lp-users" hidden>Usuários<span
+            class="tnum" id="ltnUs"></span></button>
+      </div>
+      <section id="lp-agentes" role="tabpanel" aria-labelledby="ltab-agentes">
+        <div id="listaBox"></div>
+      </section>
+      <section id="lp-users" role="tabpanel" aria-labelledby="ltab-users" hidden>
+        <div class="pad stack" id="usersNotas" style="padding-left:0;padding-right:0"></div>
+        <div id="usersBox"></div>
+      </section>
     </div>
   </section>
 
@@ -4029,14 +4105,17 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
     }
 
     function bindTabs() {
-      const tabs = $$('[role="tab"]');
-      tabs.forEach(t => t.onclick = () => {
-        tabs.forEach(o => {
-          const on = o === t;
-          o.setAttribute("aria-selected", String(on));
-          $("#" + o.getAttribute("aria-controls")).hidden = !on;
+      $$('[role="tablist"]').forEach(bar => {
+        const tabs = Array.from(bar.querySelectorAll('[role="tab"]'));
+        tabs.forEach(t => t.onclick = () => {
+          tabs.forEach(o => {
+            const on = o === t;
+            o.setAttribute("aria-selected", String(on));
+            const p = $("#" + o.getAttribute("aria-controls"));
+            if (p) p.hidden = !on;
+          });
+          if (bar.id === "tabsBar") window.scrollTo({ top: 0, behavior: "smooth" });
         });
-        window.scrollTo({ top: 0, behavior: "smooth" });
       });
     }
 
@@ -4387,6 +4466,12 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         const { data, error: e2 } = await sb.from("perfis").select("*").eq("id", u.id).maybeSingle();
         if (e2) throw e2;
         perfil = data || { id: u.id, nome: nomeDe(u), email: u.email, mestre: false };
+        /* Presença: só funciona se a coluna existir no banco. O erro é
+           engolido de propósito para não derrubar o login de quem ainda
+           não rodou a migração. */
+        const agora = new Date().toISOString();
+        sb.from("perfis").update({ ultimo_acesso: agora }).eq("id", u.id)
+          .then(r => { if (!r.error) perfil.ultimo_acesso = agora; });
         renderUsuario();
         await carregarAgentes();
         const meus = agentes.filter(a => a.dono === u.id);
@@ -4513,7 +4598,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
     async function carregarAgentes() {
       const [ag, pf] = await Promise.all([
         sb.from("agentes").select("*").order("atualizado_em", { ascending: false }),
-        sb.from("perfis").select("id,nome,email,avatar_url,mestre")
+        sb.from("perfis").select("*")
       ]);
       if (ag.error) throw ag.error;
       agentes = ag.data || [];
@@ -4526,21 +4611,26 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
        TELA: LISTA DE AGENTES
        ======================================================================= */
     function renderLista() {
+      renderUsuarios();
+      const visiveis = agentesVisiveis();
       const q = ($("#listaBusca").value || "").trim().toLowerCase();
-      const lista = agentes.filter(a => !q ||
+      const lista = visiveis.filter(a => !q ||
         (a.nome || "").toLowerCase().includes(q) ||
         (a.jogador || "").toLowerCase().includes(q) ||
         ((perfisMap[a.dono] || {}).nome || "").toLowerCase().includes(q));
 
       const meus = agentes.filter(a => a.dono === (user && user.id)).length;
-      $("#listaSub").innerHTML = agentes.length + " agente(s) na mesa · " + meus + " seu(s)" +
-        (perfil && perfil.mestre ? " · você é <b>mestre</b> e pode editar qualquer ficha" : "");
+      $("#listaSub").innerHTML = ehMestre()
+        ? agentes.length + " agente(s) na mesa · " + meus + " seu(s) · você é <b>mestre</b> e pode ver e editar qualquer ficha"
+        : meus + " ficha(s) sua(s) · jogadores só acessam as próprias fichas";
 
       const box = $("#listaBox"); box.innerHTML = "";
-      if (!agentes.length) {
-        box.innerHTML = '<div class="empty"><h3>Nenhum agente ainda</h3>' +
-          '<p>A mesa está vazia. Crie o primeiro agente e ele aparece aqui para todos os usuários.</p>' +
-          '<button class="btn primary" id="vazioNovo">Criar o primeiro agente</button></div>';
+      if (!visiveis.length) {
+        box.innerHTML = '<div class="empty"><h3>' + (ehMestre() ? "Nenhum agente ainda" : "Você ainda não tem ficha") + '</h3>' +
+          '<p>' + (ehMestre()
+            ? "A mesa está vazia. Crie o primeiro agente e ele aparece aqui."
+            : "Crie seu agente para começar. Você vê e edita apenas as suas próprias fichas — o mestre vê todas.") +
+          '</p><button class="btn primary" id="vazioNovo">Criar agente</button></div>';
         $("#vazioNovo").onclick = () => { iniciarCriacao(); mostrar("criar"); };
         return;
       }
@@ -4580,6 +4670,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
           '</div>';
         const foot = el("footer");
         const abrir = el("button", "btn primary sm", meu ? "Abrir ficha" : "Ver ficha");
+        abrir.disabled = !podeAbrir(row);
         abrir.onclick = () => abrirAgente(row);
         foot.append(abrir);
         foot.append(el("div", "grow"));
@@ -4588,6 +4679,145 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       });
       box.append(grid);
     }
+
+    /* =======================================================================
+       TELA: LISTA — ABA DO MESTRE (usuários e seus agentes)
+       ======================================================================= */
+    function ehMestre() { return !!(perfil && perfil.mestre); }
+
+    /* Agentes que o usuário atual tem direito de ver na lista. Jogador vê
+       apenas os próprios; mestre vê todos. A regra de verdade é a policy de
+       RLS no banco — isto aqui só evita mostrar o que não deve. */
+    function agentesVisiveis() {
+      if (ehMestre()) return agentes;
+      const meu = user && user.id;
+      return agentes.filter(a => a.dono === meu);
+    }
+
+    function quandoDe(iso) {
+      if (!iso) return null;
+      const t = new Date(iso).getTime();
+      if (!isFinite(t)) return null;
+      const min = Math.floor((Date.now() - t) / 60000);
+      if (min < 2) return { txt: "agora", on: true };
+      if (min < 15) return { txt: "há " + min + " min", on: true };
+      if (min < 60) return { txt: "há " + min + " min", on: false };
+      const h = Math.floor(min / 60);
+      if (h < 24) return { txt: "há " + h + "h", on: false };
+      const d = Math.floor(h / 24);
+      if (d < 30) return { txt: "há " + d + " dia" + (d > 1 ? "s" : ""), on: false };
+      return { txt: horaDe(iso), on: false };
+    }
+
+    /* Última atividade conhecida: o acesso registrado no perfil ou, na falta
+       dele, a atualização mais recente entre os agentes do usuário. */
+    function atividadeDe(p, meusAgentes) {
+      const cands = [];
+      if (p.ultimo_acesso) cands.push({ iso: p.ultimo_acesso, fonte: "acesso" });
+      meusAgentes.forEach(a => { if (a.atualizado_em) cands.push({ iso: a.atualizado_em, fonte: "ficha" }); });
+      if (!cands.length) return null;
+      cands.sort((x, y) => new Date(y.iso) - new Date(x.iso));
+      const q = quandoDe(cands[0].iso);
+      if (!q) return null;
+      return { txt: q.txt, fonte: cands[0].fonte, on: q.on && cands[0].fonte === "acesso" };
+    }
+
+    function renderUsuarios() {
+      const bt = $("#ltab-users");
+      bt.hidden = !ehMestre();
+      if (!ehMestre()) {
+        if (bt.getAttribute("aria-selected") === "true") trocarAbaLista("ltab-agentes");
+        return;
+      }
+
+      const perfis = Object.keys(perfisMap).map(k => perfisMap[k]);
+      const porDono = {};
+      agentes.forEach(a => { (porDono[a.dono] = porDono[a.dono] || []).push(a); });
+
+      const linhas = perfis.map(p => {
+        const meus = porDono[p.id] || [];
+        return { p: p, ag: meus, at: atividadeDe(p, meus) };
+      });
+      /* online primeiro, depois por atividade mais recente, depois por nome */
+      linhas.sort((a, b) => {
+        const oa = a.at && a.at.on ? 1 : 0, ob = b.at && b.at.on ? 1 : 0;
+        if (oa !== ob) return ob - oa;
+        const na = a.ag.length, nb = b.ag.length;
+        if (na !== nb) return nb - na;
+        return (a.p.nome || a.p.email || "").localeCompare(b.p.nome || b.p.email || "");
+      });
+
+      const semFicha = linhas.filter(l => !l.ag.length).length;
+      const orfaos = agentes.filter(a => !perfisMap[a.dono]);
+      $("#ltnUs").textContent = linhas.length;
+
+      const nt = $("#usersNotas"); nt.innerHTML = "";
+      nt.append(notice("", "Mesa", "<b>" + linhas.length + "</b> usuário(s) já entraram no app · <b>" +
+        agentes.length + "</b> agente(s) criados · <b>" + semFicha + "</b> ainda sem ficha.", true));
+      if (!perfis.some(p => p.ultimo_acesso)) nt.append(notice("warn", "Presença",
+        "Nenhum perfil tem <code class=\"inline\">ultimo_acesso</code> gravado, então a coluna de atividade usa a última " +
+        "atualização de ficha. Para registrar presença de verdade, rode no Supabase: " +
+        "<code class=\"inline\">alter table perfis add column ultimo_acesso timestamptz;</code> — o app passa a carimbar " +
+        "esse campo a cada login sozinho.", true));
+      nt.append(notice("warn", "Trave no banco", "A tela já impede um jogador de abrir ficha alheia, mas quem souber usar o " +
+        "console consegue ler a tabela direto. Para valer de verdade, a policy de leitura de <b>agentes</b> precisa filtrar por dono: " +
+        "<code class=\"inline\">using (dono = auth.uid() or exists (select 1 from perfis p where p.id = auth.uid() and p.mestre))</code>.", true));
+      if (orfaos.length) nt.append(notice("warn", "Sem dono",
+        orfaos.length + " agente(s) apontam para um usuário que não está mais em <b>perfis</b>.", true));
+
+      const box = $("#usersBox"); box.innerHTML = "";
+      linhas.forEach(({ p, ag, at }) => {
+        const eu = p.id === (user && user.id);
+        const card = el("div", "card ucard");
+
+        const foto = p.avatar_url
+          ? '<img class="uav" src="' + esc(p.avatar_url) + '" alt="" referrerpolicy="no-referrer">'
+          : '<span class="uav ph">' + esc((p.nome || p.email || "?").slice(0, 1).toUpperCase()) + '</span>';
+
+        const head = el("header");
+        head.innerHTML = foto +
+          '<div class="uinfo"><h3>' + esc(p.nome || "sem nome") +
+          (p.mestre ? '<span class="badge mestre">mestre</span>' : "") +
+          (eu ? '<span class="badge seu">você</span>' : "") + '</h3>' +
+          '<div class="hint">' + esc(p.email || "sem e-mail") + '</div></div>' +
+          '<div class="grow"></div>' +
+          (at ? '<span class="pres' + (at.on ? " on" : "") + '"><i></i>' + esc(at.txt) +
+            '<span class="hint"> · ' + (at.fonte === "acesso" ? "acesso" : "ficha") + '</span></span>'
+            : '<span class="pres"><i></i>sem registro</span>') +
+          '<span class="chip">' + ag.length + ' ficha(s)</span>';
+        card.append(head);
+
+        const pad = el("div", "pad stack");
+        if (!ag.length) {
+          pad.append(notice("", "Sem ficha", "Este usuário entrou no app mas ainda não criou nenhum agente.", false));
+        } else {
+          const t = el("div", "tscroll");
+          t.innerHTML = '<table><thead><tr><th>Agente</th><th>Classe</th><th class="n">NEX</th><th>Trilha</th>' +
+            '<th class="n">PV</th><th class="n">PE</th><th class="n">SAN</th><th>Atualizado</th><th></th></tr></thead><tbody>' +
+            ag.map(row => {
+              const v = comAgente(row, () => ({ M: maxes(), pv: cur("pv"), pe: cur("pe"), san: cur("san"), classe: classeAtual().nome }));
+              return '<tr><td><b>' + esc(row.nome || "Agente sem nome") + '</b></td>' +
+                '<td>' + esc(v.classe) + '</td><td class="n">' + row.nex + '%</td>' +
+                '<td class="hint">' + esc(row.trilha || "—") + '</td>' +
+                '<td class="n">' + v.pv + '/' + v.M.pv + '</td>' +
+                '<td class="n">' + v.pe + '/' + v.M.pe + '</td>' +
+                '<td class="n">' + v.san + '/' + v.M.san + '</td>' +
+                '<td class="hint">' + esc(horaDe(row.atualizado_em)) + '</td>' +
+                '<td><button class="btn ghost sm" data-abrir="' + esc(row.id) + '">Abrir</button></td></tr>';
+            }).join("") + '</tbody></table>';
+          pad.append(t);
+        }
+        card.append(pad);
+        box.append(card);
+      });
+
+      box.querySelectorAll("[data-abrir]").forEach(b => b.onclick = () => {
+        const row = agentes.find(a => String(a.id) === b.dataset.abrir);
+        if (row) abrirAgente(row);
+      });
+    }
+
+    function trocarAbaLista(id) { const b = $("#" + id); if (b) b.click(); }
 
     /* =======================================================================
        TELA: CRIAÇÃO
@@ -4712,7 +4942,16 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
     /* =======================================================================
        TELA: FICHA
        ======================================================================= */
+    /* Jogador só abre as próprias fichas; mestre abre qualquer uma. */
+    function podeAbrir(row) {
+      return !!row && (ehMestre() || row.dono === (user && user.id));
+    }
+
     async function abrirAgente(row) {
+      if (!podeAbrir(row)) {
+        toast("Esta ficha é de outro jogador. Só o mestre pode abri-la.", true);
+        return;
+      }
       agenteRow = row; agenteId = row.id;
       podeEditar = row.dono === (user && user.id) || !!(perfil && perfil.mestre);
       S = fichaDe(row);
