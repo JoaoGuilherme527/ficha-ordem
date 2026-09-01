@@ -967,6 +967,25 @@
     }
 
 
+    /* ---------- abas trilhas e origens ---------- */
+    .chip.ok {
+      color: var(--ok);
+      border-color: var(--ok)
+    }
+
+    .card.trilha.atual {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft), var(--shadow)
+    }
+
+    .perdet.atual {
+      border-color: var(--accent)
+    }
+
+    .perdet.atual>summary .pnome {
+      color: var(--accent-ink)
+    }
+
     /* ---------- aba perícias ---------- */
     .tag.carga {
       color: var(--pe);
@@ -1881,6 +1900,8 @@
       <button role="tab" id="tab-nex" aria-selected="false" aria-controls="p-nex">Progressão<span class="tnum"
           id="tnNex"></span></button>
       <button role="tab" id="tab-pericias" aria-selected="false" aria-controls="p-pericias">Perícias</button>
+      <button role="tab" id="tab-trilhas" aria-selected="false" aria-controls="p-trilhas">Trilhas</button>
+      <button role="tab" id="tab-origens" aria-selected="false" aria-controls="p-origens">Origens</button>
       <button role="tab" id="tab-rolagem" aria-selected="false" aria-controls="p-rolagem">Rolagem</button>
       <button role="tab" id="tab-sessao" aria-selected="false" aria-controls="p-sessao">Sessão</button>
       <button role="tab" id="tab-ref" aria-selected="false" aria-controls="p-ref">Referência</button>
@@ -2219,6 +2240,31 @@
           </div>
         </section>
 
+        <!-- ---------- TRILHAS ---------- -->
+        <section id="p-trilhas" role="tabpanel" aria-labelledby="tab-trilhas" hidden>
+          <div class="card">
+            <header>
+              <h3>Trilhas de <span id="trClasse">—</span></h3>
+              <div class="grow"></div><span class="chip" id="trChip"></span>
+            </header>
+            <div class="pad stack" id="trNotas"></div>
+          </div>
+          <div id="trBox"></div>
+        </section>
+
+        <!-- ---------- ORIGENS ---------- -->
+        <section id="p-origens" role="tabpanel" aria-labelledby="tab-origens" hidden>
+          <div class="card">
+            <header>
+              <h3>Origens</h3>
+              <div class="grow"></div><span class="chip" id="orCount"></span>
+              <input type="text" id="orBusca" placeholder="filtrar origem ou perícia…" style="max-width:220px">
+            </header>
+            <div class="pad stack" id="orNotas"></div>
+          </div>
+          <div class="pad stack" id="orBox" style="padding-top:0"></div>
+        </section>
+
         <!-- ---------- ROLAGEM ---------- -->
         <section id="p-rolagem" role="tabpanel" aria-labelledby="tab-rolagem" hidden>
           <div class="card">
@@ -2538,6 +2584,64 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       }
     };
 
+
+    /* ---------------------------------------------------------------------
+       Texto de apresentação das trilhas e das origens (livro básico,
+       capítulo 1). As regras mecânicas ficam em TRILHAS e ORIGENS; aqui
+       fica só a descrição de conceito que o livro traz antes dos poderes.
+       --------------------------------------------------------------------- */
+    const TRILHA_DESC = {
+      "Aniquilador": "Você é treinado para abater alvos com eficiência e velocidade. Suas armas são suas melhores amigas e você cuida tão bem delas quanto de seus companheiros de equipe. Talvez até melhor.",
+      "Comandante de Campo": "Sem um oficial, uma batalha não passa de uma briga de bar. Você é treinado para coordenar e auxiliar seus companheiros em combate, tomando decisões rápidas e tirando melhor proveito da situação e do talento de seus aliados.",
+      "Guerreiro": "Você treinou sua musculatura e movimentos a ponto de transformar seu corpo em uma verdadeira arma. Com golpes corpo a corpo tão poderosos quanto uma bala, você enfrenta inimigos sem medo.",
+      "Operações Especiais": "Você é um combatente eficaz. Suas ações são calculadas e otimizadas, sempre antevendo os movimentos inimigos e se posicionando da maneira mais inteligente no campo de batalha.",
+      "Tropa de Choque": "Você é duro na queda. Treinou seu corpo para resistir a traumas físicos, tornando-o praticamente inquebrável, e por isso não teme se colocar entre seus aliados e o perigo.",
+      "Atirador de Elite": "Um tiro, uma morte. Ao contrário dos combatentes, você é perito em neutralizar ameaças de longe, terminando uma briga antes mesmo que ela comece. Você trata sua arma como uma ferramenta de precisão, sendo capaz de executar façanhas incríveis.",
+      "Infiltrador": "Você é um perito em infiltração e sabe neutralizar alvos desprevenidos sem causar alarde. Combinando talento acrobático, destreza manual e conhecimento técnico, você é capaz de superar qualquer barreira de defesa, mesmo quando a missão parece impossível.",
+      "Médico de Campo": "Você é treinado em técnicas de primeiros socorros e tratamento de emergência, o que torna você um membro valioso para qualquer grupo de agentes. Ao contrário dos profissionais de saúde convencionais, você está acostumado com o campo de batalha e sabe tomar decisões rápidas no meio do caos.",
+      "Negociador": "Você é um diplomata habilidoso e consegue influenciar outras pessoas, seja por lábia ou intimidação. Sua capacidade de avaliar situações com rapidez e eficiência pode tirar o grupo de apuros que nem a mais poderosa das armas poderia resolver.",
+      "Técnico": "Sua principal habilidade é a manutenção e reparo do valioso equipamento que seu time carrega em missão. Seu conhecimento técnico também permite que improvise ferramentas com o que tiver à disposição e sabote os itens usados por seus inimigos.",
+      "Conduíte": "Você domina os aspectos fundamentais da conjuração de rituais e é capaz de aumentar o alcance e a velocidade de suas conjurações. Conforme sua conexão com as entidades paranormais aumenta, você se torna capaz de interferir com os rituais de outros ocultistas.",
+      "Flagelador": "Dor é um poderoso catalisador paranormal e você aprendeu a transformá-la em poder para seus rituais. Quando se torna especialmente poderoso, consegue usar a dor e o sofrimento de seus inimigos como instrumento de seus rituais ocultistas.",
+      "Graduado": "Você foca seus estudos em se tornar um conjurador versátil e poderoso, conhecendo mais rituais que os outros ocultistas e sendo capaz de torná-los mais difíceis de serem resistidos. Seu objetivo é desvendar e dominar os segredos do Outro Lado, custe o que custar.",
+      "Intuitivo": "Assim como combatentes treinam seus corpos para resistir a traumas físicos, você preparou sua mente para resistir aos efeitos do Outro Lado. Seu foco e força de vontade fazem com que você expanda os limites de suas capacidades paranormais.",
+      "Lâmina Paranormal": "Alguns ocultistas preferem ficar fechados em suas bibliotecas estudando livros e rituais. Outros preferem investigar fenômenos paranormais em sua fonte. Já você prefere usar o paranormal como uma arma: aprendeu e dominou técnicas de luta mesclando suas habilidades de conjuração com suas capacidades de combate."
+    };
+
+    /* Pré-requisitos que o livro anota como “Especial” na trilha. */
+    const TRILHA_REQ = {
+      "Médico de Campo": "Para escolher esta trilha você precisa ser treinado em Medicina. Para usar as habilidades dela, precisa possuir um kit de medicina."
+    };
+
+    const ORIGEM_DESC = {
+      "Acadêmico": "Você era um pesquisador ou professor universitário. De forma proposital ou não, seus estudos tocaram em assuntos misteriosos e chamaram a atenção da Ordo Realitas.",
+      "Agente de Saúde": "Você era um profissional da saúde, como um enfermeiro, farmacêutico, médico, psicólogo ou socorrista, treinado no atendimento e cuidado de pessoas. Pode ter sido surpreendido por um evento paranormal durante o trabalho, ou mesmo cuidado de um agente da Ordem em uma emergência, que ficou surpreso com o quão bem você lidou com a situação.",
+      "Amnésico": "Você perdeu a maior parte da memória. Sabe apenas o próprio nome, ou nem isso. Sua amnésia pode ser resultado de um trauma paranormal ou mesmo de um ritual. Talvez você tenha sido vítima de cultistas? Talvez você tenha sido um cultista? Seja como for, hoje a Ordem é a única família que conhece. Quem sabe, cumprindo missões, você descubra algo sobre seu passado.",
+      "Artista": "Você era um ator, músico, escritor, dançarino, influenciador… Seu trabalho pode ter sido inspirado por uma experiência paranormal do passado e, o que o público acha que é pura criatividade, a Ordem sabe que tem um lado mais sombrio.",
+      "Atleta": "Você competia em um esporte individual ou coletivo, como natação ou futebol. Seu desempenho pode ser fruto de uma influência paranormal que nem mesmo você conhecia, ou você pode ter se envolvido em algum evento relacionado ao Outro Lado em uma de suas competições.",
+      "Chef": "Você é um cozinheiro amador ou profissional. Talvez trabalhasse em um restaurante, talvez simplesmente gostasse de cozinhar para a família e amigos. Como sua comida fez com que você se envolvesse com o paranormal? Ninguém sabe. Mas os outros agentes adoram quando você vai para a missão!",
+      "Criminoso": "Você vivia uma vida fora da lei, seja como mero batedor de carteiras, seja como membro de uma facção criminosa. Em algum momento você se envolveu em um assunto da Ordem — talvez tenha roubado um item amaldiçoado? A organização, por sua vez, achou melhor recrutar seus talentos do que ter você como um estorvo.",
+      "Cultista Arrependido": "Você fez parte de um culto paranormal. Talvez fossem ignorantes iludidos, que acreditavam estar contatando entidades benevolentes. Talvez soubessem exatamente o que estavam fazendo. Seja como for, algo abriu seus olhos e agora você luta pelo lado certo — embora carregue para sempre traços de sua vida pregressa. Outros membros da Ordem podem desconfiar de sua conversão, e você sabe que precisará se esforçar para conquistar a confiança de todos.",
+      "Desgarrado": "Você não vivia de acordo com as normas da sociedade. Podia ser um eremita, uma pessoa em situação de rua ou simplesmente alguém que descobriu o paranormal e abandonou sua rotina — sabendo o quão frágil era a existência humana, não conseguia simplesmente continuar indo para o trabalho todo dia. De qualquer forma, a vida sem os confortos modernos o deixou mais forte.",
+      "Engenheiro": "Enquanto os acadêmicos estão preocupados com teorias, você coloca a mão na massa, seja como engenheiro profissional, seja como inventor de garagem. Provavelmente você criou algum dispositivo paranormal que chamou a atenção da Ordem.",
+      "Executivo": "Você possuía um trabalho de escritório em uma grande empresa, banco ou corporação. Era um administrador, advogado, contador ou de qualquer outra profissão que lida com papelada e burocracia. Sua vida era bastante normal, até que descobriu algo que não devia. Talvez o sucesso da empresa residisse em um ritual? Talvez toda a corporação fosse fachada para um culto? Após essa descoberta você foi recrutado pela Ordem e trocou o escritório por missões de campo — hoje, sua vida é tudo, menos normal.",
+      "Investigador": "Você era um investigador do governo, como um perito forense ou policial federal, ou privado, como um detetive particular. Pode ter tido contato com o paranormal em algum caso ou ter sido recrutado pela Ordem por suas habilidades de resolução de mistérios.",
+      "Lutador": "Você pratica uma arte marcial ou esporte de luta, ou cresceu em um bairro perigoso onde aprendeu briga de rua. Já quebrou muitos ossos, tanto seus quanto dos outros. Pode ter conhecido a Ordem após um torneio secreto envolvendo entidades do Outro Lado ou ter sido recrutado pela sua capacidade de luta.",
+      "Magnata": "Você possui muito dinheiro ou patrimônio. Pode ser o herdeiro de uma família antiga ligada ao oculto, ter criado e vendido uma empresa e decidido usar sua riqueza para uma causa maior, ou ter ganho uma loteria após inadvertidamente escolher números amaldiçoados que formavam um ritual.",
+      "Mercenário": "Você é um soldado de aluguel, que trabalha sozinho ou como parte de alguma organização que vende serviços militares. Escoltas e assassinatos fizeram parte de sua rotina por tempo suficiente para você se envolver em alguma situação com o paranormal.",
+      "Militar": "Você serviu em uma força militar, como o exército ou a marinha. Passou muito tempo treinando com armas de fogo, até se tornar um perito no uso delas. Acostumado a obedecer ordens e partir em missões, está em casa na Ordo Realitas. O inimigo é diferente, mas um tiro bem dado continua resolvendo o problema.",
+      "Operário": "Pedreiro, industriário, operador de máquinas em uma fábrica… Você passou uma parte de sua vida em um emprego braçal, desempenhando atividades práticas que lhe deram uma visão pragmática do mundo. Sua rotina mundana, entretanto, foi confrontada de alguma forma pelo paranormal, e você não consegue mais esquecer tudo que viu sobre os mistérios do mundo.",
+      "Policial": "Você fez parte de uma força de segurança pública, civil ou militar. Em alguma patrulha ou chamado se deparou com um caso paranormal e sobreviveu para contar a história.",
+      "Religioso": "Você é devoto ou sacerdote de uma fé. Independentemente da religião que pratica, se dedica a auxiliar as pessoas com problemas espirituais. A partir disso teve contato com o paranormal, o que fez com que fosse convocado pela Ordem.",
+      "Servidor Público": "Você possuía carreira em um órgão do governo, lidando com burocracia e atendendo pessoas. Sua rotina foi quebrada quando viu que o prefeito era um cultista, ou que a câmara de vereadores se reunia à noite para realizar rituais. Quando os próprios representantes do povo estão dispostos a sacrificá-lo para entidades malignas, onde reside nossa esperança? Hoje você sabe a resposta: na Ordo Realitas.",
+      "Teórico da Conspiração": "A humanidade nunca pisou na lua. Reptilianos ocupam importantes cargos públicos. A Terra é plana… e secretamente governada pelos Illuminati. Você sabe disso tudo, pois investigou a fundo esses importantes assuntos. Quando sua pesquisa esbarrou no paranormal, você foi recrutado. Na Ordem, sua determinação será usada para um bom propósito.",
+      "T.I.": "Programador, engenheiro de software ou simplesmente “o cara da T.I.”, você tem treinamento e experiência para lidar com sistemas informatizados. Seu talento (ou curiosidade exagerada) chamou a atenção da Ordem.",
+      "Trabalhador Rural": "Você trabalhava no campo ou em áreas isoladas, como fazendeiro, pescador, biólogo, veterinário… Acostumou-se ao convívio com a natureza e os animais e talvez tenha ouvido uma ou outra história de fantasmas ao redor da fogueira. Em algum momento da sua vida, porém, descobriu que muitas dessas histórias são verdadeiras.",
+      "Trambiqueiro": "Uma vida digna exige muito trabalho, então é melhor nem tentar. Você vivia de pequenos golpes, jogatina ilegal e falcatruas. Certo dia enganou a pessoa errada; no dia seguinte, se viu servindo à Ordem. Pelo menos agora tem a chance de usar sua lábia para o bem.",
+      "Universitário": "Você era aluno de uma faculdade. Em sua rotina de estudos, provas e festas, acabou descobrindo algo — talvez um livro amaldiçoado na antiga biblioteca do campus? Por seu achado, foi convocado pela Ordem. Agora estuda com mais afinco: nesse novo curso, ouviu dizer que as provas podem ser mortais.",
+      "Vítima": "Em algum momento de sua vida — infância, juventude ou início da vida adulta — você encontrou o paranormal… e a experiência não foi nada boa. Você viu os espíritos dos mortos, foi atacado por uma entidade ou mesmo foi sequestrado para ser sacrificado em um ritual impedido no último momento. A experiência foi traumática, mas você não se abateu; em vez disso, decidiu lutar para impedir que outros inocentes passem pelo mesmo. E, já tendo sido vítima do paranormal, se tornou habilidoso em evitar perigos."
+    };
+
     const PERICIAS = [
       ["acrobacia", "Acrobacia", "agilidade", false],
       ["adestramento", "Adestramento", "presenca", true],
@@ -2801,10 +2905,10 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
     const ORIGENS = [
       { n: "Acadêmico", r: "2–8", p: ["ciencias", "investigacao"], pn: "Saber é Poder", pt: "Gaste 2 PE para receber +5 em um teste que use Intelecto (declarado antes de rolar)." },
       { n: "Agente de Saúde", r: "9–10", p: ["intuicao", "medicina"], pn: "Técnica Medicinal", pt: "Sempre que cura um personagem, adiciona seu Intelecto ao total de PV curados." },
-      { n: "Amnésico", r: "11", p: [], livres: 2, pn: "Vislumbres do Passado", pt: "Uma vez por sessão, role Intelecto (DT 10) para reconhecer pessoas ou lugares. Sucesso concede 1d4 PE temporários.", obs: "Duas perícias à escolha do mestre." },
+      { n: "Amnésico", r: "11", p: [], livres: 2, pn: "Vislumbres do Passado", pt: "Uma vez por sessão, role Intelecto (DT 10) para reconhecer pessoas ou lugares familiares que tenha encontrado antes de perder a memória. Sucesso concede 1d4 PE temporários e, a critério do mestre, uma informação útil.", obs: "Duas perícias à escolha do mestre." },
       { n: "Artista", r: "12–13", p: ["artes", "enganacao"], pn: "Magnum Opus", pt: "Uma vez por missão, um alvo na cena passa a lhe reconhecer: +5 em testes de Presença e de perícias de Presença contra ele." },
       { n: "Atleta", r: "14–15", p: ["acrobacia", "atletismo"], pn: "110%", pt: "Em testes de perícia que usem Força ou Agilidade (exceto Luta e Pontaria), gaste 2 PE para receber +5." },
-      { n: "Chef", r: "16", p: ["fortitude", "profissao"], pn: "Ingrediente Secreto", pt: "Em interlúdios, a ação alimentar-se permite cozinhar um prato especial: o bônus concedido é dobrado (ou acumula efeitos)." },
+      { n: "Chef", r: "16", p: ["fortitude", "profissao"], pn: "Ingrediente Secreto", pt: "Em interlúdios, a ação alimentar-se permite cozinhar um prato especial. Você e todos do grupo que fizeram a ação alimentar-se recebem o benefício de dois pratos (o mesmo benefício escolhido duas vezes acumula efeitos)." },
       { n: "Criminoso", r: "17", p: ["crime", "furtividade"], pn: "O Crime Compensa", pt: "Ao fim de uma missão, escolha um item encontrado. Na missão seguinte ele não conta no limite de itens por patente." },
       { n: "Cultista Arrependido", r: "18", p: ["ocultismo", "religiao"], pn: "Traços do Outro Lado", pt: "Começa com um poder paranormal à escolha (cumprindo requisitos), mas sua Sanidade inicial é reduzida permanentemente à metade.", fx: "sanMetade" },
       { n: "Desgarrado", r: "19", p: ["fortitude", "sobrevivencia"], pn: "Calejado", pt: "+1 PV máximo para cada 5% de NEX, de forma cumulativa e retroativa.", fx: "pvPorNex" },
@@ -2861,7 +2965,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         "Comandante de Campo": [
           [10, "Inspirar Confiança", "Com uma reação e 2 PE, faz um aliado em alcance curto rolar novamente um teste recém-realizado."],
           [40, "Estrategista", "Ação padrão e 1 PE por aliado direcionado (limite igual ao Intelecto) em alcance curto: no próximo turno eles ganham uma ação de movimento adicional."],
-          [65, "Brecha na Guarda", "Uma vez por rodada, se um aliado causar dano a um inimigo em alcance curto, com uma reação e 2 PE outro aliado em alcance curto faz um ataque adicional contra ele. Inspirar Confiança e Estrategista passam a alcance médio."],
+          [65, "Brecha na Guarda", "Uma vez por rodada, se um aliado causar dano a um inimigo em alcance curto, com uma reação e 2 PE você ou outro aliado em alcance curto faz um ataque adicional contra ele. Inspirar Confiança e Estrategista passam a alcance médio."],
           [99, "Oficial Comandante", "Ação padrão e 5 PE: cada aliado visível em alcance médio ganha uma ação padrão adicional no próximo turno dele."]
         ],
         "Guerreiro": [
@@ -2878,17 +2982,17 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         ],
         "Tropa de Choque": [
           [10, "Casca Grossa", "+1 PV máximo para cada 5% de NEX. Ao bloquear um ataque, soma seu Vigor à resistência a dano daquele bloqueio."],
-          [40, "Cai Dentro", "Se um oponente em alcance curto atacar um aliado, com uma reação e 1 PE force um teste de Vontade (DT por Vigor). Falha redireciona o ataque para você."],
+          [40, "Cai Dentro", "Se um oponente em alcance curto atacar um aliado, com uma reação e 1 PE force um teste de Vontade (DT por Vigor). Falha redireciona o ataque para você. Só funciona se você puder ser efetivamente atacado e estiver no alcance do ataque; quem passar no teste fica imune a este poder até o fim da cena."],
           [65, "Duro de Matar", "Ao sofrer dano não-paranormal, com uma reação e 2 PE reduz esse dano à metade. No NEX 85% também funciona contra dano paranormal."],
           [99, "Inquebrável", "Enquanto machucado (PV ≤ 50%), +5 na Defesa e resistência a dano 5. Ao entrar em Morrendo você não fica indefeso e pode agir, mas segue sujeito às regras de agonia."]
         ]
       },
       especialista: {
         "Atirador de Elite": [
-          [10, "Mira de Elite", "Proficiência com armas táticas de fogo. Em testes de Pontaria com arma de fogo, soma Intelecto ao teste de ataque."],
-          [40, "Disparo Impactante", "Ao atacar com arma de fogo, gaste 2 PE para, em vez de causar dano, executar uma manobra de combate à distância (derrubar, desarmar, empurrar, quebrar)."],
-          [65, "Atirar para Matar", "+2 de margem de ameaça com armas de fogo e +1 no multiplicador de acerto crítico."],
-          [99, "Disparo Letal", "Acertos críticos com armas de fogo causam o dano máximo dos dados, sem rolá-los."]
+          [10, "Mira de Elite", "Proficiência com armas de fogo que usam balas longas. Você soma seu Intelecto nas rolagens de dano com essas armas."],
+          [40, "Disparo Letal", "Ao usar a ação mirar, gaste 1 PE para aumentar em +2 a margem de ameaça do próximo ataque que fizer até o fim do seu próximo turno."],
+          [65, "Disparo Impactante", "Ao atacar com arma de fogo, gaste 2 PE para, em vez de causar dano, executar uma manobra entre derrubar, desarmar, empurrar ou quebrar."],
+          [99, "Atirar para Matar", "Ao fazer um acerto crítico com uma arma de fogo, você causa o dano máximo, sem precisar rolar os dados."]
         ],
         "Infiltrador": [
           [10, "Ataque Furtivo", "Uma vez por rodada, ao atingir alvo desprevenido ou flanqueado em alcance curto, gaste 1 PE para causar dano extra: +1d6 (NEX 10%), +2d6 (40%), +3d6 (65%), +4d6 (99%)."],
@@ -2897,13 +3001,13 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
           [99, "Sombra Fugaz", "Ao rolar Furtividade depois de atacar ou chamar atenção, gaste 3 PE para anular a penalidade de −15 (−OOO)."]
         ],
         "Médico de Campo": [
-          [10, "Paramédico", "Ação padrão e 2 PE: cura 2d10 PV em si ou em aliado adjacente. Requer Kit de Medicina e treino em Medicina. +1d10 nos NEX 40%, 65% e 99% gastando +1 PE por dado."],
+          [10, "Paramédico", "Ação padrão e 2 PE: cura 2d10 PV em si ou em aliado adjacente. +1d10 nos NEX 40%, 65% e 99%, gastando +1 PE por dado adicional."],
           [40, "Equipe de Trauma", "Ação padrão e 2 PE: remove qualquer condição negativa (exceto Morrendo) de um aliado adjacente."],
           [65, "Resgate", "Uma vez por rodada, se estiver em alcance curto de aliado machucado ou morrendo, desloque-se até ele como ação livre. Ao curá-lo ou remover condições, ambos ganham +5 de Defesa até seu próximo turno. Carga para carregar personagens cai à metade."],
           [99, "Reanimação", "Uma vez por cena, ação completa e 10 PE para ressuscitar um personagem que morreu na mesma cena (não vale para morte por dano massivo)."]
         ],
         "Negociador": [
-          [10, "Eloquência", "Ação completa e 1 PE por alvo em alcance curto: teste de Diplomacia, Enganação ou Intimidação contra a Vontade dos alvos. Sucesso os deixa Fascinados enquanto você se concentrar."],
+          [10, "Eloquência", "Ação completa e 1 PE por alvo em alcance curto: teste de Diplomacia, Enganação ou Intimidação contra a Vontade dos alvos. Sucesso os deixa Fascinados enquanto você se concentrar (uma ação padrão por rodada). Alvo hostil ou em combate recebe +5 na resistência e tem direito a um novo teste por rodada; quem passar fica imune por um dia."],
           [40, "Discurso Motivador", "Ação padrão e 4 PE: você e aliados em alcance curto recebem +2 (+O) em todos os testes de perícia até o fim da cena. No NEX 65%, +5 (+OO) por 8 PE."],
           [65, "Eu Conheço um Cara", "Uma vez por missão, ative contatos para conseguir favores dramáticos: trocar equipamentos, resgate, local seguro."],
           [99, "Truque de Mestre", "Gaste 5 PE para simular o efeito exato de qualquer habilidade usada por aliados vista na cena, pagando todos os custos normais dela."]
@@ -3275,6 +3379,8 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       renderAgente();
       renderNex();
       renderPericias();
+      renderTrilhas();
+      renderOrigens();
       renderRolagem();
       renderSessao();
     }
@@ -3617,6 +3723,117 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         d.hidden = !on; if (on) n++;
       });
       $("#perCount").textContent = n + " de " + PERICIAS.length;
+    }
+
+    /* ---------- Trilhas da classe (capítulo 1) ---------- */
+    function renderTrilhas() {
+      const C = classeAtual(), trilhas = TRILHAS[S.classe] || {};
+      $("#trClasse").textContent = C.nome;
+      $("#trChip").textContent = S.trilha || "nenhuma escolhida";
+
+      const nt = $("#trNotas"); nt.innerHTML = "";
+      nt.append(notice("", "Como funciona", "Em <b>NEX 10%</b> você escolhe uma das " + Object.keys(trilhas).length +
+        " trilhas de " + esc(C.nome) + " e recebe o primeiro poder dela. Os demais poderes chegam em <b>NEX 40%, 65% e 99%</b>. " +
+        "A escolha da trilha é permanente na mesa — trocar aqui é uma correção de ficha, não uma regra do livro.", true));
+      if (S.nex < 10) nt.append(notice("warn", "Bloqueado", "Você está em NEX " + S.nex +
+        "%. A trilha só é escolhida ao alcançar NEX 10%.", false));
+      if (S.nex >= 50) nt.append(notice("", "Versatilidade", "Em NEX 50% você pode escolher, em vez de um poder de classe, " +
+        "o <b>primeiro poder</b> de outra trilha da sua classe. As trilhas abaixo marcam esse poder com NEX 10%.", true));
+
+      const box = $("#trBox"); box.innerHTML = "";
+      Object.keys(trilhas).forEach(nome => {
+        const poderes = trilhas[nome], atual = S.trilha === nome;
+        const card = el("div", "card trilha" + (atual ? " atual" : ""));
+        const desbloqueados = atual ? poderes.filter(p => S.nex >= p[0]).length : 0;
+
+        const head = el("header");
+        head.innerHTML = '<h3>' + esc(nome) + '</h3><div class="grow"></div>' +
+          (atual ? '<span class="chip ok">sua trilha · ' + desbloqueados + '/4 poderes</span>' : "");
+        card.append(head);
+
+        const pad = el("div", "pad stack");
+        if (TRILHA_REQ[nome]) pad.append(notice("warn", "Especial", TRILHA_REQ[nome], false));
+        const p = el("p", "rules"); p.textContent = TRILHA_DESC[nome] || ""; pad.append(p);
+
+        poderes.forEach(([nx, pn, pt]) => {
+          const on = atual && S.nex >= nx;
+          const a = el("div", "abil " + (on ? "on" : "off"));
+          a.innerHTML = '<h4>' + esc(pn) + ' <span class="nx">NEX ' + nx + '%</span>' +
+            (atual && !on ? '<span class="nx">faltam ' + (nx - S.nex) + '%</span>' : "") +
+            '</h4><p class="rules">' + esc(pt) + '</p>';
+          pad.append(a);
+        });
+
+        if (podeEditar) {
+          const row = el("div", "btnrow");
+          if (atual) {
+            const b = el("button", "btn ghost sm", "Abrir mão desta trilha");
+            b.onclick = () => { S.trilha = ""; render(); save(); };
+            row.append(b);
+          } else {
+            const b = el("button", "btn sm", S.trilha ? "Trocar para esta trilha" : "Escolher esta trilha");
+            b.disabled = S.nex < 10;
+            b.onclick = () => { S.trilha = nome; render(); save(); };
+            row.append(b);
+          }
+          pad.append(row);
+        }
+        card.append(pad);
+        box.append(card);
+      });
+    }
+
+    /* ---------- Origens (capítulo 1) ---------- */
+    function renderOrigens() {
+      const nt = $("#orNotas"); nt.innerHTML = "";
+      nt.append(notice("", "Como funciona", "A origem representa a vida do agente antes da Ordem. Ela concede <b>duas perícias treinadas</b> " +
+        "e um <b>poder de origem</b>. Você pode escolher a que combina com o conceito ou rolar <b>2d20</b> na tabela. " +
+        "O texto de cada origem é propositalmente vago: use como está ou detalhe à vontade.", true));
+      const O = origemAtual();
+      nt.append(notice("ok", "Sua origem", "<b>" + esc(O.n) + "</b> — " + esc(O.pn) + ".", true));
+
+      const box = $("#orBox"); box.innerHTML = "";
+      ORIGENS.forEach(O2 => {
+        const atual = S.origem === O2.n;
+        const pericias = O2.p.length ? O2.p.map(i => PER_MAP[i].nome) : [];
+        const det = el("details", "perdet" + (atual ? " atual" : ""));
+        det.open = atual;
+        det.dataset.busca = (O2.n + " " + pericias.join(" ") + " " + O2.pn + " " + O2.pt + " " +
+          (ORIGEM_DESC[O2.n] || "") + " " + (O2.obs || "")).toLowerCase();
+
+        let corpo = '<div class="pad stack">' +
+          '<p class="rules">' + esc(ORIGEM_DESC[O2.n] || "") + '</p>' +
+          '<div class="uso"><div class="uh"><b>Perícias treinadas</b></div><div class="rules">' +
+          esc(pericias.length ? pericias.join(" e ") : (O2.obs || "—")) + '</div></div>' +
+          '<div class="uso"><div class="uh"><b>' + esc(O2.pn) + '</b><span class="ureq">poder de origem</span></div>' +
+          '<div class="rules">' + esc(O2.pt) + '</div></div>';
+        if (podeEditar && !atual) corpo += '<div class="btnrow"><button class="btn sm" data-origem="' + esc(O2.n) +
+          '">Adotar esta origem</button></div>';
+        corpo += '</div>';
+
+        det.innerHTML = '<summary><span class="pnome">' + esc(O2.n) + '</span>' +
+          '<span class="tag">2d20 ' + esc(O2.r) + '</span>' +
+          (pericias.length ? pericias.map(n => '<span class="tag">' + esc(n) + '</span>').join("")
+            : '<span class="tag">à escolha do mestre</span>') +
+          '<span class="grow" style="flex:1"></span>' +
+          (atual ? '<span class="chip ok">sua origem</span>' : "") + '</summary>' + corpo;
+        box.append(det);
+      });
+
+      box.querySelectorAll("[data-origem]").forEach(b => b.onclick = () => {
+        S.origem = b.dataset.origem; render(); save();
+      });
+      filtrarOrigens();
+    }
+
+    function filtrarOrigens() {
+      const inp = $("#orBusca"), q = inp ? inp.value.trim().toLowerCase() : "";
+      let n = 0;
+      $$("#orBox .perdet").forEach(d => {
+        const on = !q || d.dataset.busca.includes(q);
+        d.hidden = !on; if (on) n++;
+      });
+      $("#orCount").textContent = n + " de " + ORIGENS.length;
     }
 
     /* ---------- Rolagem ---------- */
@@ -4022,6 +4239,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
 
     function bindBusca() {
       $("#perBusca").oninput = filtrarPericias;
+      $("#orBusca").oninput = filtrarOrigens;
       $("#armaBusca").oninput = e => {
         const q = e.target.value.trim().toLowerCase();
         $$("#armasTable tbody tr").forEach(tr => {
