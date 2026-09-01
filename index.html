@@ -4589,13 +4589,6 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         if (!setCfg(url, key)) { aviso("#cfgErro", "Este navegador bloqueou o armazenamento local. Preencha o bloco CONFIG no arquivo."); return; }
         location.reload();
       };
-      $("#cfgTrocar").onclick = () => {
-        const c = getCfg();
-        $("#cfgUrl").value = c.url; $("#cfgKey").value = c.key;
-        $("#cfgErro").innerHTML = "";
-        mostrar("config");
-      };
-
       /* login */
       $("#gLogin").onclick = async () => {
         const b = $("#gLogin");
