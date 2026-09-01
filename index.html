@@ -2230,9 +2230,6 @@
             Entrar com o Google
           </button>
           <div id="loginErro"></div>
-          <div class="hint" style="text-align:center">
-            <button class="linkb" id="cfgTrocar">trocar a conexão com o banco</button>
-          </div>
         </div>
       </div>
     </div>
@@ -5345,12 +5342,6 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         if (!url || !key) { aviso("#cfgErro", "Preencha os dois campos.", "warn"); return; }
         if (!setCfg(url, key)) { aviso("#cfgErro", "Este navegador bloqueou o armazenamento local. Preencha o bloco CONFIG no arquivo."); return; }
         location.reload();
-      };
-      $("#cfgTrocar").onclick = () => {
-        const c = getCfg();
-        $("#cfgUrl").value = c.url; $("#cfgKey").value = c.key;
-        $("#cfgErro").innerHTML = "";
-        mostrar("config");
       };
       /* login */
       $("#gLogin").onclick = async () => {
