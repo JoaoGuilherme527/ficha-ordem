@@ -1665,6 +1665,220 @@
       }
     }
 
+    label.chk {
+      font-size: 12px;
+      color: var(--ink-2);
+      align-items: center;
+      cursor: pointer
+    }
+
+    label.chk input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      accent-color: var(--accent)
+    }
+
+    /* =====================================================================
+       ALVOS DE TOQUE
+       No celular todo controle precisa de área confortável para o dedo. O
+       piso adotado é 44px nos controles principais e 40px nos secundários
+       (recomendação da Apple é 44pt, do Android 48dp). Os campos de texto
+       também sobem para 16px de fonte: abaixo disso o Safari do iOS dá zoom
+       sozinho ao focar o campo e desalinha a página.
+       ===================================================================== */
+    @media (max-width:720px) {
+
+      .f input,
+      .f select,
+      .f textarea,
+      input[type="text"],
+      input[type="number"],
+      select,
+      textarea {
+        min-height: 44px;
+        font-size: 16px
+      }
+
+      .btn {
+        min-height: 44px;
+        padding: 10px 16px;
+        font-size: 14px
+      }
+
+      .btn.sm {
+        min-height: 40px;
+        padding: 8px 14px;
+        font-size: 13px
+      }
+
+      .stepper {
+        gap: 6px
+      }
+
+      .stepper button {
+        min-height: 42px;
+        font-size: 13px
+      }
+
+      .nexstep button {
+        min-width: 52px
+      }
+
+      .attr .ctrl {
+        gap: 6px
+      }
+
+      .attr .ctrl button {
+        min-height: 42px;
+        min-width: 42px;
+        font-size: 15px
+      }
+
+      .cond {
+        min-height: 40px;
+        padding: 8px 15px;
+        font-size: 13px
+      }
+
+      .dstep {
+        gap: 8px
+      }
+
+      .dstep button {
+        width: 44px;
+        height: 44px;
+        font-size: 16px
+      }
+
+      .elem {
+        min-height: 42px;
+        padding: 9px 14px
+      }
+
+      /* linha de perícia: o seletor de grau e o campo de outros eram os
+         menores alvos da ficha (26px). */
+      .skrow,
+      .skhead {
+        grid-template-columns: minmax(0, 1fr) 92px 66px 54px;
+        gap: 8px;
+        padding: 8px 10px
+      }
+
+      .skrow select {
+        min-height: 40px;
+        padding: 6px 22px 6px 8px;
+        font-size: 14px
+      }
+
+      .skrow input {
+        min-height: 40px;
+        font-size: 14px;
+        text-align: center
+      }
+
+      /* checkbox: o nativo fica em 13px. Aumenta a caixa e o alvo do rótulo */
+      input[type="checkbox"],
+      label.chk input[type="checkbox"] {
+        width: 24px;
+        height: 24px;
+        min-height: 24px
+      }
+
+      label.chk {
+        font-size: 14px;
+        min-height: 44px
+      }
+
+      label.btnrow,
+      .card>header label {
+        min-height: 44px;
+        align-items: center;
+        gap: 8px
+      }
+
+      .tabs button {
+        padding: 14px 14px 12px;
+        font-size: 14px
+      }
+
+      .perdet>summary {
+        min-height: 48px;
+        align-items: center
+      }
+
+      .linkb {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center
+      }
+
+      /* botões em linha ganham respiro para não encostar um no outro */
+      .btnrow {
+        gap: 8px
+      }
+    }
+
+    /* Abaixo de 560px não cabe nome + grau + outros + bônus na mesma linha
+       sem truncar o nome da perícia. Vira duas linhas: nome e bônus em cima,
+       controles embaixo, com rótulo no campo de outros já que o cabeçalho da
+       tabela sai de cena. */
+    @media (max-width:560px) {
+      .skhead {
+        display: none
+      }
+
+      .skrow {
+        grid-template-columns: minmax(0, 1fr) 74px;
+        row-gap: 8px;
+        column-gap: 10px;
+        padding: 10px 12px
+      }
+
+      .skrow .sn {
+        grid-column: 1;
+        grid-row: 1
+      }
+
+      .skrow .sb {
+        grid-column: 2;
+        grid-row: 1;
+        text-align: right
+      }
+
+      .skrow .sgrau {
+        grid-column: 1;
+        grid-row: 2
+      }
+
+      .skrow .soutros {
+        grid-column: 2;
+        grid-row: 2;
+        position: relative
+      }
+
+      .skrow .sgrau select {
+        width: 100%
+      }
+
+      .skrow .soutros::before {
+        content: "outros";
+        position: absolute;
+        top: -1px;
+        right: 2px;
+        font-size: 9px;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: var(--ink-3);
+        pointer-events: none
+      }
+
+      .skrow .soutros input {
+        width: 100%;
+        padding-top: 9px
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       * {
         transition: none !important;
@@ -2485,8 +2699,8 @@
             <header>
               <h3>Tabela de progressão</h3>
               <div class="grow"></div>
-              <label class="btnrow" style="font-size:12px;color:var(--ink-2)"><input type="checkbox" id="fPerNex"
-                  style="width:auto" checked> ganho por NEX inclui Vigor / Presença</label>
+              <label class="btnrow chk"><input type="checkbox" id="fPerNex" checked> ganho por NEX inclui Vigor /
+                Presença</label>
             </header>
             <div class="pad">
               <div class="notice warn" id="perNexNote"></div>
@@ -3531,6 +3745,41 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       });
       return src;
     }
+    /* Origem e classe concedem perícias. Ao trocar de uma para outra, as
+       antigas continuavam marcadas como Treinado e passavam a consumir o
+       orçamento de perícias livres em silêncio, enquanto as novas nem eram
+       marcadas. Esta função roda a troca e reconcilia a diferença: rebaixa o
+       que a fonte antiga concedia e a nova não, promove o que a nova concede.
+       Graus acima de Treinado nunca são mexidos — são investimento de NEX,
+       não concessão — e viram aviso. */
+    function trocarFonte(aplicar) {
+      const antes = fontesPericias();
+      aplicar();
+      const depois = fontesPericias();
+      const rebaixadas = [], promovidas = [], presas = [];
+
+      PERICIAS.forEach(([id, nome]) => {
+        const st = S.per[id];
+        if (antes[id] && !depois[id]) {
+          if (st.grau === "Treinado") { st.grau = "Leigo"; rebaixadas.push(nome); }
+          else if (st.grau !== "Leigo") presas.push(nome + " (" + st.grau + ")");
+        }
+      });
+      /* promover depois de rebaixar: o par da classe (Luta ou Pontaria etc.)
+         se credita a partir do que já está treinado, então a segunda leitura
+         precisa do estado já limpo. */
+      const finais = fontesPericias();
+      PERICIAS.forEach(([id, nome]) => {
+        if (finais[id] && S.per[id].grau === "Leigo") { S.per[id].grau = "Treinado"; promovidas.push(nome); }
+      });
+
+      const partes = [];
+      if (promovidas.length) partes.push("treinou " + promovidas.join(", "));
+      if (rebaixadas.length) partes.push("devolveu " + rebaixadas.join(", "));
+      if (partes.length) toast("Perícias ajustadas: " + partes.join(" · ") + ".");
+      if (presas.length) toast("Mantive " + presas.join(", ") + " — grau acima de Treinado não é rebaixado sozinho.", true);
+    }
+
     function conflitoOrigemClasse() {
       const C = classeAtual(), o = origemAtual();
       const fixasUnicas = C.fixas.filter(x => x.length === 1).map(x => x[0]);
@@ -3598,6 +3847,22 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
        ESTADO VITAL / SESSÃO
        ======================================================================= */
     function maxes() { const D = derived(); return { pv: D.pv, pe: D.pe, san: D.san }; }
+
+    /* cur() já clampa na leitura, mas o valor guardado continuava alto e ia
+       assim para o banco. Se o jogador via 22/22 e levava dano, o clamp de
+       setCur descontava do 22 e o excedente sumia sem aviso quando o máximo
+       voltava. Aqui o estado é reconciliado com o máximo sempre que ele
+       encolhe — só para baixo, para não inflar PV que o jogador não tem. */
+    function normalizarVitais() {
+      const M = maxes();
+      let mudou = false;
+      ["pv", "pe", "san"].forEach(k => {
+        if (S[k] != null && S[k] > M[k]) { S[k] = M[k]; mudou = true; }
+      });
+      if (S.tpv < 0) { S.tpv = 0; mudou = true; }
+      if (S.tpe < 0) { S.tpe = 0; mudou = true; }
+      return mudou;
+    }
     function cur(k) { const m = maxes()[k]; return S[k] == null ? m : clamp(S[k], 0, m); }
     function setCur(k, v) { const m = maxes()[k]; S[k] = clamp(Math.round(v), 0, m); }
 
@@ -3673,6 +3938,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       if (h) document.documentElement.style.setProperty("--hh", Math.round(h.getBoundingClientRect().height) + "px");
     }
     function render() {
+      normalizarVitais();
       syncCampos();
       renderTopo();
       renderRail();
@@ -3823,8 +4089,8 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         row.innerHTML =
           '<div class="sn">' + tags.join("") + '<span>' + nome + '</span></div>' +
           '<div class="sa">' + ATR_ABBR[atr] + '</div>' +
-          '<div><select data-sk="' + id + '">' + opts + extra + '</select></div>' +
-          '<div><input type="number" step="1" data-sko="' + id + '" value="' + (st.outros || 0) + '"></div>' +
+          '<div class="sgrau"><select data-sk="' + id + '" aria-label="Grau de treinamento em ' + esc(nome) + '">' + opts + extra + '</select></div>' +
+          '<div class="soutros"><input type="number" step="1" data-sko="' + id + '" aria-label="Outros bônus em ' + esc(nome) + '" value="' + (st.outros || 0) + '"></div>' +
           '<div class="sb">' + sgn(bonusPericia(id)) + '</div>';
         list.append(row);
       });
@@ -3979,7 +4245,16 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       });
 
       if (S.nex >= 10 && !S.trilha) out.push({ t: "warn", m: "trilha não escolhida", aba: "tab-trilhas" });
+      if (S.nex < 10 && S.trilha) out.push({ t: "bad", m: "trilha “" + S.trilha + "” escolhida, mas ela só existe a partir do NEX 10%", aba: "tab-trilhas" });
       if (S.nex >= 50 && !S.afinidade) out.push({ t: "warn", m: "afinidade paranormal não escolhida", aba: "tab-nex" });
+      if (S.nex < 50 && S.afinidade) out.push({ t: "bad", m: "afinidade “" + S.afinidade + "” escolhida, mas ela só é definida no NEX 50%", aba: "tab-nex" });
+
+      const permitidos = grausPermitidos();
+      const acimaDoNex = PERICIAS.filter(([id]) => !permitidos.includes(S.per[id].grau));
+      if (acimaDoNex.length) out.push({
+        t: "bad", m: acimaDoNex.map(p => p[1] + " (" + S.per[p[0]].grau + ")").join(", ") + ": grau acima do que o NEX permite",
+        aba: "tab-agente"
+      });
 
       const usadasObrig = PERICIAS.filter(([id, , , ob]) => ob && S.per[id].grau === "Leigo" && fontesPericias()[id]);
       if (usadasObrig.length) out.push({
@@ -4187,7 +4462,8 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       });
 
       box.querySelectorAll("[data-origem]").forEach(b => b.onclick = () => {
-        S.origem = b.dataset.origem; render(); save();
+        trocarFonte(() => { S.origem = b.dataset.origem; });
+        render(); save();
       });
       filtrarOrigens();
     }
@@ -4367,7 +4643,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       cl.innerHTML = Object.keys(CLASSES).map(k => '<option value="' + k + '">' + CLASSES[k].nome + '</option>').join("");
       cl.value = S.classe;
       cl.onchange = () => {
-        S.classe = cl.value; S.trilha = "";
+        trocarFonte(() => { S.classe = cl.value; S.trilha = ""; });
         fillTrilhas(); render(); renderRef(); save();
       };
 
@@ -4375,8 +4651,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       og.innerHTML = ORIGENS.map(o => '<option value="' + esc(o.n) + '">' + esc(o.n) + '</option>').join("");
       og.value = S.origem;
       og.onchange = () => {
-        S.origem = og.value;
-        origemAtual().p.forEach(id => { if (S.per[id] && S.per[id].grau === "Leigo") S.per[id].grau = "Treinado"; });
+        trocarFonte(() => { S.origem = og.value; });
         render(); save();
       };
 
