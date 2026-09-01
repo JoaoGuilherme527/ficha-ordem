@@ -329,3 +329,98 @@ Formato: **Uso** — requisito de grau / DT / custo de ação — efeito mecâni
 - *Operar Dispositivo* — kit, 1d4+1 ações completas — DT 15 aparelho comum, 20 equipamento profissional, 25 sistema protegido. Pode sofrer –1d20 para fazê-lo em ação completa.
 
 **Vontade (Pre).** Teste de resistência contra efeitos que exigem determinação (intimidação, rituais mentais); DT definida pelo efeito. Também usada para conjurar rituais em condições adversas.
+
+--------------------------------------------------------------------------------
+
+11. Catálogo de Trilhas — Correções e Texto de Apresentação
+
+O catálogo mecânico das trilhas está na seção 5. Esta seção registra o texto de conceito que o livro traz antes dos poderes de cada trilha e, principalmente, as divergências encontradas ao conferir a implementação contra o livro básico (páginas 27, 30-31 e 34-35).
+
+11.1 Correções normativas
+
+**Atirador de Elite estava com os poderes fora de ordem e com textos trocados.** A sequência correta é:
+
+| NEX | Poder | Efeito |
+| --- | --- | --- |
+| 10% | Mira de Elite | Proficiência com armas de fogo que usam **balas longas**; soma o Intelecto nas **rolagens de dano** com essas armas (não no teste de ataque) |
+| 40% | Disparo Letal | Ao usar a ação mirar, gaste 1 PE para +2 de margem de ameaça no próximo ataque, até o fim do próximo turno |
+| 65% | Disparo Impactante | Ao atacar com arma de fogo, gaste 2 PE para, em vez de dano, executar derrubar, desarmar, empurrar ou quebrar |
+| 99% | Atirar para Matar | Acerto crítico com arma de fogo causa dano máximo, sem rolar dados |
+
+O efeito "+2 de margem de ameaça e +1 no multiplicador de crítico", que circulava atribuído a Atirar para Matar, **não existe no livro**.
+
+Outras divergências corrigidas:
+
+- **Brecha na Guarda** (Comandante de Campo, 65%): o ataque adicional pode ser seu **ou** de outro aliado em alcance curto.
+- **Cai Dentro** (Tropa de Choque, 40%): só funciona se você puder ser efetivamente atacado e estiver no alcance do ataque; um oponente que passe no teste de Vontade fica imune a este poder até o fim da cena.
+- **Eloquência** (Negociador, 10%): a concentração é uma ação padrão por rodada; alvo hostil ou em combate recebe +5 na resistência e tem direito a um novo teste por rodada; quem passar fica imune por um dia.
+- **Médico de Campo**: o pré-requisito é da **trilha**, não do poder Paramédico. Para escolher a trilha é preciso ser treinado em Medicina; para usar as habilidades dela, possuir um kit de medicina.
+- **Vislumbres do Passado** (Amnésico): além de 1d4 PE temporários, o sucesso concede, a critério do mestre, uma informação útil.
+- **Ingrediente Secreto** (Chef): quem fez a ação alimentar-se recebe o benefício de **dois pratos**; o mesmo benefício escolhido duas vezes acumula efeitos.
+
+11.2 Conceito de cada trilha
+
+Combatente — **Aniquilador**: treinado para abater alvos com eficiência e velocidade. **Comandante de Campo**: coordena e auxilia os companheiros, tomando decisões rápidas. **Guerreiro**: transformou o próprio corpo em arma, com golpes corpo a corpo tão poderosos quanto uma bala. **Operações Especiais**: ações calculadas, antevendo os movimentos inimigos e se posicionando melhor. **Tropa de Choque**: treinou o corpo para resistir a traumas e se coloca entre os aliados e o perigo.
+
+Especialista — **Atirador de Elite**: neutraliza ameaças de longe, tratando a arma como ferramenta de precisão. **Infiltrador**: supera barreiras de defesa e neutraliza alvos desprevenidos sem alarde. **Médico de Campo**: primeiros socorros e emergência, acostumado ao caos do campo de batalha. **Negociador**: influencia pessoas por lábia ou intimidação. **Técnico**: mantém e repara o equipamento do time, improvisa ferramentas e sabota as dos inimigos.
+
+Ocultista — **Conduíte**: domina alcance e velocidade de conjuração e passa a interferir nos rituais alheios. **Flagelador**: converte dor em poder para os rituais. **Graduado**: conjurador versátil, conhece mais rituais e os torna mais difíceis de resistir. **Intuitivo**: preparou a mente para resistir ao Outro Lado e expandir os próprios limites. **Lâmina Paranormal**: usa o paranormal como arma, mesclando conjuração e combate.
+
+--------------------------------------------------------------------------------
+
+12. Catálogo de Origens — Texto de Apresentação
+
+As 26 origens, suas perícias e seus poderes estão na Tabela 1.1 (seção 3, Passo 2). O livro acompanha cada uma de um parágrafo de conceito, propositalmente vago: serve como ponto de partida e pode ser usado como está ou detalhado à vontade. O sistema deve exibir esse texto junto da origem na criação e na ficha, sem tratá-lo como regra.
+
+Resumo por origem: **Acadêmico** pesquisador ou professor cujos estudos tocaram o misterioso · **Agente de Saúde** profissional da saúde surpreendido pelo paranormal no trabalho · **Amnésico** perdeu a memória; a Ordem é a única família que conhece · **Artista** ator, músico ou escritor cuja obra tem um lado sombrio · **Atleta** competidor cujo desempenho pode ter origem paranormal · **Chef** cozinheiro cuja comida de algum modo o envolveu com o Outro Lado · **Criminoso** vida fora da lei; a Ordem preferiu recrutar a combater · **Cultista Arrependido** ex-membro de um culto, ainda sob desconfiança · **Desgarrado** vivia fora das normas sociais e endureceu com isso · **Engenheiro** inventor que criou um dispositivo paranormal · **Executivo** trocou a burocracia corporativa por missões após descobrir demais · **Investigador** perito forense, federal ou detetive particular · **Lutador** artes marciais ou briga de rua · **Magnata** fortuna ou patrimônio ligado, de algum modo, ao oculto · **Mercenário** soldado de aluguel · **Militar** serviu numa força militar e é perito em armas de fogo · **Operário** emprego braçal e visão pragmática confrontada pelo paranormal · **Policial** segurança pública que sobreviveu a um caso paranormal · **Religioso** devoto ou sacerdote que auxilia em problemas espirituais · **Servidor Público** viu o governo local envolvido com cultos · **Teórico da Conspiração** investigou conspirações até esbarrar no real · **T.I.** profissional de sistemas cuja curiosidade chamou atenção · **Trabalhador Rural** vida no campo, onde as histórias se provaram verdadeiras · **Trambiqueiro** vivia de golpes até enganar a pessoa errada · **Universitário** achou algo que não devia no campus · **Vítima** sobreviveu a um encontro traumático e decidiu lutar.
+
+--------------------------------------------------------------------------------
+
+13. Modelo Multiusuário, Papéis e Visibilidade
+
+O aplicativo é multiusuário, com autenticação via Google (Supabase Auth) e três tabelas: `perfis`, `agentes` e `rolagens`.
+
+13.1 Papéis
+
+- **Jogador** (padrão): cria e edita as próprias fichas. **Não pode ver nem abrir a ficha de outro usuário.**
+- **Mestre** (`perfis.mestre = true`): vê e edita qualquer ficha da mesa e tem acesso ao painel de usuários.
+
+13.2 Regra de visibilidade
+
+A listagem de agentes é filtrada por dono para jogadores e completa para o mestre, e a abertura de ficha é recusada quando o agente não é do usuário. **Isso é apenas a camada de interface.** A tela é montada a partir do que o banco devolve, então a regra precisa existir na policy de RLS, caso contrário qualquer pessoa com o console do navegador lê a tabela inteira:
+
+```sql
+-- leitura de agentes: dono ou mestre
+using (
+  dono = auth.uid()
+  or exists (select 1 from perfis p where p.id = auth.uid() and p.mestre)
+)
+```
+
+13.3 Presença
+
+`perfis.ultimo_acesso` (`timestamptz`) é carimbado a cada login. A escrita é best-effort: se a coluna não existir, o erro é ignorado para não derrubar o login, o painel do mestre cai para a última atualização de ficha como aproximação de atividade e exibe a migração necessária:
+
+```sql
+alter table perfis add column ultimo_acesso timestamptz;
+```
+
+Apenas `ultimo_acesso` conta como presença. Horário derivado de edição de ficha é exibido como atividade, nunca como "online" — o Supabase não expõe ao cliente a lista de sessões ativas, e fingir que expõe seria enganoso.
+
+13.4 Painel de usuários (mestre)
+
+Lista cada usuário que já entrou no app com avatar, nome, e-mail, papel, indicador de atividade e as fichas que possui (classe, NEX, trilha, PV/PE/SAN, última atualização), ordenados por presença e depois por número de fichas. Sinaliza usuários sem ficha e agentes cujo `dono` não existe mais em `perfis`.
+
+--------------------------------------------------------------------------------
+
+14. Requisitos de Interface
+
+14.1 Reatividade ao NEX
+
+O NEX é o eixo da ficha: alterá-lo deve recalcular imediatamente PV, PE e SAN máximos, limite de PE por turno, DT base, círculo de rituais, graus de treinamento liberados (veterano em 35%, expert em 70%), pontos e teto de atributo, liberação de afinidade (50%) e quais poderes de trilha estão ativos. A interface deve tornar isso visível, e não apenas recalcular em silêncio: a faixa atual, o que ela concede, o que a próxima concede e a lista de escolhas ainda pendentes naquela faixa.
+
+Marcos de círculo de ritual (NEX 25%, 55% e 85%) valem apenas para ocultistas; para as demais classes a faixa não concede nada e deve ser apresentada como tal.
+
+14.2 Responsividade
+
+O conteúdo largo — tabelas de armas, de progressão, de perícias — precisa rolar dentro do próprio contêiner, nunca empurrar a página. Em grid, isso exige `minmax(0, 1fr)` nas colunas e `min-width: 0` nos contêineres: com `1fr`, o piso da coluna é o `min-content` do conteúdo, e uma tabela larga estoura a largura da página inteira. Critério de aceite: em 390px de largura, nenhuma aba pode produzir rolagem horizontal no documento.
