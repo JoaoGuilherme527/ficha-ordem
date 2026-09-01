@@ -1458,6 +1458,213 @@
       color: var(--surface)
     }
 
+    /* ---------- card de NEX na rail ---------- */
+    .nexcard {
+      padding: 12px
+    }
+
+    .nexhead {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px
+    }
+
+    .nexval {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+      font-family: var(--disp);
+      line-height: 1
+    }
+
+    .nexval b {
+      font-size: 30px;
+      letter-spacing: -.02em
+    }
+
+    .nexval span {
+      font-size: 14px;
+      color: var(--ink-3)
+    }
+
+    .nexstep {
+      display: flex;
+      gap: 4px
+    }
+
+    .bar.nexbar {
+      margin: 10px 0 8px
+    }
+
+    .bar.nexbar i {
+      background: linear-gradient(90deg, var(--san), var(--accent))
+    }
+
+    .nexmarco {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 10px
+    }
+
+    .nexmarco .rules {
+      font-size: 13px;
+      line-height: 1.4
+    }
+
+    .pend {
+      display: grid;
+      gap: 6px
+    }
+
+    .pend .notice {
+      padding: 7px 9px;
+      font-size: 12px
+    }
+    /* =====================================================================
+       RESPONSIVO / UX
+       O grid da .wrap usava 1fr, cujo piso é o min-content da coluna. Como
+       main contém tabelas largas, o piso empurrava a página inteira e
+       estourava a largura no celular. minmax(0,1fr) + min-width:0 nos
+       contêineres deixam o .tscroll rolar sozinho, como era a intenção.
+       ===================================================================== */
+    main,
+    .card,
+    .wrap>*,
+    section[role="tabpanel"] {
+      min-width: 0
+    }
+
+    .tscroll {
+      max-width: 100%
+    }
+
+    .tscroll table {
+      min-width: max-content
+    }
+
+    code.inline,
+    .notice code.inline {
+      overflow-wrap: anywhere
+    }
+
+    .notice span:last-child {
+      min-width: 0;
+      overflow-wrap: anywhere
+    }
+
+    /* barra de abas: sem barra de rolagem visível, com encaixe e sombra de
+       borda indicando que há mais abas para o lado */
+    .tabs {
+      scrollbar-width: none;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      background-image: linear-gradient(to right, var(--ground) 60%, transparent),
+        linear-gradient(to left, var(--ground) 60%, transparent),
+        linear-gradient(to right, rgba(0, 0, 0, .10), transparent 12px),
+        linear-gradient(to left, rgba(0, 0, 0, .10), transparent 12px);
+      background-position: left center, right center, left center, right center;
+      background-repeat: no-repeat;
+      background-size: 24px 100%, 24px 100%, 12px 100%, 12px 100%;
+      background-attachment: local, local, scroll, scroll;
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none
+    }
+
+    .tabs button {
+      scroll-snap-align: start
+    }
+
+    .tabs.inline {
+      background-image: none
+    }
+
+    @media (max-width:980px) {
+      .wrap {
+        grid-template-columns: minmax(0, 1fr)
+      }
+    }
+
+    @media (max-width:720px) {
+      .wrap {
+        padding: 12px;
+        gap: 12px
+      }
+
+      .pad {
+        padding: 12px
+      }
+
+      .tabs {
+        padding: 0 12px
+      }
+
+      .listtop {
+        align-items: stretch
+      }
+
+      .listtop .btnrow {
+        width: 100%
+      }
+
+      .listtop .btnrow>* {
+        flex: 1 1 auto
+      }
+
+      .listtop input {
+        max-width: none !important
+      }
+
+      /* alvo de toque mínimo confortável */
+      .stepper button,
+      .btn.sm,
+      .dstep button {
+        min-height: 34px
+      }
+
+      .card>header {
+        flex-wrap: wrap;
+        row-gap: 6px
+      }
+
+      .card>header input[type="text"] {
+        max-width: none !important;
+        width: 100%;
+        order: 9
+      }
+
+      .ucard>header {
+        align-items: flex-start
+      }
+
+      .perdet>summary {
+        padding: 10px 12px
+      }
+    }
+
+    @media (max-width:460px) {
+
+      .grid3,
+      .grid4 {
+        grid-template-columns: 1fr
+      }
+
+      .statgrid {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .nexval b {
+        font-size: 26px
+      }
+
+      .chiprow,
+      .hchips {
+        gap: 4px
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       * {
         transition: none !important;
@@ -2023,6 +2230,9 @@
             Entrar com o Google
           </button>
           <div id="loginErro"></div>
+          <div class="hint" style="text-align:center">
+            <button class="linkb" id="cfgTrocar">trocar a conexão com o banco</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2133,6 +2343,23 @@
     <div class="wrap">
       <!-- ============ RAIL ============ -->
       <aside class="rail">
+        <div class="card nexcard">
+          <div class="nexhead">
+            <div>
+              <span class="eyebrow">Nível de exposição</span>
+              <div class="nexval"><b id="nexBig">5</b><span>%</span></div>
+            </div>
+            <div class="grow"></div>
+            <div class="stepper nexstep">
+              <button data-nex="-5" aria-label="reduzir NEX">−5</button><button data-nex="5"
+                aria-label="aumentar NEX">+5</button>
+            </div>
+          </div>
+          <div class="bar nexbar"><i id="nexBar" style="width:0"></i></div>
+          <div class="nexmarco" id="nexMarco"></div>
+          <div class="pend" id="nexPend"></div>
+        </div>
+
         <div class="card">
           <div class="vital v-pv">
             <div class="vhead"><span class="vname">PV</span><span class="status" id="stPV">Normal</span><span
@@ -3452,6 +3679,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       syncCampos();
       renderTopo();
       renderRail();
+      renderNexRail();
       renderAgente();
       renderNex();
       renderPericias();
@@ -3729,6 +3957,71 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         const clr = el("button", "btn ghost sm", "Trocar trilha");
         clr.onclick = () => { S.trilha = ""; render(); save(); };
         tbx.append(clr);
+      }
+    }
+
+    /* ---------- NEX: barra, marco atual e pendências ----------
+       Tudo o que depende do NEX já é recalculado em derived()/maxes(); este
+       bloco existe para o jogador ver a consequência da faixa em que está,
+       e o que ainda falta escolher nela. */
+    function pendencias() {
+      const out = [];
+      const P = pontosAtributo();
+      if (P.sobra > 0) out.push({ t: "warn", m: P.sobra + " ponto(s) de atributo para distribuir", aba: "tab-agente" });
+      if (P.sobra < 0) out.push({ t: "bad", m: Math.abs(P.sobra) + " ponto(s) de atributo gastos a mais", aba: "tab-agente" });
+
+      const T = contaTreinadas();
+      if (T.livres < T.livresTotal) out.push({
+        t: "warn", m: (T.livresTotal - T.livres) + " perícia(s) livre(s) para treinar", aba: "tab-agente"
+      });
+      if (T.classeFixaFalta) out.push({
+        t: "warn", m: T.classeFixaFalta + " escolha(s) de perícia da classe pendente(s)", aba: "tab-agente"
+      });
+      if (T.lotes && T.acimaTreinado < T.lotes * T.grauLote) out.push({
+        t: "", m: "grau de treinamento: " + (T.lotes * T.grauLote - T.acimaTreinado) + " perícia(s) ainda podem subir", aba: "tab-agente"
+      });
+
+      if (S.nex >= 10 && !S.trilha) out.push({ t: "warn", m: "trilha não escolhida", aba: "tab-trilhas" });
+      if (S.nex >= 50 && !S.afinidade) out.push({ t: "warn", m: "afinidade paranormal não escolhida", aba: "tab-nex" });
+
+      const usadasObrig = PERICIAS.filter(([id, , , ob]) => ob && S.per[id].grau === "Leigo" && fontesPericias()[id]);
+      if (usadasObrig.length) out.push({
+        t: "bad", m: usadasObrig.map(p => p[1]).join(", ") + ": concedida(s) mas ainda em Leigo", aba: "tab-agente"
+      });
+      return out;
+    }
+
+    function marcoDe(nex) {
+      const m = MARCOS[nex] || "—";
+      if (/^Ocultista:/.test(m) && S.classe !== "ocultista") return "Nada nesta faixa para " + classeAtual().nome + ".";
+      return m;
+    }
+
+    function renderNexRail() {
+      const D = derived();
+      $("#nexBig").textContent = S.nex;
+      $("#nexBar").style.width = clamp(S.nex / 99 * 100, 0, 100) + "%";
+
+      const prox = NEXS.find(n => n > S.nex);
+      $("#nexMarco").innerHTML =
+        '<div><span class="eyebrow">Nesta faixa</span><div class="rules">' + esc(marcoDe(S.nex)) + '</div></div>' +
+        (prox
+          ? '<div><span class="eyebrow">Próximo · NEX ' + prox + '%</span><div class="rules">' + esc(marcoDe(prox)) + '</div></div>'
+          : '<div><span class="eyebrow">Topo</span><div class="rules">NEX 99% é o limite da progressão.</div></div>') +
+        '<div class="hint">PE por turno <b>' + D.limitePE + '</b> · DT base <b>' + (10 + D.limitePE) + '</b>' +
+        (S.classe === "ocultista" ? ' · rituais <b>' + esc(D.circulo) + '</b>' : "") + '</div>';
+
+      const pb = $("#nexPend"); pb.innerHTML = "";
+      const ps = pendencias();
+      if (!ps.length) {
+        pb.append(notice("ok", "Em dia", "Nenhuma escolha pendente para o NEX " + S.nex + "%.", false));
+      } else {
+        ps.forEach(p => {
+          const n = notice(p.t, "Pendente", p.m, false);
+          n.style.cursor = "pointer";
+          n.onclick = () => { const b = $("#" + p.aba); if (b) b.click(); };
+          pb.append(n);
+        });
       }
     }
 
@@ -4120,7 +4413,14 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
     }
 
     function bindVitais() {
-      $$(".stepper").forEach(box => {
+      $$("[data-nex]").forEach(b => b.onclick = () => {
+        const passo = parseInt(b.dataset.nex, 10);
+        const i = NEXS.indexOf(S.nex);
+        const alvo = NEXS[clamp(i + (passo > 0 ? 1 : -1), 0, NEXS.length - 1)];
+        if (alvo === S.nex) return;
+        S.nex = alvo; render(); save();
+      });
+      $$(".stepper[data-res]").forEach(box => {
         const res = box.dataset.res;
         box.querySelectorAll("button").forEach(b => b.onclick = () => {
           const dd = b.dataset.d;
@@ -4971,7 +5271,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       const ro = !podeEditar;
       $("#scr-ficha").classList.toggle("ro", ro);
       CONTROLES_EDICAO.forEach(s => { const e = $(s); if (e) e.disabled = ro; });
-      $$("#scr-ficha .stepper button, #condBox button, [data-pe], #sHit, #sHeal, #agRoll, #agReset, " +
+      $$("#scr-ficha .stepper button, [data-nex], #condBox button, [data-pe], #sHit, #sHeal, #agRoll, #agReset, " +
         "#turnoReset, .attr .ctrl button, .skrow select, .skrow input, #trilhaBox button, #afinBox .elem")
         .forEach(b => { b.disabled = ro; });
       $("#roBadge").hidden = !(tela === "ficha" && ro);
@@ -5045,6 +5345,12 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         if (!url || !key) { aviso("#cfgErro", "Preencha os dois campos.", "warn"); return; }
         if (!setCfg(url, key)) { aviso("#cfgErro", "Este navegador bloqueou o armazenamento local. Preencha o bloco CONFIG no arquivo."); return; }
         location.reload();
+      };
+      $("#cfgTrocar").onclick = () => {
+        const c = getCfg();
+        $("#cfgUrl").value = c.url; $("#cfgKey").value = c.key;
+        $("#cfgErro").innerHTML = "";
+        mostrar("config");
       };
       /* login */
       $("#gLogin").onclick = async () => {
