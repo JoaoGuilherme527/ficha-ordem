@@ -568,6 +568,39 @@
       display: block
     }
 
+    .tokenLinha {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding-top: 4px
+    }
+
+    .tokenPrev {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      flex: none;
+      border: 2px solid var(--line-strong);
+      /* contain, não cover: o preview mostra a arte inteira, igual à mesa */
+      background: var(--surface-2) center/contain no-repeat;
+      display: grid;
+      place-items: center;
+      color: var(--ink-3);
+      font-family: var(--disp);
+      font-size: 22px;
+      font-weight: 700
+    }
+
+    .tokenTxt {
+      min-width: 0
+    }
+
+    .tokenHint {
+      color: var(--ink-3);
+      font-size: 12.5px;
+      margin: 2px 0 7px
+    }
+
     label.f>span {
       display: block;
       margin-bottom: 4px
@@ -648,6 +681,13 @@
       font-weight: 600;
       font-size: 13px;
       color: var(--ink);
+    }
+
+    /* atalhos que são link (Mesa) precisam parecer botão */
+    a.btn {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none
     }
 
     .btn:hover {
@@ -2376,6 +2416,8 @@
       <span class="badge ro" id="roBadge" hidden>somente leitura</span>
       <div class="grow"></div>
       <span class="saveflag" id="saveFlag">—</span>
+      <a class="btn ghost sm" id="mesaLink" href="/mesa" target="_blank" rel="noopener"
+        title="Cenários 2D para projetar na TV" hidden>Mesa</a>
       <button class="btn ghost sm" id="themeBtn" title="Alternar tema">Tema</button>
       <div class="who" id="whoBox" hidden></div>
       <button class="btn ghost sm" id="outBtn" hidden>Sair</button>
@@ -2460,6 +2502,8 @@
         <div class="grow"></div>
         <div class="btnrow">
           <input type="text" id="listaBusca" placeholder="filtrar por nome…" style="max-width:190px">
+          <a class="btn" id="mesaBtn" href="/mesa" target="_blank" rel="noopener"
+            title="Cenários 2D para projetar na TV" hidden>Abrir mesa</a>
           <button class="btn ghost" id="listaRecarregar">Atualizar</button>
           <button class="btn primary" id="novoBtn">Novo agente</button>
         </div>
@@ -2643,6 +2687,18 @@
                 <label class="f"><span class="lab">Trilha</span><select id="fTrilha"></select></label>
                 <label class="f"><span class="lab">Pontos de prestígio</span><input type="number" id="fPP" min="0"
                     step="1" value="0"></label>
+              </div>
+              <div class="tokenLinha">
+                <div class="tokenPrev" id="tokenPrev" aria-hidden="true"></div>
+                <div class="tokenTxt">
+                  <span class="lab">Token do agente</span>
+                  <p class="tokenHint" id="tokenHint">Aparece inteira como peça no mapa da mesa. Fundo transparente fica melhor.</p>
+                  <div class="row">
+                    <button class="btn sm" type="button" id="tokenBtn">Enviar imagem…</button>
+                    <button class="btn ghost sm" type="button" id="tokenDel" hidden>Remover</button>
+                    <input type="file" id="tokenArq" accept="image/*" hidden>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -4015,6 +4071,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
 
     /* ---------- Agente ---------- */
     function renderAgente() {
+      renderToken();
       const P = pontosAtributo(), teto = tetoAtributo();
       const pool = $("#ptPool");
       pool.className = "pool" + (P.sobra < 0 ? " bad" : "");
@@ -4931,7 +4988,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       const per = {};
       PERICIAS.forEach(p => per[p[0]] = { grau: "Leigo", outros: 0 });
       return {
-        nome: "", jogador: "", conceito: "", classe: "combatente", origem: ORIGENS[0].n,
+        nome: "", jogador: "", conceito: "", token: "", classe: "combatente", origem: ORIGENS[0].n,
         trilha: "", nex: 5, pp: 0, afinidade: "",
         atr: { agilidade: 1, forca: 1, intelecto: 1, presenca: 1, vigor: 1 },
         per: per, perNexAttr: true,
@@ -4999,8 +5056,18 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         const b = $("#gLogin"); b.disabled = false; b.innerHTML = loginHTML;
       }
       if (!naFicha) $("#hName").textContent = "Ficha do Agente da Ordem";
+      aplicarAcessoMesa();
       window.scrollTo({ top: 0 });
       medirHeader();
+    }
+
+    /* A mesa é ferramenta de condução da sessão, então os atalhos só aparecem
+       para quem é mestre. Chamado ao trocar de tela e ao (re)carregar a lista,
+       que é quando o perfil já chegou do banco. */
+    function aplicarAcessoMesa() {
+      const ver = !!(user && ehMestre());
+      const l = $("#mesaLink"); if (l) l.hidden = !ver;
+      const b = $("#mesaBtn"); if (b) b.hidden = !ver;
     }
     function trocarAba(id) { const t = document.getElementById(id); if (t) t.click(); }
 
@@ -5085,6 +5152,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       N.pp = Math.max(0, parseInt(row.pp, 10) || 0);
       N.afinidade = row.afinidade || "";
       const f = row.ficha || {};
+      N.token = typeof f.token === "string" ? f.token : "";
       ATRS.forEach(k => { if (f.atr && typeof f.atr[k] === "number") N.atr[k] = clamp(f.atr[k], 0, 5); });
       if (f.per) Object.keys(N.per).forEach(k => {
         const p = f.per[k]; if (!p) return;
@@ -5121,10 +5189,13 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         nex: S.nex,
         pp: S.pp,
         afinidade: S.afinidade || null,
-        ficha: { atr: S.atr, per: S.per, perNexAttr: !!S.perNexAttr },
+        ficha: { atr: S.atr, per: S.per, perNexAttr: !!S.perNexAttr, token: S.token || "" },
         sessao: {
           pv: S.pv, pe: S.pe, san: S.san, tpv: S.tpv, tpe: S.tpe, rd: S.rd,
-          falhas: S.falhas, morrendo: S.morrendo, cond: S.cond, peTurno: S.peTurno, notas: S.notas
+          falhas: S.falhas, morrendo: S.morrendo, cond: S.cond, peTurno: S.peTurno, notas: S.notas,
+          // máximos derivados, gravados para que a rota /mesa desenhe as barras
+          // sem precisar recalcular origem, trilha e afinidade
+          max: (function () { const M = maxes(); return { pv: M.pv, pe: M.pe, san: M.san }; })()
         }
       };
     }
@@ -5183,6 +5254,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
        TELA: LISTA DE AGENTES
        ======================================================================= */
     function renderLista() {
+      aplicarAcessoMesa();
       renderUsuarios();
       const visiveis = agentesVisiveis();
       const q = ($("#listaBusca").value || "").trim().toLowerCase();
@@ -5212,6 +5284,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       }
 
       const grid = el("div", "cards");
+      const semMax = [];
       lista.forEach(row => {
         const dono = perfisMap[row.dono] || {};
         const seu = row.dono === (user && user.id);
@@ -5220,6 +5293,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
           M: maxes(), pv: cur("pv"), pe: cur("pe"), san: cur("san"),
           D: derived(), classe: classeAtual().nome
         }));
+        if (!(row.sessao && row.sessao.max)) semMax.push({ row: row, max: v.M });
         const c = el("div", "acard");
         const faixa = (nome, val, max, cor) =>
           '<div class="track"><span>' + nome + '</span><span class="bar"><i style="width:' +
@@ -5250,6 +5324,35 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         grid.append(c); c.append(foot);
       });
       box.append(grid);
+      completarMaximos(semMax);
+    }
+
+    /* Fichas salvas antes de `sessao.max` existir não desenham barra nenhuma
+       no /mesa, que de propósito não recalcula origem, trilha e afinidade —
+       é justamente o que `sessao.max` evita. Esta lista já computou os
+       máximos para os cards, então grava o que faltava e o problema não
+       volta. Só toca em quem está sem o campo, e some sozinho depois de
+       rodar uma vez. Falha de permissão é silenciosa de propósito: um
+       jogador vê a ficha de outro na aba do mestre e não pode gravar. */
+    let completandoMax = false;
+    const maxTentados = new Set();
+    async function completarMaximos(pendentes) {
+      // renderLista() roda a cada tecla do filtro: sem esta trava, uma ficha
+      // que o banco recusa viraria um update por tecla digitada.
+      const fila = pendentes.filter(p => !maxTentados.has(p.row.id));
+      if (!sb || completandoMax || !fila.length) return;
+      completandoMax = true;
+      fila.forEach(p => maxTentados.add(p.row.id));
+      let feitos = 0;
+      for (const p of fila) {
+        const sessao = Object.assign({}, p.row.sessao || {}, { max: p.max });
+        const { error } = await sb.from("agentes").update({ sessao: sessao }).eq("id", p.row.id);
+        if (error) continue;
+        p.row.sessao = sessao;
+        feitos++;
+      }
+      completandoMax = false;
+      if (feitos) toast(feitos + " ficha(s) preparada(s) para a mesa.");
     }
 
     /* =======================================================================
@@ -5396,7 +5499,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
        ======================================================================= */
     function iniciarCriacao() {
       novo = {
-        nome: "", jogador: "", conceito: "", classe: "combatente", origem: ORIGENS[0].n,
+        nome: "", jogador: "", conceito: "", token: "", classe: "combatente", origem: ORIGENS[0].n,
         atr: { agilidade: 1, forca: 1, intelecto: 1, presenca: 1, vigor: 1 }
       };
       $("#cNome").value = ""; $("#cJogador").value = ""; $("#cConceito").value = "";
@@ -5535,9 +5638,71 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       renderSessao();
     }
 
+    /* Token do agente: a imagem é encaixada inteira num quadrado, reduzida e guardada como
+       data URL dentro de ficha.token. Fica pequena o bastante para viajar no
+       mesmo save da ficha, sem depender de bucket de arquivos. */
+    const TOKEN_PX = 160;
+
+    function processarToken(arq) {
+      return new Promise((ok, falha) => {
+        const url = URL.createObjectURL(arq);
+        const img = new Image();
+        img.onload = () => {
+          /* A imagem inteira entra, sem recorte: cabe dentro de um quadrado
+             TOKEN_PX e o que sobra fica transparente. O quadrado mantém o
+             centro da arte no centro da peça no mapa. Recortar aqui era
+             destrutivo — cortava a cabeça do personagem e não tinha volta. */
+          const escala = Math.min(TOKEN_PX / img.width, TOKEN_PX / img.height);
+          const w = Math.round(img.width * escala), h = Math.round(img.height * escala);
+          const cv = document.createElement("canvas");
+          cv.width = cv.height = TOKEN_PX;
+          const cx = cv.getContext("2d");
+          cx.imageSmoothingQuality = "high";
+          cx.drawImage(img, 0, 0, img.width, img.height, (TOKEN_PX - w) / 2, (TOKEN_PX - h) / 2, w, h);
+          URL.revokeObjectURL(url);
+          /* Precisa de canal alfa por causa das bordas transparentes, então
+             o fallback é PNG e não JPEG — JPEG encheria a sobra de preto. */
+          let saida = cv.toDataURL("image/webp", 0.82);
+          if (saida.indexOf("data:image/webp") !== 0) saida = cv.toDataURL("image/png");
+          ok(saida);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); falha(new Error("não deu para ler a imagem")); };
+        img.src = url;
+      });
+    }
+
+    function renderToken() {
+      const p = $("#tokenPrev"), tem = !!S.token;
+      p.style.backgroundImage = tem ? `url("${S.token}")` : "";
+      p.textContent = tem ? "" : (S.nome.trim()[0] || "?").toUpperCase();
+      $("#tokenDel").hidden = !tem;
+      const kb = tem ? Math.round(S.token.length * 0.75 / 1024) : 0;
+      $("#tokenHint").textContent = tem
+        ? `Peça no mapa da mesa — ${kb} KB, salva junto com a ficha.`
+        : "Aparece inteira como peça no mapa da mesa. Fundo transparente fica melhor.";
+    }
+
+    function ligarToken() {
+      $("#tokenBtn").onclick = () => $("#tokenArq").click();
+      $("#tokenArq").onchange = async ev => {
+        const arq = ev.target.files && ev.target.files[0];
+        ev.target.value = "";
+        if (!arq || !podeEditar) return;
+        try {
+          S.token = await processarToken(arq);
+          renderToken(); save();
+        } catch (e) { toast("Não deu para ler essa imagem.", true); }
+      };
+      $("#tokenDel").onclick = () => {
+        if (!podeEditar) return;
+        S.token = ""; renderToken(); save();
+      };
+    }
+
     const CONTROLES_EDICAO = [
       "#fNome", "#fJogador", "#fConceito", "#fNex", "#fClasse", "#fOrigem", "#fTrilha", "#fPP", "#fNotas",
-      "#fPerNex", "#sVal", "#sTipo", "#sTpv", "#sTpe", "#sRd", "#impBtn", "#delBtn", "#logClear"
+      "#fPerNex", "#sVal", "#sTipo", "#sTpv", "#sTpe", "#sRd", "#impBtn", "#delBtn", "#logClear",
+      "#tokenBtn", "#tokenDel"
     ];
     function aplicarPermissao() {
       const ro = !podeEditar;
@@ -5682,6 +5847,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       loginHTML = $("#gLogin").innerHTML;
       bindTema();
       bindTabs(); bindCampos(); bindVitais(); bindRolagem(); bindSessao(); bindDados(); bindBusca();
+      ligarToken();
       bindApp();
       renderRef();
       $("#dArma").dispatchEvent(new Event("change"));
