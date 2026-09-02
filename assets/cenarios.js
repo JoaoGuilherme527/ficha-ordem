@@ -64,6 +64,26 @@ const CENARIOS = [
         { t: "texto", x: 2.2, y: 9, txt: "rua", tam: 0.9 }
       ]
     },
+    /* Beco em imagem, 1723x913 px. Escala medida pelas caçambas (~2 m de
+       frente, 160 px) e pelos engradados: ~80 px por metro, o que dá
+       21,5 x 11,4 — a proporção do arquivo, senão o `slice` cortaria as
+       bordas. A arte já é noturna, então a escuridão entra bem mais leve
+       que a "penumbra" do desenho, só para a lanterna ainda valer. */
+    imagem: {
+      url: "/mapas/beco-sem-saida.png",
+      w: 21.5, h: 11.4,
+      escuridao: 0.2,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 17.9, y: 5.5, nome: "Escada de incêndio", detalhe: "Único caminho para cima. O primeiro degrau fica a 2,5 m do chão — exige Atletismo ou um apoio." },
+        { n: 2, x: 16.1, y: 2.4, nome: "Caçamba", detalhe: "Esconderijo para uma pessoa. Também dá acesso ao topo do muro." },
+        { n: 3, x: 14, y: 8.8, nome: "Contêiner", detalhe: "Cobertura leve. Barulhento se empurrado." }
+      ],
+      tokens: [
+        { nome: "Agentes", elemento: "neutro", x: 15.4, y: 5.6 },
+        { nome: "Alvo", elemento: "sangue", x: 3.7, y: 5.6 }
+      ]
+    },
     pontos: [
       { n: 1, x: 28.6, y: 8.8, nome: "Escada de incêndio", detalhe: "Único caminho para cima. O primeiro degrau fica a 2,5 m do chão — exige Atletismo ou um apoio." },
       { n: 2, x: 26, y: 4.2, nome: "Caçamba", detalhe: "Esconderijo para uma pessoa. Também dá acesso ao topo do muro." },
@@ -119,6 +139,24 @@ const CENARIOS = [
         { t: "texto", x: 7.4, y: 7.5, txt: "sótão", tam: 0.75 }
       ]
     },
+    /* Casa em imagem, 1508x1043 px. Escala medida pelas camas (~1,9 m de
+       comprimento, 145 px) e pela banheira: ~77 px por metro, o que dá
+       19,5 x 13,5 e deixa a casa com uns 13,7 x 9,8 m internos. A arte é
+       diurna vista de cima, então a escuridão fica em 0,4: escuro o
+       bastante para a lanterna dos agentes importar, sem apagar o mapa. */
+    imagem: {
+      url: "/mapas/casa-abandonada.png",
+      w: 19.5, h: 13.5,
+      escuridao: 0.4,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 4.9, y: 5, nome: "Alçapão do sótão", detalhe: "Tábuas podres no cômodo dos fundos. Percepção ouve algo se mexendo acima." },
+        { n: 2, x: 4.1, y: 8.5, nome: "Pia entupida", detalhe: "Investigação encontra algo que ficou preso no sifão." },
+        { n: 3, x: 15.4, y: 2.7, nome: "Armário", detalhe: "Roupas de alguém que saiu com pressa. Documentos no bolso de um casaco." },
+        { n: 4, x: 10.2, y: 3.2, nome: "Sob a cama", detalhe: "Marcas recentes no pó — algo foi arrastado para fora daqui." }
+      ],
+      tokens: [{ nome: "Agentes", elemento: "neutro", x: 10.3, y: 10.3, luz: true }]
+    },
     pontos: [
       { n: 1, x: 7.4, y: 9, nome: "Escada do sótão", detalhe: "Degraus podres. Percepção ouve algo se mexendo acima." },
       { n: 2, x: 6, y: 14.6, nome: "Pia entupida", detalhe: "Investigação encontra algo que ficou preso no sifão." },
@@ -159,6 +197,21 @@ const CENARIOS = [
         { t: "texto", x: 37.7, y: 15.6, txt: "mezanino", tam: 0.85 },
         { t: "texto", x: 20, y: 22.2, txt: "área de manobra", tam: 0.9 }
       ]
+    },
+    /* Galpão em imagem, 1607x979 px. Escala medida pelos engradados
+       (~1,2 m, 75 px) e conferida nas placas do piso: ~60 px por metro, o
+       que dá 26,75 x 16,3 — um galpão de 27 x 16 m. Cena "claro", então
+       não leva escuridão. */
+    imagem: {
+      url: "/mapas/galpao-de-cargas.png",
+      w: 26.75, h: 16.3,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 24.4, y: 11.8, nome: "Escada do mezanino", detalhe: "Vantagem de altura sobre todo o galpão. Dois turnos para subir." },
+        { n: 2, x: 20.3, y: 11.7, nome: "Contêiner de carga", detalhe: "Cobertura pesada, o único abrigo sólido da área aberta. Empurrar ou abrir faz um barulho que atrai." },
+        { n: 3, x: 12.5, y: 5, nome: "Corredor central", detalhe: "Linha de visão limpa de ponta a ponta entre as fileiras de engradados. Quem cruzar fica exposto." }
+      ],
+      tokens: [{ nome: "Agentes", elemento: "neutro", x: 13.4, y: 14.3 }]
     },
     pontos: [
       { n: 1, x: 37.7, y: 20, nome: "Escada do mezanino", detalhe: "Vantagem de altura sobre todo o galpão. Dois turnos para subir." },
