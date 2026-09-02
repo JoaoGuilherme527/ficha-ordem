@@ -219,25 +219,25 @@ const CENARIOS = [
         { t: "movel", x: 35.4, y: 20.6, w: 5.2, h: 2.7, nome: "van" }
       ]
     },
-    /* Planta da base em imagem. 570x965 px calibrados em 30 px por metro
-       (medido pelas camas do dormitório, ~1x2 m), o que dá 19 x 32,2 — a
-       mesma proporção do arquivo, senão o `preserveAspectRatio="slice"`
-       cortaria as bordas. O desenho gerado continua disponível no botão
-       "Ver desenho". */
+    /* Planta da base em imagem, 965x570 px na horizontal. Calibrada em 30 px
+       por metro (medido pelas camas do dormitório, ~1x2 m), o que dá
+       32,2 x 19 — a mesma proporção do arquivo, senão o
+       `preserveAspectRatio="slice"` cortaria as bordas. O desenho gerado
+       continua disponível no botão "Ver desenho". */
     imagem: {
       url: "/mapas/base-ordem.png",
-      w: 19, h: 32.2,
+      w: 32.2, h: 19,
       credito: "planta da base — uso na mesa",
       pontos: [
-        { n: 1, x: 10.2, y: 21.8, nome: "Mesas do salão", detalhe: "Onde os recrutas esperam. Momento de apresentação dos personagens entre si." },
-        { n: 2, x: 15.9, y: 21.5, nome: "Mesa de Caio", detalhe: "Ele espalha os documentos e o mapa de Tronco do Oeste aqui. Entrega o rádio comunicador." },
-        { n: 3, x: 4, y: 9.5, nome: "Sala de convivência", detalhe: "Caio se levanta e fala sobre a função da Ordem enquanto os recrutas descansam entre uma coisa e outra." },
-        { n: 4, x: 3.5, y: 28.3, nome: "Arsenal", detalhe: "Escolha do equipamento inicial antes de sair." },
-        { n: 5, x: 14.4, y: 1.7, nome: "Saída", detalhe: "A van leva o grupo até Tronco do Oeste — poucas horas de viagem, saindo de São Paulo e subindo a serra." }
+        { n: 1, x: 22.7, y: 8.8, nome: "Mesas do salão", detalhe: "Onde os recrutas esperam. Momento de apresentação dos personagens entre si." },
+        { n: 2, x: 21.2, y: 3.1, nome: "Mesa de Caio", detalhe: "Ele espalha os documentos e o mapa de Tronco do Oeste aqui. Entrega o rádio comunicador." },
+        { n: 3, x: 9.7, y: 15, nome: "Sala de convivência", detalhe: "Caio se levanta e fala sobre a função da Ordem enquanto os recrutas descansam entre uma coisa e outra." },
+        { n: 4, x: 28.5, y: 15.2, nome: "Arsenal", detalhe: "Escolha do equipamento inicial antes de sair." },
+        { n: 5, x: 1.1, y: 4.5, nome: "Saída", detalhe: "A van leva o grupo até Tronco do Oeste — poucas horas de viagem, saindo de São Paulo e subindo a serra." }
       ],
       tokens: [
-        { nome: "Recrutas", elemento: "neutro", x: 10.2, y: 23.4 },
-        { nome: "Caio Leal", elemento: "conhecimento", x: 15.9, y: 20.2 }
+        { nome: "Recrutas", elemento: "neutro", x: 22.7, y: 10.3 },
+        { nome: "Caio Leal", elemento: "conhecimento", x: 21.2, y: 4.4 }
       ]
     },
     pontos: [
