@@ -449,7 +449,7 @@ const CENARIOS = [
         { n: 6, x: 6.4, y: 3.1, nome: "Maca", detalhe: "Fora do texto da missão, mas a arte entrega: é onde as sete crianças foram examinadas. Medicina DT 10 no lençol acha fios de cabelo de mais de uma criança — a maca não foi trocada desde os últimos atendimentos." }
       ],
       tokens: [
-        { nome: "Euclides", elemento: "neutro", x: 2.6, y: 0.95 },
+        { nome: "Euclides", arte: "euclides", elemento: "neutro", x: 2.6, y: 0.95 },
         { nome: "Dra. Ruth", arte: "dra-ruth", elemento: "neutro", x: 6, y: 2.3 }
       ]
     },
@@ -461,7 +461,7 @@ const CENARIOS = [
       { n: 5, x: 17, y: 14.2, nome: "Caixa de brinquedos de madeira", detalhe: "Organizada no canto da sala. O consultório é simples, mas limpo e bem cuidado." }
     ],
     tokens: [
-      { nome: "Euclides", elemento: "neutro", x: 7, y: 9.2 },
+      { nome: "Euclides", arte: "euclides", elemento: "neutro", x: 7, y: 9.2 },
       { nome: "Dra. Ruth", arte: "dra-ruth", elemento: "neutro", x: 22, y: 9.8 }
     ]
   },
@@ -524,7 +524,7 @@ const CENARIOS = [
       tokens: [
         { nome: "Turba", elemento: "sangue", x: 3.1, y: 2.2 },
         { nome: "Dra. Ruth", arte: "dra-ruth", elemento: "neutro", x: 5.6, y: 1.75 },
-        { nome: "Euclides", elemento: "neutro", x: 2.6, y: 3.2 }
+        { nome: "Euclides", arte: "euclides", elemento: "neutro", x: 2.6, y: 3.2 }
       ]
     },
     pontos: [
@@ -535,7 +535,7 @@ const CENARIOS = [
     tokens: [
       { nome: "Turba", elemento: "sangue", x: 13, y: 9 },
       { nome: "Dra. Ruth", arte: "dra-ruth", elemento: "neutro", x: 21.5, y: 8.6 },
-      { nome: "Euclides", elemento: "neutro", x: 12, y: 12 }
+      { nome: "Euclides", arte: "euclides", elemento: "neutro", x: 12, y: 12 }
     ]
   },
 

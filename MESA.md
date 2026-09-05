@@ -176,8 +176,8 @@ O nome do arquivo é o contrato — `assets/elenco.js` aponta para ele:
 <id>-morto.png     a criatura depois de cair        opcional
 ```
 
-Sem `-normal`, **Mostrar na TV** usa o próprio token (é o caso do bicho papão e
-da Dra. Ruth). Sem `-morto`, o botão de versão morta fica desligado. Para somar
+Sem `-normal`, **Mostrar na TV** usa o próprio token (é o caso do bicho papão,
+da Dra. Ruth e do Euclides). Sem `-morto`, o botão de versão morta fica desligado. Para somar
 alguém, salve a arte com esse padrão e acrescente uma entrada em
 `assets/elenco.js` com `id`, `tipo` (`monstro` ou `pessoa`), `nome`, `elemento`,
 os caminhos, o `tam` (multiplicador do tamanho da peça no mapa) e as `cenas` a
@@ -185,8 +185,8 @@ que pertence. Quem entra posicionado está nos `tokens` da cena, em
 `assets/cenarios.js` — monstro vivo sempre com `oculto: true`.
 
 O que já está catalogado: **Existido** (com `-normal` e `-morto`), **Bicho
-papão**, **Felipe** e **Dra. Ruth**. Os nomes e elementos batem com o bloco de
-criaturas do PDF em `ref/`.
+papão**, **Felipe**, **Dra. Ruth** e **Euclides**. Os nomes e elementos batem
+com o bloco de criaturas do PDF em `ref/`.
 
 Se uma peça não tiver `arte`, a mesa tenta casar pelo **nome** do token com o
 catálogo. É a rede que faz um token chamado "Dra. Ruth" — criado na mão, ou

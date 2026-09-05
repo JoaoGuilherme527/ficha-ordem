@@ -71,6 +71,16 @@ const ELENCO = [
     tam: 1,
     cenas: ["m1-c2-consultorio", "m1-c3-revolta"],
     nota: "A pediatra que atendeu as sete crianças. Protegê-la é o objetivo da Cena 3."
+  },
+  {
+    id: "euclides",
+    tipo: "pessoa",
+    nome: "Euclides",
+    elemento: "neutro",
+    token: "/tokens/Euclides-token.png",
+    tam: 1,
+    cenas: ["m1-c2-consultorio", "m1-c3-revolta"],
+    nota: "Euclides Salvador, o recepcionista. Barra a porta do consultório até um Diplomacia DT 10 ou Intimidação DT 15."
   }
 ];
 
