@@ -1016,7 +1016,68 @@ function telaPalco() {
     </div>
     <div class="revelacao" id="revelacao" hidden><img id="revImg" alt=""></div>`;
   if (canal) canal.postMessage({ tipo: "pedido" });
+  ligarZoomPalco();
   renderPalco();
+}
+
+/* ---------- zoom da TV ----------
+   A roda do mouse aproxima o mapa dos jogadores no ponto onde o cursor está,
+   que é como o mestre mostra um canto da planta sem trocar de cena. O estado
+   fica aqui fora porque `montarMapa()` só troca o miolo da caixa: o elemento
+   `#mapa` sobrevive aos repintes e o transform inline junto com ele.
+   É zoom local desta janela — não entra no estado transmitido, já que quem
+   gira a roda está sentado nesta tela. */
+const ZOOM_MIN = 1, ZOOM_MAX = 6;
+let zoom = 1, zoomX = 0, zoomY = 0, zoomCena = null;
+
+function aplicarZoom() {
+  const m = $("#mapa");
+  if (!m) return;
+  m.style.transform = zoom === 1 ? "" : "translate(" + zoomX + "px," + zoomY + "px) scale(" + zoom + ")";
+}
+
+function zerarZoom() { zoom = 1; zoomX = zoomY = 0; }
+
+/* Segura o mapa dentro da moldura: sem isso dá para empurrar a cena inteira
+   para fora da tela e sobrar só o fundo preto. O retângulo medido já vem
+   ampliado, então a largura original é `r.width / zoom`. */
+function limitarZoom() {
+  const m = $("#mapa");
+  if (!m) return;
+  if (zoom <= ZOOM_MIN) { zerarZoom(); return; }
+  const r = m.getBoundingClientRect();
+  zoomX = clamp(zoomX, -(r.width - r.width / zoom) / 2, (r.width - r.width / zoom) / 2);
+  zoomY = clamp(zoomY, -(r.height - r.height / zoom) / 2, (r.height - r.height / zoom) / 2);
+}
+
+function ligarZoomPalco() {
+  const area = document.querySelector(".palco-mapa");
+  const m = $("#mapa");
+  if (!area || !m) return;
+
+  area.addEventListener("wheel", ev => {
+    ev.preventDefault();
+    /* Um passo de roda vem em pixels, em linhas ou em páginas conforme o
+       mouse e o navegador; sem normalizar, o mesmo giro daria saltos bem
+       diferentes entre uma máquina e outra. */
+    const passo = ev.deltaMode === 1 ? 16 : ev.deltaMode === 2 ? 400 : 1;
+    const k = clamp(zoom * Math.exp(-ev.deltaY * passo * 0.0018), ZOOM_MIN, ZOOM_MAX);
+    if (k === zoom) return;
+    /* O centro sem deslocamento: o retângulo medido já está deslocado por
+       (zoomX, zoomY), então descontá-los devolve a origem do transform. Daí
+       sai o deslocamento novo que mantém parado o ponto sob o cursor. */
+    const r = m.getBoundingClientRect();
+    const ex = ev.clientX - (r.left + r.width / 2 - zoomX);
+    const ey = ev.clientY - (r.top + r.height / 2 - zoomY);
+    const f = k / zoom;
+    zoomX = ex - f * (ex - zoomX);
+    zoomY = ey - f * (ey - zoomY);
+    zoom = k;
+    aplicarZoom(); limitarZoom(); aplicarZoom();
+  }, { passive: false });
+
+  // duplo clique volta a cena inteira, que é a saída rápida do zoom
+  area.addEventListener("dblclick", () => { zerarZoom(); aplicarZoom(); });
 }
 
 let ultimoDadoId = null;
@@ -1057,7 +1118,11 @@ function renderPalco() {
   $("#espera").hidden = !!estado.revelado;
   if (!estado.revelado) return;
 
+  /* Trocou de cena, some o zoom: entrar num cenário novo já ampliado num
+     canto qualquer só confunde quem está olhando a TV. */
+  if (zoomCena !== cen.id) { zoomCena = cen.id; zerarZoom(); }
   montarMapa($("#mapa"), cen, { somentePontosAbertos: true });
+  aplicarZoom();
   mostrarDado();
 
   const lg = $("#legenda");

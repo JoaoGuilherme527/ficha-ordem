@@ -15,6 +15,11 @@ de novo.
 O notebook fica com os controles, os pontos de interesse e as pistas. A TV
 mostra só o mapa, os tokens e a faixa de status.
 
+Na janela da TV a **roda do mouse aproxima o mapa** no ponto onde o cursor
+está — dá para mostrar um canto da planta sem trocar de cena. **Duplo clique**
+volta a cena inteira, e trocar de cenário também zera o zoom. É zoom só desta
+janela: o painel do mestre não muda junto.
+
 ## O que a tela do mestre faz
 
 - **Cenários** — 3 genéricos e as 10 cenas de *As Mãos que nos Acolhem*.

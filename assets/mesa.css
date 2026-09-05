@@ -281,6 +281,9 @@ body.palco{
 .palco-wrap{position:fixed; inset:0; display:flex; flex-direction:column}
 .palco-mapa{
   flex:1; position:relative; display:grid; place-items:center; padding:10px; min-height:0;
+  /* o mapa ampliado transborda a caixa; sem isso ele passaria por cima da
+     faixa dos agentes em vez de ser cortado na moldura da cena */
+  overflow:hidden;
 }
 /* Na TV quem manda é a altura; a largura sai do aspect-ratio que o
    montarMapa() escreve inline a partir da cena. Sem essa proporção a caixa
@@ -290,6 +293,9 @@ body.palco{
   border:0; background:transparent; max-height:100%; max-width:100%;
   width:auto; height:100%;
   display:grid; place-items:center;
+  /* o zoom da roda do mouse escreve um transform inline aqui. A origem no
+     centro é o que a conta do zoom-no-cursor em mesa.js assume. */
+  transform-origin:50% 50%; will-change:transform;
 }
 .palco-mapa .mapa svg{width:100%; height:100%}
 .palco-mapa .token{width:44px; height:44px}
