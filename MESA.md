@@ -44,20 +44,74 @@ mostra só o mapa, os tokens e a faixa de status.
   na TV ela vale inteira. O botão **Luz** desliga tudo isso.
 - **Cômodos** — ligue o modo e clique numa sala para escondê-la na TV (vira um
   bloco preto). Clique de novo para revelar. É a névoa de guerra da casa:
-  revele cômodo por cômodo conforme os agentes avançam.
+  revele cômodo por cômodo conforme os agentes avançam. Só funciona no desenho,
+  porque depende da geometria das salas; sobre imagem use os **Blocos**.
+- **Blocos** — a névoa livre, que funciona nas duas vistas. Ligue **Blocos** e
+  arraste no vazio para criar um retângulo preto, no corpo dele para mover, na
+  alça do canto para redimensionar. Shift cria um bloco dentro de outro (sem
+  isso, um bloco grande não deixaria desenhar nada por cima dele). Para o
+  mestre o bloco é translúcido, para os jogadores é preto opaco, e sempre fica
+  **por cima dos tokens** — cobre a peça que estiver embaixo. Ficam gravados
+  por vista, então trocar de cena e voltar não perde o que você montou.
+- **Elenco** — monstros e NPCs com arte, no card **Monstros**. Escolha no
+  `select` (agrupado em Monstros e Pessoas, com "(desta cena)" em quem
+  pertence à cena aberta) e **Colocar em cena** põe a peça no meio do mapa,
+  pronta para arrastar. **Mostrar na TV** apaga o palco inteiro — legenda,
+  faixa de agentes, aviso, mapa — e deixa só a arte da criatura no escuro;
+  **Voltar para a cena** desfaz. A revelação vale mesmo com a cena ainda
+  oculta, que é quando o susto funciona, e continua valendo se você trocar de
+  cena por trás dela.
+- **Peça oculta** — **Esconder na TV** tira o token da tela dos jogadores sem
+  tirar do seu mapa: você vê a peça tracejada e meia-tinta, eles não veem nada
+  (nem a luz da lanterna dela). É assim que o existido já vem montado no porão
+  e o bicho papão na fábrica, no lugar certo, sem entregar a surpresa. Clique
+  de novo para mostrar.
+- **Versão morta** — selecione uma peça do elenco no mapa e, se houver arte
+  `-morto` na pasta, o botão **Versão morta** troca o desenho (e deixa a peça
+  acinzentada). O corpo do existido na Cena 6 já entra assim.
 - **Dados** — d4 a d100 ou expressão (`2d6+3`). O resultado aparece grande na
   TV por alguns segundos; máximo natural em dourado, 1 natural em vermelho.
 - **Pontos de interesse** — os círculos numerados. Clicar abre a pista e os
   testes no painel do mestre **e** revela o número na TV. Clicar de novo esconde.
 - **Aviso na tela** — texto grande sobre o mapa, para chamar um teste ou uma
   revelação.
-- **Desenho ou imagem** — duas cenas já vêm com battlemap em `mapas/`: o casebre
-  (Cena 4) e a fábrica (Cena 7). O botão **Ver desenho / Ver imagem** alterna
-  entre as duas vistas, e cada vista guarda os próprios tokens e pontos de
-  interesse — mover token na imagem não bagunça o desenho.
+- **Desenho ou imagem** — todas as treze cenas já vêm com battlemap em
+  `mapas/`. O botão **Ver desenho / Ver imagem** alterna entre as duas vistas,
+  e cada vista guarda os próprios tokens e pontos de interesse — mover token na
+  imagem não bagunça o desenho.
+- **Cenas que dividem o mesmo cômodo** — três pares reaproveitam arte, porque
+  são o mesmo lugar em momentos diferentes. Consultório (Cena 2) e Revolta
+  Parental (Cena 3) são a mesma planta em dois arquivos: no segundo a porta da
+  rua saiu das dobradiças, a porta interna virou lascas e a janela está
+  estilhaçada. Sozinho no Escuro (Cena 5) e Amor Profano (Cena 6) apontam para
+  o **mesmo arquivo**, com pontos de interesse diferentes — na 5 são a criatura
+  e o teste de Presença Perturbadora, na 6 são os documentos e a caixa de
+  música.
 - **Calibração de grade** — com imagem ativa, informe quantos quadrados ela tem
   na largura e na altura. Aí o token de 1 metro cai exatamente numa casa da
-  grade da imagem. Casebre é 19×14, fábrica 24×17,6.
+  grade da imagem. O que já vem calibrado:
+
+  | cena | imagem | grade |
+  | --- | --- | --- |
+  | Beco sem saída | `beco-sem-saida.png` | 21,5 × 11,4 |
+  | Casa abandonada | `casa-abandonada.png` | 19,5 × 13,5 |
+  | Galpão de cargas | `galpao-de-cargas.png` | 26,75 × 16,3 |
+  | Prólogo — Base | `base-ordem.png` | 32,2 × 19 |
+  | Cena 1 — Casa de Felipe | `m1-c1-felipe.png` | 18,5 × 13,6 |
+  | Cena 2 — Consultório | `m1-c2-consultorio.jpg` | 8,1 × 5,28 |
+  | Cena 3 — Revolta Parental | `m1-c3-revolta.jpg` | 8,1 × 5,28 |
+  | Cena 4 — Casebre | `m1-c4-casebre.jpg` | 19 × 14 |
+  | Cena 5 — Sozinho no Escuro | `m1-c5-porao.png` | 14 × 9,33 |
+  | Cena 6 — Amor Profano | `m1-c5-porao.png` (o mesmo) | 14 × 9,33 |
+  | Interlúdio — Pousada | `m1-interludio-pousada.png` | 17,9 × 14,53 |
+  | Cena 7 — Fábrica | `m1-c7-fabrica.jpg` | 24 × 17,6 |
+  | Cena 8 — Ninho | `m1-c8-ninho.png` | 21,5 × 15,2 |
+
+  A grade de cada imagem **tem que respeitar a proporção do arquivo**: o mapa é
+  desenhado com `preserveAspectRatio="slice"`, então uma proporção errada corta
+  as bordas da arte. Os comentários em `assets/cenarios.js` registram de onde
+  saiu a escala de cada uma (cama, porta, gaiola — algum objeto de tamanho
+  conhecido na própria arte).
 - **Enviar imagem** — "Enviar imagem…" troca o desenho pela imagem
   que você escolher em qualquer cena, sem mexer no repositório.
   Tokens, luz e grade continuam funcionando por cima. A imagem viaja para a
@@ -74,7 +128,11 @@ Duas camadas:
 
 - Entre as duas janelas (notebook ↔ TV): `BroadcastChannel`, mesma origem,
   sem servidor. O estado da cena também fica no `localStorage`, então fechar
-  tudo e voltar não perde a mesa.
+  tudo e voltar não perde a mesa — vale para posição de token, peça oculta,
+  versão morta, blocos, cômodos escondidos e calibração de grade. O estado tem
+  um número de versão: quando o conjunto de tokens padrão das cenas muda, as
+  peças guardadas são descartadas na primeira carga para não ressuscitar
+  tokens que saíram do repositório. O resto do estado sobrevive.
 - Entre os celulares e a TV: Supabase. A rota tenta `postgres_changes` em
   `agentes` e `rolagens`; se o Realtime não estiver habilitado no projeto, ela
   cai sozinha para uma consulta a cada 10 segundos. O indicador no topo mostra
@@ -92,13 +150,45 @@ alter publication supabase_realtime add table public.rolagens;
 ```
 mesa.html              a rota
 mapas/                 battlemaps das cenas que têm imagem
+tokens/                arte de monstros e NPCs
+ref/                   material de origem (o PDF de Casos Paranormais)
 assets/mesa.css        estilos (mesmos tokens de design do index.html)
 assets/mapa.js         renderizador: texturas de piso, paredes e móveis
 assets/mesa.js         painel do mestre e palco
 assets/cenarios.js     os cenários e a geometria dos mapas
+assets/elenco.js       catálogo de monstros e NPCs que têm arte
 vendor/supabase.js     o bundle que já estava embutido no index.html,
                        agora em arquivo para as duas rotas usarem
 ```
+
+### Como a pasta `tokens/` é lida
+
+O nome do arquivo é o contrato — `assets/elenco.js` aponta para ele:
+
+```
+<id>-token.png     a peça que anda pelo mapa        obrigatória
+<id>-normal.png    a arte cheia da revelação        opcional
+<id>-morto.png     a criatura depois de cair        opcional
+```
+
+Sem `-normal`, **Mostrar na TV** usa o próprio token (é o caso do bicho papão e
+da Dra. Ruth). Sem `-morto`, o botão de versão morta fica desligado. Para somar
+alguém, salve a arte com esse padrão e acrescente uma entrada em
+`assets/elenco.js` com `id`, `tipo` (`monstro` ou `pessoa`), `nome`, `elemento`,
+os caminhos, o `tam` (multiplicador do tamanho da peça no mapa) e as `cenas` a
+que pertence. Quem entra posicionado está nos `tokens` da cena, em
+`assets/cenarios.js` — monstro vivo sempre com `oculto: true`.
+
+O que já está catalogado: **Existido** (com `-normal` e `-morto`), **Bicho
+papão**, **Felipe** e **Dra. Ruth**. Os nomes e elementos batem com o bloco de
+criaturas do PDF em `ref/`.
+
+Se uma peça não tiver `arte`, a mesa tenta casar pelo **nome** do token com o
+catálogo. É a rede que faz um token chamado "Dra. Ruth" — criado na mão, ou
+guardado no `localStorage` antes de a arte existir — puxar o retrato dela
+sozinho. Quando mesmo assim a cena ficar com peça velha, **Repor todas as
+cenas** joga fora as peças guardadas e remonta pelo repositório; blocos,
+cômodos escondidos e calibração ficam.
 
 ## Mudanças no `index.html`
 

@@ -23,18 +23,29 @@ const uid = () => (crypto.randomUUID ? crypto.randomUUID() : "t" + Date.now() + 
 
 const CANAL = "op-mesa-2d";
 const CHAVE = "op-mesa-estado";
+/* Sobe quando o conjunto de tokens padrão das cenas muda. As peças que o
+   mestre moveu ficam guardadas por cena no `localStorage`, então sem isso o
+   estado antigo continuaria ressuscitando os tokens "Agentes" que saíram das
+   cenas — e os monstros novos nunca apareceriam. Só `tokens` é descartado; o
+   resto do estado (cena aberta, véus, calibração) sobrevive. */
+const VERSAO_ESTADO = 3;
 
 function estadoPadrao() {
-  return { cenarioId: CENARIOS[0].id, revelado: false, aviso: "",
+  return { versao: VERSAO_ESTADO,
+           cenarioId: CENARIOS[0].id, revelado: false, aviso: "",
            grade: true, rotulos: true, iluminacao: true,
            pontosAbertos: [], tokens: {}, ocultas: {}, imgNome: {},
-           calib: {}, usarDesenho: {}, dado: null };
+           calib: {}, usarDesenho: {}, dado: null,
+           veus: {}, revelacao: null };
 }
 
 function carregar() {
   try {
     const b = localStorage.getItem(CHAVE);
-    return b ? Object.assign(estadoPadrao(), JSON.parse(b)) : estadoPadrao();
+    if (!b) return estadoPadrao();
+    const e = Object.assign(estadoPadrao(), JSON.parse(b));
+    if (e.versao !== VERSAO_ESTADO) { e.tokens = {}; e.versao = VERSAO_ESTADO; }
+    return e;
   } catch (e) { return estadoPadrao(); }
 }
 
@@ -77,6 +88,12 @@ function reenviarImagens() {
 }
 
 function ocultasDaCena(id) { return estado.ocultas[id] || (estado.ocultas[id] = []); }
+
+/* Véus: retângulos pretos que o mestre desenha por cima do cenário para
+   esconder o cômodo ao lado. Guardados pela chave da vista, e não pela cena,
+   porque as coordenadas do desenho e as da imagem são grades diferentes —
+   um véu do desenho cairia no lugar errado sobre a foto. */
+function veusDaVista(v) { return estado.veus[v.chave] || (estado.veus[v.chave] = []); }
 
 /* Uma cena pode ser vista de dois jeitos: o desenho gerado ou uma imagem.
    Cada vista tem suas próprias medidas, pontos e posições de token. */
@@ -191,8 +208,14 @@ const corDoElemento = e => (ELEMENTOS[e] || ELEMENTOS.neutro).cor;
 function montarMapa(caixa, cen, opcoes) {
   const o = opcoes || {};
   const v = vista(cen);
+  /* Peça marcada como `oculto` fica só do lado do mestre: ele posiciona o
+     monstro na planta antes da cena começar e os jogadores não veem nada até
+     ele mandar. É o que deixa o bicho papão já montado na fábrica sem
+     entregar a surpresa na TV. A luz também não vaza — uma lanterna de peça
+     oculta acenderia o mapa dos jogadores e denunciaria a posição. */
+  const pecas = tokensDaVista(v).filter(t => o.modoMestre || !t.oculto);
   const luzes = v.luzes.concat(
-    tokensDaVista(v).filter(t => t.luz).map(t => ({ x: t.x, y: t.y, r: 5.5, tom: "fria" })));
+    pecas.filter(t => t.luz).map(t => ({ x: t.x, y: t.y, r: 5.5, tom: "fria" })));
   caixa.innerHTML = svgMapa(cen, {
     dims: { w: v.w, h: v.h },
     grade: estado.grade !== false,
@@ -237,16 +260,27 @@ function montarMapa(caixa, cen, opcoes) {
   });
 
   // tokens
-  tokensDaVista(v).forEach(t => {
+  pecas.forEach(t => {
     const b = el("button", "token");
+    b.dataset.token = t.id;
     b.style.left = (t.x / v.w * 100) + "%";
     b.style.top = (t.y / v.h * 100) + "%";
     b.style.setProperty("--cor", corDoElemento(t.elemento));
     b.setAttribute("aria-label", t.nome);
     if (o.selecionado === t.id) b.classList.add("sel");
+    if (t.oculto) b.classList.add("oculto");
 
     const ag = t.agenteId ? agentePorId(t.agenteId) : null;
-    const foto = ag && ag.ficha && ag.ficha.token;
+    /* Duas fontes de arte para a mesma moldura: a ficha do agente e o
+       catálogo do elenco. A peça do elenco respeita o `morto`, então trocar
+       a versão é só virar o campo — a arte vem atrás. */
+    const pc = elencoDaPeca(t);
+    const foto = (ag && ag.ficha && ag.ficha.token) || (pc ? arteElenco(pc, t.morto) : null);
+    if (pc) {
+      b.classList.add("mst");
+      if (t.morto) b.classList.add("morto");
+      if (pc.tam && pc.tam !== 1) b.style.setProperty("--tam", pc.tam);
+    }
     if (!foto) b.appendChild(el("span", "ini", (t.nome || "?").slice(0, 1).toUpperCase()));
     const fr = ag ? fracaoPV(ag) : null;
     if (fr != null) {
@@ -277,22 +311,119 @@ function montarMapa(caixa, cen, opcoes) {
     } else b.tabIndex = -1;
     caixa.appendChild(b);
   });
+
+  /* Véus por último, para ficarem por cima dos tokens: o pedido é que o
+     bloco esconda o que estiver embaixo dele, peça inclusive. Só o mestre
+     enxerga através (o CSS baixa a opacidade em `.mapa.editavel`), e só no
+     modo de edição eles aceitam clique — fora dele o arrasto de token
+     continua passando reto. */
+  veusDaVista(v).forEach(q => {
+    const d = el("div", "veu");
+    d.style.left = (q.x / v.w * 100) + "%";
+    d.style.top = (q.y / v.h * 100) + "%";
+    d.style.width = (q.w / v.w * 100) + "%";
+    d.style.height = (q.h / v.h * 100) + "%";
+    d.dataset.veu = q.id;
+    if (o.modoVeu) {
+      d.classList.add("edit");
+      if (o.veuSel === q.id) d.classList.add("sel");
+      d.appendChild(el("span", "alca"));
+    }
+    caixa.appendChild(d);
+  });
 }
 
 let arrastando = null;
 
-function ligarArraste(caixa, v, aoMover, aoSoltar) {
-  const posicao = ev => {
-    const svg = caixa.querySelector("svg");
-    const r = (svg || caixa).getBoundingClientRect();
-    return {
-      x: clamp((ev.clientX - r.left) / r.width * v.w, 0, v.w),
-      y: clamp((ev.clientY - r.top) / r.height * v.h, 0, v.h)
-    };
+/* Converte um evento de ponteiro para unidades de grid da vista. O retângulo
+   medido é o do <svg>, não o da caixa: no palco a caixa pode sobrar dos lados
+   do desenho, e medir a caixa jogaria tudo alguns metros para o lado. */
+function posNoMapa(caixa, v, ev) {
+  const svg = caixa.querySelector("svg");
+  const r = (svg || caixa).getBoundingClientRect();
+  return {
+    x: clamp((ev.clientX - r.left) / r.width * v.w, 0, v.w),
+    y: clamp((ev.clientY - r.top) / r.height * v.h, 0, v.h)
   };
-  caixa.onpointermove = ev => { if (arrastando) aoMover(arrastando, posicao(ev)); };
+}
+
+function ligarArraste(caixa, v, aoMover, aoSoltar) {
+  caixa.onpointerdown = null;
+  caixa.onpointermove = ev => { if (arrastando) aoMover(arrastando, posNoMapa(caixa, v, ev)); };
   caixa.onpointerup = caixa.onpointercancel = () => {
     if (arrastando) { arrastando = null; aoSoltar && aoSoltar(); }
+  };
+}
+
+/* A ação em curso mora fora da função de propósito: cada render() reatribui
+   os handlers da caixa, e uma variável de closure seria zerada no meio do
+   arrasto — o bloco largaria o ponteiro no primeiro repinte. */
+let veuAcao = null;
+const VEU_MIN = 0.6; // menor bloco que vale a pena guardar, em metros
+
+function ligarVeus(caixa, v, aoMudar) {
+  const lista = veusDaVista(v);
+  const pinta = q => {
+    const d = caixa.querySelector('[data-veu="' + q.id + '"]');
+    if (!d) return;
+    d.style.left = (q.x / v.w * 100) + "%";
+    d.style.top = (q.y / v.h * 100) + "%";
+    d.style.width = (q.w / v.w * 100) + "%";
+    d.style.height = (q.h / v.h * 100) + "%";
+  };
+
+  caixa.onpointerdown = ev => {
+    const cx = ev.target.closest ? ev.target.closest(".veu") : null;
+    const naAlca = !!(ev.target.classList && ev.target.classList.contains("alca"));
+    const p = posNoMapa(caixa, v, ev);
+    /* Um bloco grande cobre o mapa embaixo dele, e sem escapatória não haveria
+       como desenhar um segundo bloco dentro do primeiro. Shift força bloco
+       novo mesmo com o ponteiro sobre um que já existe. */
+    if (cx && !ev.shiftKey) {
+      const q = lista.find(x => x.id === cx.dataset.veu);
+      if (!q) return;
+      veuSel = q.id;
+      veuAcao = naAlca ? { modo: "tam", q } : { modo: "mover", q, dx: p.x - q.x, dy: p.y - q.y };
+    } else {
+      const q = { id: uid(), x: p.x, y: p.y, w: 0, h: 0 };
+      lista.push(q);
+      veuSel = q.id;
+      veuAcao = { modo: "novo", q, x0: p.x, y0: p.y };
+    }
+    ev.preventDefault();
+    caixa.setPointerCapture(ev.pointerId);
+    aoMudar();
+  };
+
+  caixa.onpointermove = ev => {
+    if (!veuAcao) return;
+    const p = posNoMapa(caixa, v, ev), q = veuAcao.q;
+    if (veuAcao.modo === "novo") {
+      q.x = Math.min(veuAcao.x0, p.x); q.y = Math.min(veuAcao.y0, p.y);
+      q.w = Math.abs(p.x - veuAcao.x0); q.h = Math.abs(p.y - veuAcao.y0);
+    } else if (veuAcao.modo === "mover") {
+      q.x = clamp(p.x - veuAcao.dx, 0, Math.max(0, v.w - q.w));
+      q.y = clamp(p.y - veuAcao.dy, 0, Math.max(0, v.h - q.h));
+    } else {
+      q.w = clamp(p.x - q.x, VEU_MIN, v.w - q.x);
+      q.h = clamp(p.y - q.y, VEU_MIN, v.h - q.y);
+    }
+    pinta(q);
+    const agora = Date.now();
+    if (agora - ultimaTransmissao > 90) { ultimaTransmissao = agora; transmitir(); }
+  };
+
+  caixa.onpointerup = caixa.onpointercancel = () => {
+    if (!veuAcao) return;
+    const q = veuAcao.q;
+    /* Um clique seco no vazio nasce com 0×0. Em vez de deixar um bloco
+       invisível preso no mapa, ele é descartado na soltura. */
+    if (q.w < VEU_MIN || q.h < VEU_MIN) {
+      estado.veus[v.chave] = lista.filter(x => x.id !== q.id);
+      if (veuSel === q.id) veuSel = null;
+    }
+    veuAcao = null;
+    transmitir(); aoMudar();
   };
 }
 
@@ -369,6 +500,7 @@ function telaMestre() {
             <div class="grow"></div>
             <button class="btn ghost sm" id="btnLuz">Luz</button>
             <button class="btn ghost sm" id="btnComodos">Cômodos</button>
+            <button class="btn ghost sm" id="btnVeus">Blocos</button>
             <button class="btn ghost sm" id="btnGrade">Grade</button>
             <button class="btn ghost sm" id="btnRotulos">Rótulos</button>
             <button class="btn sm" id="btnRevelar">Revelar cena</button>
@@ -379,9 +511,11 @@ function telaMestre() {
             <div class="row">
               <button class="btn sm" id="btnToken">Novo token</button>
               <button class="btn sm" id="btnRemover">Remover</button>
+              <button class="btn sm" id="btnOculto">Esconder na TV</button>
               <button class="btn sm" id="btnLanterna">Lanterna</button>
               <button class="btn sm" id="btnAgentes">Trazer agentes</button>
               <button class="btn sm" id="btnRepor">Repor posições</button>
+              <button class="btn ghost sm" id="btnReporTudo">Repor todas as cenas</button>
               <div class="grow"></div>
               <div class="row" id="cores"></div>
             </div>
@@ -392,10 +526,22 @@ function telaMestre() {
               <span class="hint" id="imgNome"></span>
               <input type="file" id="arqImagem" accept="image/*" hidden>
             </div>
+            <div class="row" id="linhaVeu" hidden>
+              <span class="hint">Arraste no vazio para criar · no bloco para mover · na alça para
+                redimensionar · Shift cria um bloco dentro de outro. Ficam gravados na cena.</span>
+              <div class="grow"></div>
+              <button class="btn sm" id="btnVeuTira">Remover bloco</button>
+              <button class="btn ghost sm" id="btnVeuLimpa">Limpar todos</button>
+            </div>
             <div class="row" id="linhaVinc" hidden>
               <span class="hint">Token selecionado:</span>
               <select id="selAgente" style="max-width:210px"></select>
               <span class="hint" id="vincInfo"></span>
+            </div>
+            <div class="row" id="linhaMonstro" hidden>
+              <span class="hint" id="mstSelNome">Monstro:</span>
+              <button class="btn sm" id="btnMorto">Versão morta</button>
+              <span class="hint" id="mstSelInfo"></span>
             </div>
             <div class="row" id="linhaCalib" hidden>
               <span class="hint">Grade da imagem:</span>
@@ -407,6 +553,20 @@ function telaMestre() {
             </div>
           </div>
           <div id="detPonto"></div>
+        </div>
+        <div class="card">
+          <header><h3>Monstros</h3><div class="grow"></div><span class="hint" id="mstStatus"></span></header>
+          <div class="pad stack">
+            <div class="row">
+              <select id="selMonstro" style="max-width:220px"></select>
+              <button class="btn sm" id="btnPorMonstro">Colocar em cena</button>
+            </div>
+            <div class="row">
+              <button class="btn sm" id="btnMostrarMonstro">Mostrar na TV</button>
+              <button class="btn ghost sm" id="btnPararMonstro">Voltar para a cena</button>
+            </div>
+            <p class="hint" id="mstNota"></p>
+          </div>
         </div>
         <div class="card">
           <header><h3>Dados</h3><div class="grow"></div><span class="hint" id="ultDado"></span></header>
@@ -448,17 +608,70 @@ function telaMestre() {
   $("#btnRevelar").onclick = () => { estado.revelado = !estado.revelado; transmitir(); render(); };
   $("#btnGrade").onclick = () => { estado.grade = estado.grade === false; transmitir(); render(); };
   $("#btnLuz").onclick = () => { estado.iluminacao = estado.iluminacao === false; transmitir(); render(); };
-  $("#btnComodos").onclick = () => { modoComodos = !modoComodos; render(); };
+  /* Os dois modos de edição do mapa mordem o mesmo ponteiro: um clica em
+     cômodo, o outro desenha bloco. Ligar um desliga o outro. */
+  $("#btnComodos").onclick = () => {
+    modoComodos = !modoComodos;
+    if (modoComodos) modoVeu = false;
+    render();
+  };
+  $("#btnVeus").onclick = () => {
+    modoVeu = !modoVeu;
+    if (modoVeu) { modoComodos = false; selecionado = null; } else veuSel = null;
+    render();
+  };
+  $("#btnVeuTira").onclick = () => {
+    if (!veuSel) return;
+    const v = vistaAtual();
+    estado.veus[v.chave] = veusDaVista(v).filter(q => q.id !== veuSel);
+    veuSel = null; transmitir(); render();
+  };
+  $("#btnVeuLimpa").onclick = () => {
+    const v = vistaAtual();
+    if (!veusDaVista(v).length) return;
+    estado.veus[v.chave] = [];
+    veuSel = null; transmitir(); render();
+  };
+
+  $("#btnPorMonstro").onclick = () => {
+    const m = elencoPorId($("#selMonstro").value);
+    if (!m) return;
+    const v = vistaAtual();
+    const novo = { id: uid(), arte: m.id, nome: m.nome, elemento: m.elemento || "neutro",
+                   x: v.w / 2, y: v.h / 2 };
+    tokensDaVista(v).push(novo);
+    selecionado = novo.id;
+    transmitir(); render();
+  };
+  $("#btnMostrarMonstro").onclick = () => {
+    const id = $("#selMonstro").value;
+    if (!id) return;
+    estado.revelacao = estado.revelacao === id ? null : id;
+    transmitir(); render();
+  };
+  $("#btnPararMonstro").onclick = () => { estado.revelacao = null; transmitir(); render(); };
+  $("#btnMorto").onclick = () => {
+    if (!selecionado) return;
+    const t = tokensDaVista(vistaAtual()).find(t => t.id === selecionado);
+    if (!t || !elencoDaPeca(t)) return;
+    t.morto = !t.morto;
+    transmitir(); render();
+  };
   $("#btnLanterna").onclick = () => {
     if (!selecionado) return;
     const t = tokensDaVista(vistaAtual()).find(t => t.id === selecionado);
     if (t) { t.luz = !t.luz; transmitir(); render(); }
   };
+  $("#btnOculto").onclick = () => {
+    if (!selecionado) return;
+    const t = tokensDaVista(vistaAtual()).find(t => t.id === selecionado);
+    if (t) { t.oculto = !t.oculto; transmitir(); render(); }
+  };
 
   $("#btnVista").onclick = () => {
     const id = cenarioAtual().id;
     estado.usarDesenho[id] = !estado.usarDesenho[id];
-    selecionado = null; transmitir(); render();
+    selecionado = null; veuSel = null; transmitir(); render();
   };
   $("#btnCalib").onclick = () => {
     const w = parseFloat(($("#calW").value || "").replace(",", "."));
@@ -546,6 +759,16 @@ function telaMestre() {
     delete estado.tokens[vistaAtual().chave];
     selecionado = null; transmitir(); render();
   };
+  /* Escotilha de emergência. As peças ficam guardadas por vista no
+     `localStorage`, então quando o repositório ganha arte nova ou perde um
+     token as cenas que o mestre já abriu continuam com a cópia velha. Isto
+     joga fora a cópia de todas as cenas de uma vez e remonta pelo
+     `cenarios.js`. Só as peças: véus, cômodos e calibração ficam. */
+  $("#btnReporTudo").onclick = () => {
+    if (!confirm("Remontar as peças de todas as cenas pelo repositório?\nBlocos, cômodos escondidos e calibração continuam como estão.")) return;
+    estado.tokens = {};
+    selecionado = null; transmitir(); render();
+  };
 
   const cores = $("#cores");
   Object.keys(ELEMENTOS).forEach(k => {
@@ -566,6 +789,8 @@ function telaMestre() {
 }
 
 let modoComodos = false;
+let modoVeu = false;
+let veuSel = null;
 let ultimaTransmissao = 0;
 
 function rolarDado(q, faces, mod) {
@@ -594,7 +819,7 @@ function montarLista() {
     b.onclick = () => {
       estado.cenarioId = c.id;
       estado.pontosAbertos = [];
-      selecionado = null; painelPonto = null;
+      selecionado = null; painelPonto = null; veuSel = null;
       transmitir(); render();
     };
     box.appendChild(b);
@@ -619,6 +844,38 @@ function render() {
   $("#btnRotulos").classList.toggle("on", estado.rotulos !== false);
   $("#btnLuz").classList.toggle("on", estado.iluminacao !== false);
   $("#btnComodos").classList.toggle("on", modoComodos);
+  $("#btnVeus").classList.toggle("on", modoVeu);
+  $("#linhaVeu").hidden = !modoVeu;
+  if (modoVeu) {
+    $("#btnVeuTira").disabled = !veuSel;
+    $("#btnVeuLimpa").disabled = !veusDaVista(v).length;
+  }
+
+  /* Catálogo do elenco. O `select` é remontado a cada render porque a marca
+     "(desta cena)" depende da cena aberta; a escolha do mestre é preservada,
+     e o padrão é a primeira peça da cena. */
+  const selM = $("#selMonstro");
+  const daCena = elencoDaCena(cen.id).map(m => m.id);
+  const antes = selM.value;
+  selM.innerHTML = "";
+  [["Monstros", MONSTROS], ["Pessoas", PESSOAS]].forEach(([rot, lista]) => {
+    if (!lista.length) return;
+    const g = el("optgroup");
+    g.label = rot;
+    lista.forEach(m => g.appendChild(
+      new Option(m.nome + (daCena.indexOf(m.id) >= 0 ? " (desta cena)" : ""), m.id)));
+    selM.appendChild(g);
+  });
+  selM.value = ELENCO.some(m => m.id === antes) ? antes : (daCena[0] || ELENCO[0].id);
+  const mSel = elencoPorId(selM.value);
+  $("#mstNota").textContent = mSel
+    ? (mSel.nota || "") + (mSel.normal ? "" : " A revelação usa o próprio token — não há arte “-normal” na pasta.")
+    : "";
+  const mRev = estado.revelacao ? elencoPorId(estado.revelacao) : null;
+  $("#mstStatus").textContent = mRev ? "na TV: " + mRev.nome : "";
+  $("#btnMostrarMonstro").classList.toggle("on", !!mRev && mRev.id === selM.value);
+  $("#btnPararMonstro").disabled = !mRev;
+
   const temEnvio = !!imagensMem[cen.id];
   const temAlguma = temEnvio || !!cen.imagem;
   $("#btnImagemTira").hidden = !temEnvio;
@@ -626,8 +883,25 @@ function render() {
   $("#btnVista").textContent = estado.usarDesenho[cen.id] ? "Ver imagem" : "Ver desenho";
   $("#btnVista").classList.toggle("on", !estado.usarDesenho[cen.id]);
   const tSel = selecionado ? tokensDaVista(v).find(t => t.id === selecionado) : null;
-  $("#linhaVinc").hidden = !tSel;
-  if (tSel) {
+  const bo = $("#btnOculto");
+  bo.disabled = !tSel;
+  bo.classList.toggle("on", !!(tSel && tSel.oculto));
+  bo.textContent = tSel && tSel.oculto ? "Mostrar na TV" : "Esconder na TV";
+  $("#btnLanterna").disabled = !tSel;
+  $("#btnRemover").disabled = !tSel;
+  const mTok = elencoDaPeca(tSel);
+  $("#linhaMonstro").hidden = !mTok;
+  if (mTok) {
+    $("#mstSelNome").textContent = mTok.nome + ":";
+    $("#btnMorto").disabled = !temMorto(mTok);
+    $("#btnMorto").classList.toggle("on", !!tSel.morto);
+    $("#mstSelInfo").textContent = temMorto(mTok)
+      ? (tSel.morto ? "mostrando a versão morta" : "")
+      : "sem arte “-morto” na pasta";
+  }
+  /* Vincular a agente só faz sentido em peça solta: um monstro não é ficha. */
+  $("#linhaVinc").hidden = !tSel || !!mTok;
+  if (tSel && !mTok) {
     const sel = $("#selAgente");
     sel.innerHTML = "";
     sel.appendChild(new Option("— peça solta —", ""));
@@ -650,9 +924,14 @@ function render() {
 
   const caixa = $("#mapa");
   montarMapa(caixa, cen, {
-    arrastavel: true,
+    /* No modo de blocos o ponteiro é todo do véu: token arrastável junto
+       roubaria o pointerdown e o mestre não conseguiria desenhar sobre uma
+       peça. */
+    arrastavel: !modoVeu,
     modoMestre: true,
     modoComodos,
+    modoVeu,
+    veuSel,
     aoMudar: render,
     selecionado,
     aoSelecionar: id => { selecionado = id; render(); },
@@ -663,11 +942,15 @@ function render() {
       transmitir(); render();
     }
   });
-  ligarArraste(caixa, v, (id, pos) => {
+  caixa.classList.toggle("veuando", modoVeu);
+  if (modoVeu) ligarVeus(caixa, v, render);
+  else ligarArraste(caixa, v, (id, pos) => {
     const t = tokensDaVista(v).find(t => t.id === id);
     if (!t) return;
     t.x = pos.x; t.y = pos.y;
-    const b = [...caixa.querySelectorAll(".token")][tokensDaVista(v).indexOf(t)];
+    /* Procura pelo id, não pela posição na lista: peça oculta não é desenhada
+       no palco, então índice de lista e índice de botão deixaram de casar. */
+    const b = caixa.querySelector('[data-token="' + id + '"]');
     if (b) { b.style.left = (pos.x / v.w * 100) + "%"; b.style.top = (pos.y / v.h * 100) + "%"; }
     const agora = Date.now();
     if (agora - ultimaTransmissao > 90) { ultimaTransmissao = agora; transmitir(); }
@@ -730,7 +1013,8 @@ function telaPalco() {
       <div class="selo">OP</div>
       <h1>Ordo Realitas</h1>
       <p>AGUARDE</p>
-    </div>`;
+    </div>
+    <div class="revelacao" id="revelacao" hidden><img id="revImg" alt=""></div>`;
   if (canal) canal.postMessage({ tipo: "pedido" });
   renderPalco();
 }
@@ -752,6 +1036,23 @@ function mostrarDado() {
 
 function renderPalco() {
   const cen = cenarioAtual();
+
+  /* Revelação de monstro: passa por cima de tudo. Sem legenda, sem faixa de
+     agentes, sem aviso, sem mapa — só a arte no escuro. Vale mesmo com a cena
+     ainda oculta, que é justamente quando o susto funciona. */
+  const rev = estado.revelacao ? elencoPorId(estado.revelacao) : null;
+  const cxRev = $("#revelacao");
+  cxRev.hidden = !rev;
+  if (rev) {
+    const arte = arteRevelacao(rev);
+    const img = $("#revImg");
+    if (img.getAttribute("src") !== arte) img.setAttribute("src", arte);
+    img.alt = rev.nome;
+    $("#cena").hidden = true;
+    $("#espera").hidden = true;
+    return;
+  }
+
   $("#cena").hidden = !estado.revelado;
   $("#espera").hidden = !!estado.revelado;
   if (!estado.revelado) return;

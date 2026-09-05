@@ -80,7 +80,6 @@ const CENARIOS = [
         { n: 3, x: 14, y: 8.8, nome: "Contêiner", detalhe: "Cobertura leve. Barulhento se empurrado." }
       ],
       tokens: [
-        { nome: "Agentes", elemento: "neutro", x: 15.4, y: 5.6 },
         { nome: "Alvo", elemento: "sangue", x: 3.7, y: 5.6 }
       ]
     },
@@ -90,7 +89,6 @@ const CENARIOS = [
       { n: 3, x: 22.2, y: 13.8, nome: "Contêiner", detalhe: "Cobertura leve. Barulhento se empurrado." }
     ],
     tokens: [
-      { nome: "Agentes", elemento: "neutro", x: 5, y: 9 },
       { nome: "Alvo", elemento: "sangue", x: 26, y: 9 }
     ]
   },
@@ -155,7 +153,7 @@ const CENARIOS = [
         { n: 3, x: 15.4, y: 2.7, nome: "Armário", detalhe: "Roupas de alguém que saiu com pressa. Documentos no bolso de um casaco." },
         { n: 4, x: 10.2, y: 3.2, nome: "Sob a cama", detalhe: "Marcas recentes no pó — algo foi arrastado para fora daqui." }
       ],
-      tokens: [{ nome: "Agentes", elemento: "neutro", x: 10.3, y: 10.3, luz: true }]
+      tokens: []
     },
     pontos: [
       { n: 1, x: 7.4, y: 9, nome: "Escada do sótão", detalhe: "Degraus podres. Percepção ouve algo se mexendo acima." },
@@ -163,7 +161,7 @@ const CENARIOS = [
       { n: 3, x: 25.5, y: 5, nome: "Armário", detalhe: "Roupas de alguém que saiu com pressa. Documentos no bolso de um casaco." },
       { n: 4, x: 16.8, y: 5.4, nome: "Sob a cama", detalhe: "Marcas recentes no pó — algo foi arrastado para fora daqui." }
     ],
-    tokens: [{ nome: "Agentes", elemento: "neutro", x: 9.8, y: 20, luz: true }]
+    tokens: []
   },
 
   {
@@ -211,14 +209,14 @@ const CENARIOS = [
         { n: 2, x: 20.3, y: 11.7, nome: "Contêiner de carga", detalhe: "Cobertura pesada, o único abrigo sólido da área aberta. Empurrar ou abrir faz um barulho que atrai." },
         { n: 3, x: 12.5, y: 5, nome: "Corredor central", detalhe: "Linha de visão limpa de ponta a ponta entre as fileiras de engradados. Quem cruzar fica exposto." }
       ],
-      tokens: [{ nome: "Agentes", elemento: "neutro", x: 13.4, y: 14.3 }]
+      tokens: []
     },
     pontos: [
       { n: 1, x: 37.7, y: 20, nome: "Escada do mezanino", detalhe: "Vantagem de altura sobre todo o galpão. Dois turnos para subir." },
       { n: 2, x: 32, y: 19.8, nome: "Empilhadeira", detalhe: "Cobertura pesada. Pode ser ligada com um teste — barulho atrai." },
       { n: 3, x: 12, y: 10.6, nome: "Corredor central", detalhe: "Linha de visão limpa de ponta a ponta. Quem cruzar fica exposto." }
     ],
-    tokens: [{ nome: "Agentes", elemento: "neutro", x: 6.5, y: 23 }]
+    tokens: []
   },
 
   /* ===================================================================
@@ -352,6 +350,29 @@ const CENARIOS = [
         { t: "movel", x: 26.9, y: 9, w: 2.3, h: 2.6, nome: "armário" }
       ]
     },
+    /* Casa de Felipe em imagem, 1464x1074 px. A escala saiu da cama do quarto
+       (2,0 x 1,4 m em 107 x 78 px) e fecha com a pia da cozinha e o sofá da
+       sala: ~54 px por metro, o que dá 18,5 x 13,6 — a proporção do arquivo,
+       senão o `slice` cortaria o quintal cercado. A arte tem o telhado
+       removido e o quintal inteiro, que é onde a cena começa. Cena de dia:
+       nenhuma escuridão por cima. */
+    imagem: {
+      url: "/mapas/m1-c1-felipe.png",
+      w: 18.5, h: 13.6,
+      escuridao: 0,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 7.6, y: 12, nome: "Portão verde", detalhe: "Aberto quando os agentes chegam. Nenhum sinal de arrombamento em lugar nenhum da casa." },
+        { n: 2, x: 4.6, y: 4.1, nome: "Sala", detalhe: "Felipe oferece um copo de água e um lugar para sentar. É aqui que acontece o interrogatório." },
+        { n: 3, x: 2, y: 5.3, nome: "Estante com o porta-retrato", detalhe: "Foto de Marcelo. Ao sair, Felipe pousa o porta-retrato de cabeça para baixo." },
+        { n: 4, x: 13.1, y: 2.9, nome: "Quarto de Marcelo", detalhe: "Sumiu daqui, de madrugada. Felipe deu falta de manhã cedo. Era o aniversário do menino." },
+        { n: 5, x: 4.1, y: 7.4, nome: "Caminho para o consultório", detalhe: "Felipe se oferece para levar os agentes até a Dra. Ruth Wendhal — poucos minutos a pé." },
+        { n: 6, x: 7.6, y: 9.6, nome: "Jardim da frente", detalhe: "Fora do texto da missão, mas a arte entrega: a grama alta atrapalha a vista do interior. Percepção DT 10 para enxergar alguma coisa da casa antes de entrar." }
+      ],
+      tokens: [
+        { nome: "Felipe", arte: "felipe", elemento: "neutro", x: 5.6, y: 4.3 }
+      ]
+    },
     pontos: [
       { n: 1, x: 14, y: 21.9, nome: "Portão verde", detalhe: "Aberto quando os agentes chegam. Nenhum sinal de arrombamento em lugar nenhum da casa." },
       { n: 2, x: 8, y: 7, nome: "Sala", detalhe: "Felipe oferece um copo de água e um lugar para sentar. É aqui que acontece o interrogatório." },
@@ -360,8 +381,7 @@ const CENARIOS = [
       { n: 5, x: 17, y: 14.5, nome: "Caminho para o consultório", detalhe: "Felipe se oferece para levar os agentes até a Dra. Ruth Wendhal — poucos minutos a pé." }
     ],
     tokens: [
-      { nome: "Agentes", elemento: "neutro", x: 14, y: 18 },
-      { nome: "Felipe", elemento: "neutro", x: 11, y: 8 }
+      { nome: "Felipe", arte: "felipe", elemento: "neutro", x: 11, y: 8 }
     ]
   },
 
@@ -406,6 +426,33 @@ const CENARIOS = [
         { t: "movel", x: 26.1, y: 3.2, w: 2.3, h: 3, nome: "armário" }
       ]
     },
+    /* Consultório em imagem, 2550x1664 px. Escala pela maca (1,9 x 0,7 m em
+       230 x 90 px) e conferida no notebook, na cadeira de escritório e na
+       folha da porta: ~123,5 px por metro, o que dá 8,1 x 5,28 — a proporção
+       do arquivo, senão o `slice` cortaria o jardim da frente. A arte tem só
+       dois ambientes: o da esquerda, com o balcão em L e o notebook, é a
+       recepção de Euclides; o da direita, com o armário e a maca, é o
+       consultório da Dra. Ruth. A porta de madeira fechada no meio do divisor
+       é exatamente a passagem que Euclides não quer liberar. Cena de dia e
+       arte já bem acesa: nenhuma escuridão por cima. */
+    imagem: {
+      url: "/mapas/m1-c2-consultorio.jpg",
+      w: 8.1, h: 5.28,
+      escuridao: 0,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 2.5, y: 1.6, nome: "Computador de Euclides", detalhe: "Percepção DT 10: ele está lendo um blog sobre um incêndio ocorrido na cidade há pouco mais de um ano. Chegando perto, dá para ler a matéria inteira." },
+        { n: 2, x: 3.7, y: 1.9, nome: "Porta do consultório", detalhe: "Fechada na arte. Euclides só libera a passagem com Diplomacia DT 10 ou Intimidação DT 15." },
+        { n: 3, x: 5.2, y: 0.8, nome: "Sete prontuários", detalhe: "Ciência DT 10, Medicina DT 10 e Ocultismo DT 15 tiram leituras diferentes. Ocultismo aponta traços de Conhecimento: aprendizado súbito e vozes em sonhos." },
+        { n: 4, x: 5.33, y: 1.45, nome: "Pasta sob a cadeira", detalhe: "Onde a Dra. Ruth guarda os prontuários das sete crianças que atendeu antes de sumirem. Na arte, é a cadeira em frente à mesa do fundo." },
+        { n: 5, x: 4, y: 3.4, nome: "Caixa de brinquedos de madeira", detalhe: "Organizada no canto da sala. O consultório é simples, mas limpo e bem cuidado." },
+        { n: 6, x: 6.4, y: 3.1, nome: "Maca", detalhe: "Fora do texto da missão, mas a arte entrega: é onde as sete crianças foram examinadas. Medicina DT 10 no lençol acha fios de cabelo de mais de uma criança — a maca não foi trocada desde os últimos atendimentos." }
+      ],
+      tokens: [
+        { nome: "Euclides", elemento: "neutro", x: 2.6, y: 0.95 },
+        { nome: "Dra. Ruth", arte: "dra-ruth", elemento: "neutro", x: 6, y: 2.3 }
+      ]
+    },
     pontos: [
       { n: 1, x: 7.2, y: 7.2, nome: "Computador de Euclides", detalhe: "Percepção DT 10: ele está lendo um blog sobre um incêndio ocorrido na cidade há pouco mais de um ano. Chegando perto, dá para ler a matéria inteira." },
       { n: 2, x: 14.7, y: 9, nome: "Porta do consultório", detalhe: "Euclides só libera a passagem com Diplomacia DT 10 ou Intimidação DT 15." },
@@ -414,9 +461,8 @@ const CENARIOS = [
       { n: 5, x: 17, y: 14.2, nome: "Caixa de brinquedos de madeira", detalhe: "Organizada no canto da sala. O consultório é simples, mas limpo e bem cuidado." }
     ],
     tokens: [
-      { nome: "Agentes", elemento: "neutro", x: 13, y: 17 },
       { nome: "Euclides", elemento: "neutro", x: 7, y: 9.2 },
-      { nome: "Dra. Ruth", elemento: "neutro", x: 22, y: 9.8 }
+      { nome: "Dra. Ruth", arte: "dra-ruth", elemento: "neutro", x: 22, y: 9.8 }
     ]
   },
 
@@ -456,15 +502,39 @@ const CENARIOS = [
         { t: "texto", x: 19.8, y: 14.6, txt: "a doutora corre para trás da mesa", tam: 0.72 }
       ]
     },
+    /* Mesmo arquivo-base da Cena 2, mesma planta e mesmo tamanho (2550x1664
+       px), então a grade é idêntica: 8,1 x 5,28. A diferença é o estado —
+       a porta da rua saiu das dobradiças e caiu no jardim, a porta do
+       consultório virou lascas espalhadas pelo divisor e a janela da esquerda
+       está estilhaçada. Dá para alternar entre as duas cenas na mesa e a
+       arte conta a passagem do tempo sozinha. Cena de dia: nenhuma escuridão
+       por cima. */
+    imagem: {
+      url: "/mapas/m1-c3-revolta.jpg",
+      w: 8.1, h: 5.28,
+      escuridao: 0,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 3.78, y: 2.16, nome: "Porta rompida", detalhe: "Estouro de madeira anuncia a entrada da turba. É por aqui que os pais entram — as lascas espalhadas pelo divisor são o que sobrou dela." },
+        { n: 2, x: 5.4, y: 1.6, nome: "Atrás da mesa", detalhe: "Posição da Dra. Ruth durante toda a cena. Protegê-la por 3 rodadas é o objetivo." },
+        { n: 3, x: 4.5, y: 2.1, nome: "Linha de contenção", detalhe: "Conter os ânimos funciona como Procurar Pistas: Diplomacia para apelar à razão, Luta para a força bruta. Usos criativos de itens valem +5 a critério do mestre." },
+        { n: 4, x: 2.07, y: 4.05, nome: "Porta da rua arrombada", detalhe: "Fora do texto da missão, mas a arte entrega: a folha saiu das dobradiças e caiu no jardim. Ninguém sai por aqui sem pisar em madeira quebrada — Furtividade DT 15 para tentar." },
+        { n: 5, x: 1.13, y: 2.12, nome: "Janela estilhaçada", detalhe: "Fora do texto da missão: vidro no chão da recepção. Rota de fuga alternativa, com 1 de dano para quem passar sem cuidado." }
+      ],
+      tokens: [
+        { nome: "Turba", elemento: "sangue", x: 3.1, y: 2.2 },
+        { nome: "Dra. Ruth", arte: "dra-ruth", elemento: "neutro", x: 5.6, y: 1.75 },
+        { nome: "Euclides", elemento: "neutro", x: 2.6, y: 3.2 }
+      ]
+    },
     pontos: [
       { n: 1, x: 15.4, y: 9.2, nome: "Porta rompida", detalhe: "Estouro de madeira anuncia a entrada da turba. É por aqui que os pais entram." },
       { n: 2, x: 21, y: 8.8, nome: "Atrás da mesa", detalhe: "Posição da Dra. Ruth durante toda a cena. Protegê-la por 3 rodadas é o objetivo." },
       { n: 3, x: 18, y: 11.6, nome: "Linha de contenção", detalhe: "Conter os ânimos funciona como Procurar Pistas: Diplomacia para apelar à razão, Luta para a força bruta. Usos criativos de itens valem +5 a critério do mestre." }
     ],
     tokens: [
-      { nome: "Agentes", elemento: "neutro", x: 18, y: 11 },
       { nome: "Turba", elemento: "sangue", x: 13, y: 9 },
-      { nome: "Dra. Ruth", elemento: "neutro", x: 21.5, y: 8.6 },
+      { nome: "Dra. Ruth", arte: "dra-ruth", elemento: "neutro", x: 21.5, y: 8.6 },
       { nome: "Euclides", elemento: "neutro", x: 12, y: 12 }
     ]
   },
@@ -528,7 +598,7 @@ const CENARIOS = [
         { n: 5, x: 9.6, y: 7.95, nome: "Porta de entrada", detalhe: "Vidro quebrado, abre por dentro pelo buraco. Nenhum outro sinal de arrombamento." },
         { n: 6, x: 13.3, y: 1.4, nome: "Gerador", detalhe: "Fora do texto da missão, mas útil: ligar o gerador acende a casa e faz um barulho dos diabos. Aumente o grau de urgência em 1 se usarem." }
       ],
-      tokens: [{ nome: "Agentes", elemento: "neutro", x: 9.6, y: 10.4 }]
+      tokens: []
     },
     pontos: [
       { n: 1, x: 4.5, y: 5.8, nome: "Geladeira", detalhe: "Tomada por fotos presas com ímãs. Investigação DT 15 identifica Gustavo, a esposa e um menino de 5 ou 6 anos — e uma foto das costas marcadas de Jônata. Medicina DT 15 bate as manchas com os prontuários. Intuição DT 10 percebe a distância entre o casal. Percepção DT 10 sente o cheiro: a comida apodreceu." },
@@ -537,7 +607,7 @@ const CENARIOS = [
       { n: 4, x: 23.6, y: 4.7, nome: "Cama de ferro", detalhe: "Investigação ou Percepção DT 15 nota o alçapão embaixo. Atletismo DT 10 move a cama, mas o alçapão está trancado. Crime DT 15 destranca; falhar aumenta o grau de urgência em 1. Arrombar acorda o que está lá embaixo." },
       { n: 5, x: 13.8, y: 14.7, nome: "Porta de entrada", detalhe: "Vidro quebrado, abre por dentro pelo buraco. Nenhum outro sinal de arrombamento." }
     ],
-    tokens: [{ nome: "Agentes", elemento: "neutro", x: 13.8, y: 17 }]
+    tokens: []
   },
 
   {
@@ -571,16 +641,44 @@ const CENARIOS = [
         { t: "texto", x: 15.5, y: 17, txt: "CÔMODO RITUALÍSTICO", tam: 0.9 }
       ]
     },
+    /* Cômodo ritualístico em imagem, 1536x1024 px. Escala pela estante do
+       fundo (~2 m em 140 px) e conferida nos engradados e nas velas: ~71 px
+       por metro, o que dá 14 x 9,33 — a proporção do arquivo, senão o `slice`
+       cortaria a escada em caracol. A arte já tem a escadaria no cômodo da
+       esquerda, a porta entreaberta no meio e o sigilo aceso no centro, então
+       a escuridão entra leve e as velas viram luzes de verdade — a lanterna
+       dos agentes ainda importa nos cantos. */
+    imagem: {
+      url: "/mapas/m1-c5-porao.png",
+      w: 14, h: 9.33,
+      escuridao: 0.28,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 2.3, y: 3.1, nome: "Escadaria", detalhe: "Se os agentes fizerem muito barulho, não conseguirem abrir o alçapão ou desistirem, a criatura sobe e ataca — o alçapão explode em pedaços." },
+        { n: 2, x: 8.5, y: 4.5, nome: "Círculo de velas", detalhe: "As velas estão distribuídas de modo a formar um sigilo paranormal. No centro, a criatura de costas." },
+        { n: 3, x: 8.7, y: 1.1, nome: "Foto de Jônata", detalhe: "É para ela que o existido olha fixamente quando os agentes descem." },
+        { n: 4, x: 5.9, y: 6.6, nome: "Presença Perturbadora", detalhe: "Na primeira rodada, antes de qualquer um agir: teste de Vontade. Falhar custa 1d6 de dano mental, metade se passar. Só vale na primeira rodada ou no primeiro encontro com a criatura." },
+        { n: 5, x: 4.2, y: 5.3, nome: "Porta entreaberta", detalhe: "Separa a escadaria do cômodo ritualístico. É por essa fresta que sai a luz de chamas. Furtividade para descer sem abrir de vez." },
+        { n: 6, x: 6.6, y: 1, nome: "Estante e altar", detalhe: "Fora do texto da missão, mas útil: Ocultismo DT 15 nos livros e no estandarte do fundo confirma que o sigilo é de Conhecimento, ligado a rituais de transformação — a mesma linha das marcas na TV do casebre." }
+      ],
+      tokens: [{ nome: "Existido", arte: "existido", oculto: true, elemento: "conhecimento", x: 8.5, y: 4.5 }],
+      luzes: [
+        { x: 8.5, y: 4.5, r: 3.6, tom: "quente" },
+        { x: 1.5, y: 4.5, r: 3.2, tom: "quente" },
+        { x: 5.2, y: 1.8, r: 2.6, tom: "quente" },
+        { x: 11, y: 1.2, r: 2.8, tom: "quente" },
+        { x: 12.4, y: 4.8, r: 3, tom: "quente" },
+        { x: 5.4, y: 7.2, r: 2.4, tom: "quente" },
+        { x: 11.4, y: 7.6, r: 2.6, tom: "quente" }
+      ]
+    },
     pontos: [
       { n: 1, x: 5.6, y: 6.8, nome: "Escadaria", detalhe: "Se os agentes fizerem muito barulho, não conseguirem abrir o alçapão ou desistirem, a criatura sobe e ataca — o alçapão explode em pedaços." },
       { n: 2, x: 15.5, y: 9.8, nome: "Círculo de velas", detalhe: "As velas estão distribuídas de modo a formar um sigilo paranormal. No centro, a criatura de costas." },
       { n: 3, x: 15.5, y: 4.6, nome: "Foto de Jônata", detalhe: "É para ela que o existido olha fixamente quando os agentes descem." },
       { n: 4, x: 12, y: 12.6, nome: "Presença Perturbadora", detalhe: "Na primeira rodada, antes de qualquer um agir: teste de Vontade. Falhar custa 1d6 de dano mental, metade se passar. Só vale na primeira rodada ou no primeiro encontro com a criatura." }
     ],
-    tokens: [
-      { nome: "Agentes", elemento: "neutro", x: 7, y: 9, luz: true },
-      { nome: "Existido", elemento: "conhecimento", x: 15.5, y: 9.8 }
-    ]
+    tokens: [{ nome: "Existido", arte: "existido", oculto: true, elemento: "conhecimento", x: 15.5, y: 9.8 }]
   },
 
   {
@@ -613,13 +711,43 @@ const CENARIOS = [
         { t: "texto", x: 14.6, y: 17.2, txt: "as velas formam o símbolo de adoração", tam: 0.7 }
       ]
     },
+    /* É o mesmo cômodo da Cena 5 — mesma planta 24 x 20 no desenho, mesma
+       escada em caracol, mesma porta, mesmo sigilo — só num momento
+       diferente: o existido já caiu e agora é vasculhar. Então reusa o mesmo
+       arquivo e a mesma grade (14 x 9,33), com os pontos remapeados para o
+       que esta cena procura. Só as velas continuam acesas, e é por isso que
+       a lanterna dos agentes ainda importa nos cantos. */
+    imagem: {
+      url: "/mapas/m1-c5-porao.png",
+      w: 14, h: 9.33,
+      escuridao: 0.28,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 8.5, y: 4.5, nome: "Velas e símbolos", detalhe: "Ocultismo DT 15: é um ritual de transformação, feito para ajudar a enfraquecer a Membrana. Investigação DT 10 acha a caixa de música que toca cantigas de ninar — ativada com ação de movimento, ocupa 1 espaço." },
+        { n: 2, x: 10.4, y: 1.5, nome: "Mesa e documentos", detalhe: "Atualidades DT 10: tudo se refere ao incêndio da fábrica em 21/02/2021 — as mesmas informações do post de blog." },
+        { n: 3, x: 11.2, y: 7.4, nome: "Diário rasgado", detalhe: "Investigação DT 15: anotações rasgadas que precisam ser organizadas. Gustavo e Jairo estavam no incêndio; Gustavo sobreviveu queimado; os trabalhadores temiam pelos filhos que visitavam a fábrica; Gustavo sabia dos livros ocultistas de Jairo e veio atrás de algo que trouxesse o filho de volta." },
+        { n: 4, x: 5.8, y: 7.3, nome: "Caixa de música", detalhe: "Toca cantigas de ninar. Item aproveitável pelos agentes." },
+        { n: 5, x: 8.7, y: 1.1, nome: "Foto de Jônata", detalhe: "O centro da adoração: é para ela que as velas apontam e para ela que a criatura olhava. Intuição DT 10 fecha a conta — quem montou isso não estava caçando as crianças, estava cuidando de uma." },
+        { n: 6, x: 2.3, y: 3.1, nome: "Escadaria", detalhe: "A saída. Vale lembrar da urgência: são 6 rodadas de investigação antes de a cena fechar." }
+      ],
+      tokens: [{ nome: "Existido", arte: "existido", morto: true, elemento: "conhecimento", x: 8.5, y: 4.5 }],
+      luzes: [
+        { x: 8.5, y: 4.5, r: 3.6, tom: "quente" },
+        { x: 1.5, y: 4.5, r: 3.2, tom: "quente" },
+        { x: 5.2, y: 1.8, r: 2.6, tom: "quente" },
+        { x: 11, y: 1.2, r: 2.8, tom: "quente" },
+        { x: 12.4, y: 4.8, r: 3, tom: "quente" },
+        { x: 5.4, y: 7.2, r: 2.4, tom: "quente" },
+        { x: 11.4, y: 7.6, r: 2.6, tom: "quente" }
+      ]
+    },
     pontos: [
       { n: 1, x: 14.6, y: 9.8, nome: "Velas e símbolos", detalhe: "Ocultismo DT 15: é um ritual de transformação, feito para ajudar a enfraquecer a Membrana. Investigação DT 10 acha a caixa de música que toca cantigas de ninar — ativada com ação de movimento, ocupa 1 espaço." },
       { n: 2, x: 20, y: 5.2, nome: "Mesa e documentos", detalhe: "Atualidades DT 10: tudo se refere ao incêndio da fábrica em 21/02/2021 — as mesmas informações do post de blog." },
       { n: 3, x: 20.1, y: 14.3, nome: "Diário rasgado", detalhe: "Investigação DT 15: anotações rasgadas que precisam ser organizadas. Gustavo e Jairo estavam no incêndio; Gustavo sobreviveu queimado; os trabalhadores temiam pelos filhos que visitavam a fábrica; Gustavo sabia dos livros ocultistas de Jairo e veio atrás de algo que trouxesse o filho de volta." },
       { n: 4, x: 12.9, y: 15.7, nome: "Caixa de música", detalhe: "Toca cantigas de ninar. Item aproveitável pelos agentes." }
     ],
-    tokens: [{ nome: "Agentes", elemento: "neutro", x: 10.5, y: 9.8, luz: true }]
+    tokens: [{ nome: "Existido", arte: "existido", morto: true, elemento: "conhecimento", x: 14.6, y: 9.8 }]
   },
 
   {
@@ -662,12 +790,32 @@ const CENARIOS = [
         { t: "movel", x: 21, y: 10.2, w: 2.8, h: 1.8, nome: "cama" }
       ]
     },
+    /* Pousada em imagem, 1392x1130 px. Escala pelas camas (2,15 x 1,35 m em
+       117 x 75 px) e conferida na porta dupla da frente (1,35 m em 76 px):
+       ~56 px por metro, o que dá 17,9 x 14,53 — a proporção do arquivo, senão
+       o `slice` cortaria a varanda de entrada. A arte tem quatro quartos de
+       uma cama cada, recepção e sala comum, tudo aceso por lampião. Interlúdio
+       de descanso: nenhuma escuridão por cima. */
+    imagem: {
+      url: "/mapas/m1-interludio-pousada.png",
+      w: 17.9, h: 14.53,
+      escuridao: 0,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 3.6, y: 3.6, nome: "Recepção", detalhe: "Ponto de encontro do grupo. Boa hora para revisitar o caso antes de decidir." },
+        { n: 2, x: 5.2, y: 9.4, nome: "Sala comum", detalhe: "Ações de interlúdio: descanso e recuperação antes da fábrica." },
+        { n: 3, x: 3.7, y: 5.6, nome: "A decisão", detalhe: "Chamar Caio encerra a missão e pula direto para o Epílogo. Seguir investigando leva à fábrica abandonada." },
+        { n: 4, x: 8.6, y: 3.7, nome: "Os quartos", detalhe: "Quatro quartos, uma cama em cada. Divida o grupo como quiserem — quem dormir sozinho é quem o mestre pode usar para um pesadelo antes da fábrica." },
+        { n: 5, x: 5.7, y: 11.7, nome: "Varanda da frente", detalhe: "Onde os agentes chegam. O lampião aceso é a única luz do lado de fora — quem ficar de vigia passa a noite aqui." }
+      ],
+      tokens: []
+    },
     pontos: [
       { n: 1, x: 6.4, y: 7.2, nome: "Recepção", detalhe: "Ponto de encontro do grupo. Boa hora para revisitar o caso antes de decidir." },
       { n: 2, x: 6.2, y: 13.2, nome: "Sala comum", detalhe: "Ações de interlúdio: descanso e recuperação antes da fábrica." },
       { n: 3, x: 17, y: 8, nome: "A decisão", detalhe: "Chamar Caio encerra a missão e pula direto para o Epílogo. Seguir investigando leva à fábrica abandonada." }
     ],
-    tokens: [{ nome: "Agentes", elemento: "neutro", x: 7.7, y: 16 }]
+    tokens: []
   },
 
   {
@@ -734,10 +882,7 @@ const CENARIOS = [
         { n: 4, x: 22.8, y: 2, nome: "Passarela e dutos", detalhe: "A passarela suspensa dá altura à criatura. É pela boca de duto no fim dela que ela leva as crianças — os agentes são grandes demais para passar e precisam seguir os dutos por fora." },
         { n: 5, x: 11, y: 10, nome: "Presença Perturbadora", detalhe: "Vontade DT 15 na primeira rodada, antes de qualquer um agir. Falha custa 2d6 de dano mental, metade se passar." }
       ],
-      tokens: [
-        { nome: "Agentes", elemento: "neutro", x: 3, y: 5, luz: true },
-        { nome: "Bicho papão", elemento: "conhecimento", x: 15, y: 4.4 }
-      ],
+      tokens: [{ nome: "Bicho papão", arte: "bicho-papao", oculto: true, elemento: "conhecimento", x: 15, y: 4.4 }],
       luzes: [
         { x: 5.4, y: 7, r: 7 }, { x: 5.4, y: 11.5, r: 6 }, { x: 5.4, y: 16.3, r: 6 },
         { x: 19.5, y: 4.4, r: 7 }, { x: 22.5, y: 1.6, r: 5 }
@@ -750,10 +895,7 @@ const CENARIOS = [
       { n: 4, x: 25, y: 10.6, nome: "Presença Perturbadora", detalhe: "Vontade DT 15 na primeira rodada. Falha custa 2d6 de dano mental, metade se passar." },
       { n: 5, x: 20, y: 8, nome: "Lembrete de mesa", detalhe: "Vale lembrar aos jogadores que dá para recordar informações sobre criaturas com Ocultismo — e que a investigação já lhes deu pistas sobre essa." }
     ],
-    tokens: [
-      { nome: "Agentes", elemento: "neutro", x: 21.5, y: 25.2, luz: true },
-      { nome: "Bicho papão", elemento: "conhecimento", x: 34, y: 12.6 }
-    ]
+    tokens: [{ nome: "Bicho papão", arte: "bicho-papao", oculto: true, elemento: "conhecimento", x: 34, y: 12.6 }]
   },
 
   {
@@ -797,13 +939,37 @@ const CENARIOS = [
         { t: "texto", x: 21.4, y: 14.2, txt: "SALA PARCIALMENTE DESABADA", tam: 0.88 }
       ]
     },
+    /* Ninho em imagem, 1491x1055 px. Escala pelas próprias gaiolas (as seis
+       têm 85 px de lado e o desenho as trata como 1,9 m) e conferida na
+       largura do corredor de pedra a oeste (~2 m): ~46,5 px por metro, o que
+       dá 21,5 x 15,2 — a proporção do arquivo, senão o `slice` cortaria o
+       corredor de acesso. A arte já traz as seis gaiolas em 3 x 2, o
+       desabamento a nordeste e os destroços onde a criatura empilha os
+       papéis. Escuridão leve — a arte já é quase preta — com a luz fria
+       entrando pelo teto desabado. */
+    imagem: {
+      url: "/mapas/m1-c8-ninho.png",
+      w: 21.5, h: 15.2,
+      escuridao: 0.22,
+      credito: "battlemap de terceiros — uso na mesa",
+      pontos: [
+        { n: 1, x: 11.8, y: 7.5, nome: "As seis gaiolas", detalhe: "As crianças dos prontuários, menos Jônata Magalhães. Estão assustadas e começam a chorar — uma delas manda as outras pararem, porque a criatura fica irritada com gritos." },
+        { n: 2, x: 17, y: 10.3, nome: "Papéis sobre os destroços", detalhe: "Entradas de um diário sem identificação, empilhadas na madeira quebrada. Jairo não morreu no incêndio: ficou preso nos escombros, com medo constante de que o filho tivesse morrido nas chamas. Ele ouvia algo se aproximando, pedindo ajuda." },
+        { n: 3, x: 17.2, y: 11.8, nome: "As duas consciências", detalhe: "Jairo viu o próprio filho no bicho papão e passou a cuidar dele. Começou a se confundir com a criatura, a ponto de não separar mais os dois no diário. As marcas nas costas das crianças são as mãos dele, e aparecem algum tempo antes do ataque." },
+        { n: 4, x: 2.6, y: 6.9, nome: "Corredor de acesso", detalhe: "Caminho apertado desde a saída dos dutos, ~2 m de largura. Boa hora para tensão antes da revelação." },
+        { n: 5, x: 15.9, y: 13.1, nome: "Mancha de sangue", detalhe: "Fora do texto da missão, mas a arte entrega: Medicina DT 15 diz que é humano, antigo e de mais de uma pessoa. Não é de nenhuma das seis crianças — são de antes." },
+        { n: 6, x: 17.6, y: 3.2, nome: "Teto desabado", detalhe: "A única luz do lugar entra por aqui. Escalar os escombros exige Atletismo DT 15 e é a saída mais rápida com as crianças — mas faz barulho." }
+      ],
+      tokens: [],
+      luzes: [{ x: 17.6, y: 3.2, r: 6 }]
+    },
     pontos: [
       { n: 1, x: 18.5, y: 9.4, nome: "As seis gaiolas", detalhe: "As crianças dos prontuários, menos Jônata Magalhães. Estão assustadas e começam a chorar — uma delas manda as outras pararem, porque a criatura fica irritada com gritos." },
       { n: 2, x: 26, y: 11.4, nome: "Papéis sobre a mesa", detalhe: "Entradas de um diário sem identificação. Jairo não morreu no incêndio: ficou preso nos escombros, com medo constante de que o filho tivesse morrido nas chamas. Ele ouvia algo se aproximando, pedindo ajuda." },
       { n: 3, x: 26, y: 13.4, nome: "As duas consciências", detalhe: "Jairo viu o próprio filho no bicho papão e passou a cuidar dele. Começou a se confundir com a criatura, a ponto de não separar mais os dois no diário. As marcas nas costas das crianças são as mãos dele, e aparecem algum tempo antes do ataque." },
       { n: 4, x: 10.5, y: 9.4, nome: "Corredor de acesso", detalhe: "Caminho apertado desde a saída dos dutos. Boa hora para tensão antes da revelação." }
     ],
-    tokens: [{ nome: "Agentes", elemento: "neutro", x: 10.5, y: 9.2, luz: true }]
+    tokens: []
   }
 ];
 
