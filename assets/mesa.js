@@ -1137,10 +1137,15 @@ function renderPalco() {
 
   const f = $("#faixa");
   f.innerHTML = "";
-  agentes.slice(0, 4).forEach(a => {
+  /* Todos os agentes entram na faixa — antes o slice(0,4) simplesmente sumia
+     com o resto do grupo. Acima de 4 a faixa aperta (fonte, barra e espaço)
+     para caber sem rolagem, já que na TV ninguém rola a tela. */
+  f.className = "faixa" + (agentes.length > 4 ? " densa" : "") + (agentes.length > 6 ? " muitos" : "");
+  agentes.forEach(a => {
     const d = el("div", "ag");
     const h = el("h4");
-    h.appendChild(document.createTextNode(a.nome || "Agente"));
+    // nome em elemento próprio para poder truncar com reticências quando aperta
+    h.appendChild(el("span", "nome", a.nome || "Agente"));
     h.appendChild(el("span", "nex", "NEX " + (a.nex || 0) + "%"));
     d.appendChild(h);
     d.appendChild(barrasDoAgente(a, true));

@@ -350,6 +350,95 @@
       .rail {
         position: static !important
       }
+
+      /* No telefone o rail deixa de ser coluna e vira uma pilha em cima do
+         painel — PV, PE, SAN e companhia reapareciam em cima de toda aba,
+         empurrando o conteúdo para baixo. Fora da aba Agente ele sai.
+         No PC nada muda: continua sticky e visível em todas as abas. */
+      #scr-ficha:not([data-aba="agente"]) .rail {
+        display: none
+      }
+    }
+
+    /* ---------- inventário ---------- */
+    .cargabar {
+      height: 12px
+    }
+
+    .cargabar i {
+      background: var(--ok)
+    }
+
+    .cargabar.cheio i {
+      background: var(--warn)
+    }
+
+    .cargabar.excedido i {
+      background: var(--bad)
+    }
+
+    .invrow {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 14px;
+      border-top: 1px solid var(--line)
+    }
+
+    .invrow:first-child {
+      border-top: 0
+    }
+
+    .invrow .nm {
+      flex: 1;
+      min-width: 0
+    }
+
+    .invrow .nm b {
+      font-family: var(--disp);
+      font-size: 13.5px;
+      font-weight: 600
+    }
+
+    .invrow .nm .sub {
+      display: block;
+      font-size: 11.5px;
+      color: var(--ink-3);
+      margin-top: 1px
+    }
+
+    .invrow .cat {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      flex: none
+    }
+
+    .invrow .esp {
+      font-family: var(--mono);
+      font-size: 12px;
+      flex: none;
+      min-width: 44px;
+      text-align: right
+    }
+
+    .invrow .uso {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      font-size: 11.5px;
+      color: var(--ink-2);
+      flex: none
+    }
+
+    .equipgrp {
+      font-family: var(--disp);
+      font-size: 10.5px;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      font-weight: 600;
+      padding: 9px 14px 4px
     }
 
     /* ---------- cards ---------- */
@@ -2433,6 +2522,9 @@
       <button role="tab" id="tab-rolagem" aria-selected="false" aria-controls="p-rolagem">Rolagem</button>
       <button role="tab" id="tab-sessao" aria-selected="false" aria-controls="p-sessao">Sessão</button>
       <button role="tab" id="tab-ref" aria-selected="false" aria-controls="p-ref">Referência</button>
+      <button role="tab" id="tab-inv" aria-selected="false" aria-controls="p-inv">Inventário<span class="tnum"
+          id="tnInv"></span></button>
+      <button role="tab" id="tab-equip" aria-selected="false" aria-controls="p-equip">Equipamento</button>
       <button role="tab" id="tab-dados" aria-selected="false" aria-controls="p-dados">Dados</button>
     </div>
   </div>
@@ -2594,7 +2686,7 @@
   </section>
 
   <!-- ===================== TELA: FICHA ===================== -->
-  <section class="screen" id="scr-ficha">
+  <section class="screen" id="scr-ficha" data-aba="agente">
     <div class="wrap">
       <!-- ============ RAIL ============ -->
       <aside class="rail">
@@ -3047,6 +3139,65 @@
         </section>
 
         <!-- ---------- DADOS ---------- -->
+        <!-- ---------- INVENTÁRIO ---------- -->
+        <section id="p-inv" role="tabpanel" aria-labelledby="tab-inv" hidden>
+          <div class="card">
+            <header>
+              <h3>Carga</h3>
+              <div class="grow"></div><span id="cargaFlag"></span>
+            </header>
+            <div class="pad stack">
+              <div class="bar cargabar"><i id="cargaBar" style="width:0"></i></div>
+              <div class="statgrid" id="cargaGrid"></div>
+              <div id="cargaAviso"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <header>
+              <h3>Adicionar item</h3>
+            </header>
+            <div class="pad stack">
+              <div class="row">
+                <select id="invSel" style="flex:1;min-width:0"></select>
+                <input type="number" id="invQtd" min="1" step="1" value="1" style="max-width:78px"
+                  aria-label="quantidade">
+                <button class="btn primary sm" type="button" id="invAdd">Adicionar</button>
+              </div>
+              <div id="invPrev"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <header>
+              <h3>Carregando</h3>
+              <div class="grow"></div><span class="chip" id="invCount"></span>
+            </header>
+            <div id="invLista"></div>
+          </div>
+
+          <div class="card">
+            <header>
+              <h3>Limite por categoria</h3>
+            </header>
+            <div class="statgrid" id="invCats"></div>
+            <div class="pad hint" id="invCatNota"></div>
+          </div>
+        </section>
+
+        <!-- ---------- EQUIPAMENTO (CAPÍTULO 3) ---------- -->
+        <section id="p-equip" role="tabpanel" aria-labelledby="tab-equip" hidden>
+          <div class="card">
+            <header>
+              <h3>Capítulo 3 — Equipamento</h3>
+              <div class="grow"></div><input type="text" id="equipBusca" placeholder="filtrar itens…"
+                style="max-width:190px">
+            </header>
+            <div class="pad stack" id="equipRegras"></div>
+          </div>
+          <div id="equipTabelas"></div>
+        </section>
+
         <section id="p-dados" role="tabpanel" aria-labelledby="tab-dados" hidden>
           <div class="card">
             <header>
@@ -3623,25 +3774,158 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       }
     };
 
+    /* =====================================================================
+       CAPÍTULO 3 — EQUIPAMENTO (Tabelas 3.3 a 3.10 do livro de regras)
+       Extraído do PDF oficial. Campos das armas:
+       nome, categoria, dano, crítico, alcance, tipo, espaços, descrição,
+       classe (branca|disparo|fogo), proficiência, empunhadura.
+       ===================================================================== */
     const ARMAS = [
-      ["Faca", "0", "1d4", "19", "Curto", "Corte", 1, "Ágil, arremessável.", "branca"],
-      ["Punhal", "0", "1d4", "×3", "—", "Perfuração", 1, "Ágil; usada por cultistas.", "branca"],
-      ["Bastão", "0", "1d6", "×2", "—", "Impacto", 1, "Uma mão.", "branca"],
-      ["Machete", "0", "1d6", "19", "—", "Corte", 1, "Uma mão.", "branca"],
-      ["Lança", "0", "1d6", "×2", "Curto", "Perfuração", 1, "Pode ser arremessada.", "branca"],
-      ["Cajado", "0", "1d6", "×2", "—", "Impacto", 2, "Duas mãos, ágil.", "branca"],
-      ["Arco", "0", "1d6", "×3", "Médio", "Perfuração", 2, "Arma de disparo, duas mãos.", "disparo"],
-      ["Besta", "0", "1d8", "19", "Médio", "Perfuração", 2, "Arma de disparo, duas mãos.", "disparo"],
-      ["Pistola", "I", "1d12", "18", "Curto", "Balístico", 1, "Arma de fogo leve.", "fogo"],
-      ["Revólver", "I", "2d6", "19/×3", "Curto", "Balístico", 1, "Arma de fogo leve.", "fogo"],
-      ["Fuzil de Caça", "I", "2d8", "19/×3", "Médio", "Balístico", 2, "Arma de fogo, duas mãos.", "fogo"],
-      ["Submetralhadora", "I", "2d6", "19/×3", "Curto", "Balístico", 1, "Automática.", "fogo"],
-      ["Espingarda", "I", "4d6", "×3", "Curto", "Balístico", 2, "Dano cai à metade em alcance médio.", "fogo"],
-      ["Fuzil de Assalto", "II", "2d10", "19/×3", "Médio", "Balístico", 2, "Automática.", "fogo"],
-      ["Fuzil de Precisão", "III", "2d10", "19/×3", "Longo", "Balístico", 2, "+5 de margem de ameaça ao mirar (se veterano).", "fogo"],
-      ["Katana", "I", "1d10", "19", "—", "Corte", 2, "Ágil. Uma mão se for veterano em Luta.", "branca"],
-      ["Motosserra", "I", "3d6", "×2", "—", "Corte", 2, "Role um dado extra a cada 6 no dano. −1 dado em testes.", "branca"]
+      ["Coronhada", "—", "1d4/1d6", "×2", "—", "Impacto", "—", "Ataque com a coronha da arma ou golpe desarmado improvisado.", "branca", "Armas Simples", "Corpo a Corpo – Leves"],
+      ["Faca", "0", "1d4", "19", "Curto", "Corte", "1", "Uma lâmina afiada, como uma navalha, uma faca de churrasco ou uma faca militar (facas de cozinha pequenas causam apenas 1d3 pontos de dano). É uma arma ágil e pode ser arremessada.", "branca", "Armas Simples", "Corpo a Corpo – Leves"],
+      ["Martelo", "0", "1d6", "×2", "—", "Impacto", "1", "Esta ferramenta comum pode ser usada como arma na falta de opções melhores.", "branca", "Armas Simples", "Corpo a Corpo – Leves"],
+      ["Punhal", "0", "1d4", "×3", "—", "Perfuração", "1", "Uma faca de lâmina longa e pontiaguda, usada por cultistas em seus rituais. É uma arma ágil.", "branca", "Armas Simples", "Corpo a Corpo – Leves"],
+      ["Bastão", "0", "1d6/1d8", "×2", "—", "Impacto", "1", "Um cilindro de madeira maciça. Pode ser um taco de beisebol, um cassetete da polícia, uma tonfa ou apenas uma clava envolta em pregos ou arame farpado. Você pode empunhar um bastão com uma mão (dano 1d6) ou com as duas (dano 1d8).", "branca", "Armas Simples", "Corpo a Corpo – Uma Mão"],
+      ["Machete", "0", "1d6", "19", "—", "Corte", "1", "Uma lâmina longa e larga, muito usada como ferramenta para abrir trilhas.", "branca", "Armas Simples", "Corpo a Corpo – Uma Mão"],
+      ["Lança", "0", "1d6", "×2", "Curto", "Perfuração", "1", "Uma haste de madeira com uma ponta metálica afiada, a lança é uma arma arcaica, mas usada ainda hoje por artistas marciais. Pode ser arremessada.", "branca", "Armas Simples", "Corpo a Corpo – Uma Mão"],
+      ["Cajado", "0", "1d6/1d6", "×2", "—", "Impacto", "2", "Um cabo de madeira ou barra de ferro longos. Inclui o bo usado em artes marciais. É uma arma ágil. Além disso, pode ser usado com Combater com Duas Armas (e poderes similares) para fazer ataques adicionais, como se fosse uma arma de uma mão e uma arma leve.", "branca", "Armas Simples", "Corpo a Corpo – Duas Mãos"],
+      ["Arco", "0", "1d6", "×3", "Médio", "Perfuração", "2", "Um arco e flecha comum, próprio para tiro ao alvo.", "disparo", "Armas Simples", "Armas de Disparo – Duas Mãos"],
+      ["Besta", "0", "1d8", "19", "Médio", "Perfuração", "2", "Esta arma da antiguidade exige uma ação de movimento para ser recarregada a cada disparo.", "disparo", "Armas Simples", "Armas de Disparo – Duas Mãos"],
+      ["Pistola", "I", "1d12", "18", "Curto", "Balístico", "1", "Uma arma de mão comum entre policiais e militares por ser facilmente recarregável.", "fogo", "Armas Simples", "Armas de Fogo – Leves"],
+      ["Revólver", "I", "2d6", "19/×3", "Curto", "Balístico", "1", "A arma de fogo mais comum, e uma das mais confiáveis.", "fogo", "Armas Simples", "Armas de Fogo – Leves"],
+      ["Fuzil de caça", "I", "2d8", "19/×3", "Médio", "Balístico", "2", "Esta arma de fogo é bastante popular entre fazendeiros, caçadores e atiradores esportistas.", "fogo", "Armas Simples", "Armas de Fogo – Duas Mãos"],
+      ["Machadinha", "0", "1d6", "×3", "Curto", "Corte", "1", "Ferramenta útil para cortar madeira, muito comum em fazendas e canteiros de obras. Pode ser arremessada.", "branca", "Armas Táticas", "Corpo a Corpo – Leves"],
+      ["Nunchaku", "0", "1d8", "×2", "—", "Impacto", "1", "Dois bastões curtos de madeira ligados por uma corrente. É uma arma ágil.", "branca", "Armas Táticas", "Corpo a Corpo – Leves"],
+      ["Corrente", "0", "1d8", "×2", "—", "Impacto", "1", "Um pedaço de corrente grossa pode ser usado como uma arma bastante efetiva. A corrente fornece +2 em testes para desarmar e derrubar.", "branca", "Armas Táticas", "Corpo a Corpo – Uma Mão"],
+      ["Espada", "I", "1d8/1d10", "19", "—", "Corte", "1", "Uma arma medieval, como uma espada longa dos cavaleiros europeus ou uma cimitarra sarracena. Você pode empunhar uma espada com uma mão (dano 1d8) ou com as duas (dano 1d10).", "branca", "Armas Táticas", "Corpo a Corpo – Uma Mão"],
+      ["Florete", "I", "1d6", "18", "—", "Corte", "1", "Esta espada de lâmina fina e comprida é usada por esgrimistas. É uma arma ágil.", "branca", "Armas Táticas", "Corpo a Corpo – Uma Mão"],
+      ["Machado", "I", "1d8", "×3", "—", "Corte", "1", "Uma ferramenta importante para lenhadores e bombeiros, um machado pode causar ferimentos terríveis.", "branca", "Armas Táticas", "Corpo a Corpo – Uma Mão"],
+      ["Maça", "I", "2d4", "×2", "—", "Impacto", "1", "Bastão com uma cabeça metálica cheia de protuberâncias.", "branca", "Armas Táticas", "Corpo a Corpo – Uma Mão"],
+      ["Acha", "I", "1d12", "×3", "—", "Corte", "2", "Um machado grande e pesado, usado no corte de árvores largas.", "branca", "Armas Táticas", "Corpo a Corpo – Duas Mãos"],
+      ["Gadanho", "I", "2d4", "×4", "—", "Corte", "2", "Uma ferramenta agrícola, o gadanho é uma versão maior da foice, para uso com as duas mãos. Foi criada para ceifar cereais, mas também pode ceifar vidas.", "branca", "Armas Táticas", "Corpo a Corpo – Duas Mãos"],
+      ["Katana", "I", "1d10", "19", "—", "Corte", "2", "Originária do Japão, esta espada longa e levemente curvada transcendeu os séculos. É uma arma ágil. Se você for veterano em Luta pode usá-la como uma arma de uma mão.", "branca", "Armas Táticas", "Corpo a Corpo – Duas Mãos"],
+      ["Marreta", "I", "3d4", "×2", "—", "Impacto", "2", "Normalmente usada para demolir paredes, também pode ser usada para demolir pessoas. Use 59 estas estatísticas para outras ferramentas de construção civil, como picaretas.", "branca", "Armas Táticas", "Corpo a Corpo – Duas Mãos"],
+      ["Montante", "I", "2d6", "19", "—", "Corte", "2", "Enorme e pesada, esta espada de 1,5m de comprimento foi uma das armas mais poderosas em seu tempo. Motoserra. Uma ferramenta capaz de causar ferimentos profundos; sempre que rolar um 6 em um dado de dano com uma motosserra, role um dado de dano adicional. Apesar de potente, esta arma é desajeitada e impõe –O nos seus testes de ataque. Ligar uma motosserra gasta uma ação de movimento.", "branca", "Armas Táticas", "Corpo a Corpo – Duas Mãos"],
+      ["Motosserra", "I", "3d6", "×2", "—", "Corte", "2", "Uma ferramenta capaz de causar ferimentos profundos; sempre que rolar um 6 em um dado de dano com uma motosserra, role um dado de dano adicional. Apesar de potente, esta arma é desajeitada e impõe –O nos seus testes de ataque. Ligar uma motosserra gasta uma ação de movimento. Nunchaku. Dois bastões curtos de madeira ligados por uma corrente. É uma arma ágil. Pistola. Uma arma de mão comum entre policiais e militares por ser facilmente recarregável. Punhal. Uma faca de lâmina longa e pontiaguda, usada por cultistas em seus rituais. É uma arma ágil. Revólver. A arma de fogo mais comum, e uma das mais confiáveis. Submetralhadora. Esta arma de fogo automática pode ser empunhada com apenas uma mão. Habilidades de Armas Armas Ágeis Facas, punhais, cajados, nunchakus, floretes e katanas permitem que você aplique sua Agilidade em vez de sua Força em testes de ataque e rolagens de dano realizadas com elas. Armas Automáticas Fuzis de assalto, submetralhadoras e metralhadoras podem disparar tiros únicos, usando a regra normal, ou rajadas. Quando dispara uma rajada, você sofre –O no teste de ataque, mas causa 1 dado de dano adicional do mesmo tipo. Coronhada Você pode usar uma arma de fogo como uma arma corpo a corpo. O dano é 1d4 de impacto para armas de fogo leves e de uma mão (como pistolas) e 1d6 para armas de fogo de duas mãos (como fuzis). MUNIÇÕES A munição é representada por “pacotes”, como uma caixa de balas ou aljava de flechas. Cada pacote é suficiente para uma ou mais cenas, independente de quantos disparos (ataques) você fizer em cada uma. Quando você usar a munição pelo número de cenas especificado, gasta o pacote. Esse sistema abstrato representa o fato de que no caos de um combate vários disparos são dados, além de que parte da munição pode apresentar problemas ou se perder. Ele existe para manter o foco na ação e eliminar a necessidade de controlar o consumo de munição a cada disparo. Descrição das Munições Balas Curtas. Munição básica, usada em pistolas, revólveres e submetralhadoras. Um pacote de balas curtas dura duas cenas. Balas Longas. Maior e mais potente, esta munição é usada em fuzis e metralhadoras. Um pacote de balas longas dura uma cena. Cartuchos. Usados em espingardas, esses cartuchos são carregados com esferas de chumbo. Um pacote de cartuchos dura uma cena. Combustível. Um tanque de combustível para lança-chamas. Dura uma cena. Flechas. Usadas em arcos e bestas, flechas podem ser reaproveitadas após cada combate. Por isso, um pacote de flechas dura uma missão inteira. Foguete. Disparado por bazucas. Ao contrário de outras munições, cada foguete dura um único disparo, não uma cena. Para fazer vários ataques, você precisará carregar vários foguetes.", "branca", "Armas Táticas", "Corpo a Corpo – Duas Mãos"],
+      ["Arco composto", "I", "1d10", "×3", "Médio", "Perfuração", "2", "Este arco moderno usa materiais de alta tensão e um sistema de roldanas para gerar mais pressão. Ao contrário de outras armas de disparo, permite que você aplique seu valor de Força às rolagens de dano.", "disparo", "Armas Táticas", "Armas de Disparo – Duas Mãos"],
+      ["Balestra", "I", "1d12", "19", "Médio", "Perfuração", "2", "Uma besta pesada, capaz de disparos poderosos. Exige uma ação de movimento para ser recarregada a cada disparo.", "disparo", "Armas Táticas", "Armas de Disparo – Duas Mãos"],
+      ["Submetralhadora", "I", "2d6", "19/×3", "Curto", "Balístico", "1", "Esta arma de fogo automática pode ser empunhada com apenas uma mão. Habilidades de Armas Armas Ágeis Facas, punhais, cajados, nunchakus, floretes e katanas permitem que você aplique sua Agilidade em vez de sua Força em testes de ataque e rolagens de dano realizadas com elas. Armas Automáticas Fuzis de assalto, submetralhadoras e metralhadoras podem disparar tiros únicos, usando a regra normal, ou rajadas. Quando dispara uma rajada, você sofre –O no teste de ataque, mas causa 1 dado de dano adicional do mesmo tipo. Coronhada Você pode usar uma arma de fogo como uma arma corpo a corpo. O dano é 1d4 de impacto para armas de fogo leves e de uma mão (como pistolas) e 1d6 para armas de fogo de duas mãos (como fuzis). MUNIÇÕES A munição é representada por “pacotes”, como uma caixa de balas ou aljava de flechas. Cada pacote é suficiente para uma ou mais cenas, independente de quantos disparos (ataques) você fizer em cada uma. Quando você usar a munição pelo número de cenas especificado, gasta o pacote. Esse sistema abstrato representa o fato de que no caos de um combate vários disparos são dados, além de que parte da munição pode apresentar problemas ou se perder. Ele existe para manter o foco na ação e eliminar a necessidade de controlar o consumo de munição a cada disparo. Descrição das Munições Balas Curtas. Munição básica, usada em pistolas, revólveres e submetralhadoras. Um pacote de balas curtas dura duas cenas. Balas Longas. Maior e mais potente, esta munição é usada em fuzis e metralhadoras. Um pacote de balas longas dura uma cena. Cartuchos. Usados em espingardas, esses cartuchos são carregados com esferas de chumbo. Um pacote de cartuchos dura uma cena. Combustível. Um tanque de combustível para lança-chamas. Dura uma cena. Flechas. Usadas em arcos e bestas, flechas podem ser reaproveitadas após cada combate. Por isso, um pacote de flechas dura uma missão inteira. Foguete. Disparado por bazucas. Ao contrário de outras munições, cada foguete dura um único disparo, não uma cena. Para fazer vários ataques, você precisará carregar vários foguetes.", "fogo", "Armas Táticas", "Armas de Fogo – Uma Mão"],
+      ["Espingarda", "I", "4d6", "×3", "Curto", "Balístico", "2", "Arma de fogo longa e com cano liso. A espingarda causa apenas metade do dano em alcance médio ou maior.", "fogo", "Armas Táticas", "Armas de Fogo – Duas Mãos"],
+      ["Fuzil de assalto", "II", "2d10", "19/×3", "Médio", "Balístico", "2", "A arma de fogo padrão da maioria dos exércitos modernos. É uma arma automática.", "fogo", "Armas Táticas", "Armas de Fogo – Duas Mãos"],
+      ["Fuzil de precisão", "III", "2d10", "19/×3", "Longo", "Balístico", "2", "Esta arma de fogo de uso militar é projetada para disparos longos e precisos. Se for veterano em Pontaria e mirar com um fuzil de precisão (veja a página 87), você recebe +5 na margem de ameaça de seu ataque.", "fogo", "Armas Táticas", "Armas de Fogo – Duas Mãos"],
+      ["Bazuca", "III", "10d8", "×2", "Médio", "Impacto", "2", "Este lança-foguetes foi concebido como uma arma anti-tanques, mas também se mostrou eficaz contra criaturas. A bazuca causa seu dano no alvo atingido e em todos os seres num raio de 3m; esses seres (mas não o alvo atingido diretamente) têm direito a um teste de Reflexos (DT Agi) para reduzir o dano à metade. Você pode disparar o foguete num ponto qualquer em alcance médio, em vez de num ser específico; nesse caso, não precisa rolar ataque e não tem chance de errar (mas também não acerta nenhum ser diretamente). A bazuca exige uma ação de movimento para ser recarregada a cada disparo.", "fogo", "Armas Pesadas", "Armas de Fogo – Duas Mãos"],
+      ["Lança-chamas", "III", "6d6", "×2", "Curto", "Fogo", "2", "Equipamento militar que esguicha líquido inflamável incandescente. Um lança-chamas atinge todos os seres em uma linha de 1,5m de largura com alcance curto, mas não alcança além disso. Faça um único teste de ataque e compare o resultado com a Defesa de todos os seres na área. Além de sofrer dano, seres atingidos ficam em chamas.", "fogo", "Armas Pesadas", "Armas de Fogo – Duas Mãos"],
+      ["Metralhadora", "II", "2d12", "19/×3", "Médio", "Balístico", "2", "Uma arma de fogo pesada, de uso militar. Para atacar com uma metralhadora, você precisa ter Força 4 ou maior ou gastar uma ação de movimento para apoiá-la em seu tripé ou suporte apropriado; caso contrário, sofre –5 em seus ataques. Uma metralhadora é uma arma automática.", "fogo", "Armas Pesadas", "Armas de Fogo – Duas Mãos"],
     ];
+
+    const MUNICOES = [
+      ["Balas curtas", "0", "1"],
+      ["Balas longas", "I", "1"],
+      ["Cartuchos", "I", "1"],
+      ["Combustível", "I", "1"],
+      ["Flechas", "0", "1"],
+      ["Foguete", "I", "1"],
+    ];
+
+    /* nome, Defesa, categoria, espaços */
+    const PROTECOES = [
+      ["Leve", "+5", "I", "2"],
+      ["Pesada", "+10", "II", "5"],
+      ["Escudo", "+2", "I", "2"],
+    ];
+
+    /* nome, categoria, espaços, grupo, descrição */
+    const GERAIS = [
+      ["Kit de perícia", "0", "1", "Acessórios", "Um conjunto de ferramentas necessárias para algumas perícias ou usos de perícias. Sem o kit, você sofre –5 no teste. Existe um kit de perícia para cada perícia que exige este item."],
+      ["Utensílio", "I", "1", "Acessórios", "Um item comum que tenha uma utilidade específica, como um canivete, uma lupa, um smartphone ou um notebook. Um utensílio fornece +2 em uma perícia (exceto Luta e Pontaria). Por exemplo, um smartphone pode ser usado para acessar a internet e fornecer bônus em Ciências, enquanto um notebook pode ser preparado para invadir sistemas e fornecer bônus em Tecnologia. Você pode inventar itens menos realistas, como um “detector de mentiras portátil” que fornece +2 em Intuição, mas o mestre tem a palavra final se o utensílio é apropriado ou não. Utensílios sempre ocupam 1 espaço e precisam ser empunhados para que o bônus seja aplicado."],
+      ["Vestimenta", "I", "1", "Acessórios", "Uma peça de vestuário que fornece +2 em uma perícia (exceto Luta ou Pontaria). Por exemplo, um par de botas militares pode fornecer +2 em Atletismo, um terno ou vestido elegante pode fornecer +2 em Diplomacia e um manto com glifos pode fornecer +2 em Ocultismo. Assim como utensílios, o benefício de cada vestimenta deve ser aprovado pelo mestre. Você pode receber os bônus de no máximo duas vestimentas ao mesmo tempo. Vestir ou despir uma vestimenta é uma ação completa. TABELA 3.8: EQUIPAMENTOS GERAIS Nome Categoria Espaços Acessórios Kit de perícia 0 1 Utensílio I 1 Vestimenta I 1 Explosivos Granada de atordoamento 0 1 Granada de fragmentação I 1 Granada de fumaça 0 1 Granada incendiária I 1 Mina antipessoal I 1 Itens Operacionais Algemas 0 1 Arpéu 0 1 Bandoleira I 1 Binóculos 0 1 Bloqueador de sinal I 1 Cicatrizante I 1 Corda 0 1 Equipamento de sobrevivência 0 2 Lanterna tática I 1 Máscara de gás 0 1 Mochila militar I * Óculos de visão térmica I 1 Pé de cabra 0 1 Pistola de dardos I 1 Pistola sinalizadora 0 1 Soqueira 0 1 Spray de pimenta I 1 Taser I 1 Traje hazmat I 2 64 Explosivos Granadas. Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. I Atordoamento. Também chamadas de flash-bang, por criarem um estouro barulhento e luminoso. Seres na área ficam atordoados por 1 rodada (Fortitude DT Agi reduz para ofuscado e surdo por uma rodada). I Fragmentação. Espalha fragmentos perfurantes. Seres na área sofrem 8d6 pontos de dano de perfuração (Reflexos DT Agi reduz à metade). I Fumaça. Produz uma fumaça espessa e escura. Seres na área ficam cegos e sob camuflagem total. A fumaça dura 2 rodadas. I Incendiária. Espalha labaredas incandescentes. Seres na área sofrem 6d6 pontos de dano de fogo e ficam em chamas (Reflexos DT Agi reduz o dano à metade e evita a condição em chamas)."],
+      ["Granada de atordoamento", "0", "1", "Explosivos", "Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. Também chamadas de flash-bang, por criarem um estouro barulhento e luminoso. Seres na área ficam atordoados por 1 rodada (Fortitude DT Agi reduz para ofuscado e surdo por uma rodada). I"],
+      ["Granada de fragmentação", "I", "1", "Explosivos", "Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. Espalha fragmentos perfurantes. Seres na área sofrem 8d6 pontos de dano de perfuração (Reflexos DT Agi reduz à metade). I"],
+      ["Granada de fumaça", "0", "1", "Explosivos", "Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. Produz uma fumaça espessa e escura. Seres na área ficam cegos e sob camuflagem total. A fumaça dura 2 rodadas. I"],
+      ["Granada incendiária", "I", "1", "Explosivos", "Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. Espalha labaredas incandescentes. Seres na área sofrem 6d6 pontos de dano de fogo e ficam em chamas (Reflexos DT Agi reduz o dano à metade e evita a condição em chamas). Mina Antipessoal. Esta mina é ativada por controle remoto. Se você estiver a até alcance longo dela, pode gastar uma ação padrão para detoná-la. Ao explodir, a mina dispara centenas de bolas de aço em um cone de 6m, causando 12d6 pontos de dano de perfuração em todos os seres na área (Reflexos DT Int reduz à metade). Você define a direção do cone quando posiciona a mina no chão. Instalar a mina exige uma ação completa e um teste de Tática contra DT 15. Caso falhe, você gasta a mina, mas ela não funciona. Encontrar uma mina instalada exige um teste de Percepção (DT igual ao resultado do seu teste para instalá-la). Itens Operacionais Algemas. Um par de algemas de aço. Para prender uma pessoa que não esteja indefesa você precisa empunhar a algema, agarrar a pessoa (veja “Manobras de Combate”, no Capítulo 4) e então vencer um novo teste de agarrar contra ela. Você pode prender os dois pulsos da pessoa (–5 em testes que exijam o uso das mãos, impede conjuração) ou um dos pulsos dela em um objeto imóvel adjacente, caso haja, para impedir que ela se mova. Escapar das algemas exige um teste de Acrobacia contra DT 30 (ou ter as chaves…). TABELA 3.9: MODIFICAÇÕES PARA ACESSÓRIOS Modificação Efeito Aprimorado Aumenta um dos bônus em perícia para +5. Discreto +5 em testes de ocultar e reduz o espaço em –1. Função adicional Concede +2 a uma perícia adicional. Instrumental O acessório funciona como um kit de perícia. Modificações para Acessórios Assim como armas, itens da categoria acessórios podem ser modificados. Cada modificação aumenta a categoria do item em I e fornece certos benefícios. Usando modificações, é possível criar itens variados. Por exemplo, para criar um “smartphone hacker”, podemos começar com um utensílio que concede +2 em Atualidades, com aplicativos personalizados para hackear outros aparelhos (modificação função adicional, fornecendo +2 em Tecnologia) e que funciona como um kit de tecnologia (modificação instrumental). Este será um item de categoria III. Cada modificação só pode ser aplicada ao mesmo acessório uma vez. Descrição das Modificações Aprimorado. O bônus em perícia concedido pelo acessório aumenta para +5. Se o item tiver função adicional, esta modificação poderá ser escolhida uma segunda vez para esta função. Discreto. O item é miniaturizado ou disfarçado como outro item inócuo (como um relógio). Reduz o número de espaços ocupados em 1, fornece +5 em testes de Crime para ser ocultado e permite que você faça esse teste mesmo que não seja treinado na perícia. Função Adicional. O acessório fornece +2 em uma perícia adicional à sua escolha, sujeita à aprovação do mestre. Instrumental. O acessório pode ser usado como um kit de perícia específico (escolhido ao aplicar esta modificação)."],
+      ["Mina antipessoal", "I", "1", "Explosivos", "Esta mina é ativada por controle remoto. Se você estiver a até alcance longo dela, pode gastar uma ação padrão para detoná-la. Ao explodir, a mina dispara centenas de bolas de aço em um cone de 6m, causando 12d6 pontos de dano de perfuração em todos os seres na área (Reflexos DT Int reduz à metade). Você define a direção do cone quando posiciona a mina no chão. Instalar a mina exige uma ação completa e um teste de Tática contra DT 15. Caso falhe, você gasta a mina, mas ela não funciona. Encontrar uma mina instalada exige um teste de Percepção (DT igual ao resultado do seu teste para instalá-la). Itens Operacionais"],
+      ["Algemas", "0", "1", "Itens Operacionais", "Um par de algemas de aço. Para prender uma pessoa que não esteja indefesa você precisa empunhar a algema, agarrar a pessoa (veja “Manobras de Combate”, no Capítulo 4) e então vencer um novo teste de agarrar contra ela. Você pode prender os dois pulsos da pessoa (–5 em testes que exijam o uso das mãos, impede conjuração) ou um dos pulsos dela em um objeto imóvel adjacente, caso haja, para impedir que ela se mova. Escapar das algemas exige um teste de Acrobacia contra DT 30 (ou ter as chaves…). TABELA 3.9: MODIFICAÇÕES PARA ACESSÓRIOS Modificação Efeito Aprimorado Aumenta um dos bônus em perícia para +5. Discreto +5 em testes de ocultar e reduz o espaço em –1. Função adicional Concede +2 a uma perícia adicional. Instrumental O acessório funciona como um kit de perícia. Modificações para Acessórios Assim como armas, itens da categoria acessórios podem ser modificados. Cada modificação aumenta a categoria do item em I e fornece certos benefícios. Usando modificações, é possível criar itens variados. Por exemplo, para criar um “smartphone hacker”, podemos começar com um utensílio que concede +2 em Atualidades, com aplicativos personalizados para hackear outros aparelhos (modificação função adicional, fornecendo +2 em Tecnologia) e que funciona como um kit de tecnologia (modificação instrumental). Este será um item de categoria III. Cada modificação só pode ser aplicada ao mesmo acessório uma vez. Descrição das Modificações Aprimorado. O bônus em perícia concedido pelo acessório aumenta para +5. Se o item tiver função adicional, esta modificação poderá ser escolhida uma segunda vez para esta função. Discreto. O item é miniaturizado ou disfarçado como outro item inócuo (como um relógio). Reduz o número de espaços ocupados em 1, fornece +5 em testes de Crime para ser ocultado e permite que você faça esse teste mesmo que não seja treinado na perícia. Função Adicional. O acessório fornece +2 em uma perícia adicional à sua escolha, sujeita à aprovação do mestre. Instrumental. O acessório pode ser usado como um kit de perícia específico (escolhido ao aplicar esta modificação). 65"],
+      ["Arpéu", "0", "1", "Itens Operacionais", "Um gancho de aço que pode ser amarrado na ponta de uma corda para se fixar em muros, janelas, parapeitos de prédios… Prender um arpéu exige um teste de Pontaria (DT 15). Subir um muro com a ajuda de uma corda fornece +5 no teste de Atletismo."],
+      ["Bandoleira", "I", "1", "Itens Operacionais", "Um cinto com bolsos e alças. Uma vez por rodada, você pode sacar ou guardar um item em seu inventário como uma ação livre."],
+      ["Binóculos", "0", "1", "Itens Operacionais", "Estes binóculos militares fornecem +5 em testes de Percepção para observar coisas distantes."],
+      ["Bloqueador de sinal", "I", "1", "Itens Operacionais", "Este dispositivo compacto emite ondas que “poluem” a frequência de rádio usada por celulares, impedindo que qualquer aparelho desse tipo em alcance médio se conecte."],
+      ["Cicatrizante", "I", "1", "Itens Operacionais", "Um spray contendo um remédio com potente efeito cicatrizante. Você pode gastar uma ação padrão e este item para curar 2d8+2 PV em você ou em um ser adjacente."],
+      ["Corda", "0", "1", "Itens Operacionais", "Um rolo com 10 metros de corda resistente. Possui diversas utilidades: pode ajudar a descer um buraco ou prédio (+5 em testes de Atletismo nessas situações), amarrar pessoas inconscientes etc."],
+      ["Equipamento de sobrevivência", "0", "2", "Itens Operacionais", "Uma mochila com saco de dormir, panelas, GPS e outros itens úteis para sobreviver no mato. Fornece +5 em testes de Sobrevivência para acampar e orientar-se e permite que você faça esses testes sem treinamento."],
+      ["Lanterna tática", "I", "1", "Itens Operacionais", "Ilumina um cone de 9m. Além disso, você pode gastar uma ação de movimento para mirar a luz nos olhos de um ser em alcance curto. Ele fica ofuscado por 1 rodada, mas imune à lanterna pelo resto da cena. 66"],
+      ["Máscara de gás", "0", "1", "Itens Operacionais", "Uma máscara com filtro que cobre o rosto inteiro. Fornece +10 em testes de Fortitude contra efeitos que dependam de respiração."],
+      ["Mochila militar", "I", "*", "Itens Operacionais", "Uma mochila leve e de alta qualidade. Ela não usa nenhum espaço e aumenta sua capacidade de carga em 2 espaços."],
+      ["Óculos de visão térmica", "I", "1", "Itens Operacionais", "Estes óculos eliminam a penalidade em testes por camuflagem."],
+      ["Pé de cabra", "0", "1", "Itens Operacionais", "Esta barra de ferro fornece +5 em testes de Força para arrombar portas. Pode ser usada em combate como um bastão."],
+      ["Pistola de dardos", "I", "1", "Itens Operacionais", "Esta arma leve dispara dardos com um sonífero em alcance curto. Para disparar em um ser, faça um ataque à distância contra ele. Se acertá-lo, ele fica inconsciente até o fim da cena (Fortitude DT Agi reduz para desprevenido e lento por uma rodada). A pistola vem com 2 dardos. Uma caixa adicional com 2 dardos é um item de categoria 0 que ocupa 1 espaço."],
+      ["Pistola sinalizadora", "0", "1", "Itens Operacionais", "Esta pistola dispara um sinalizador luminoso, útil para chamar outras pessoas para sua localização. Pode ser usada como uma arma de disparo leve com alcance curto que causa 2d6 pontos de dano de fogo. A pistola vem com 2 cargas. Uma caixa adicional com 2 cargas é um item de categoria 0 que ocupa 1 espaço."],
+      ["Soqueira", "0", "1", "Itens Operacionais", "Esta peça de metal é usada entre os dedos e permite socos mais perigosos — fornece +1 em rolagens de dano desarmado e os torna letal. Uma soqueira pode receber modificações e maldições de armas corpo a corpo e aplica os efeitos delas em seus ataques desarmados."],
+      ["Spray de pimenta", "I", "1", "Itens Operacionais", "Este spray dispara um composto químico que causa dor e lacrimação. Você pode gastar uma ação padrão para atingir um ser adjacente. O ser fica cego por 1d4 rodadas (Fortitude DT Agi evita). A carga do spray dura dois usos."],
+      ["Taser", "I", "1", "Itens Operacionais", "Um dispositivo de eletrochoque capaz de atordoar ou até incapacitar um alvo. Você pode gastar uma ação padrão para atingir um ser adjacente. O alvo sofre 1d6 pontos de dano de eletricidade e fica atordoado por uma rodada (Fortitude DT Agi evita). A bateria do taser dura dois usos."],
+      ["Traje hazmat", "I", "2", "Itens Operacionais", "Uma roupa impermeável e que cobre o corpo inteiro, usada para impedir o contato do usuário com materiais tóxicos. Fornece +5 em testes de resistência contra efeitos ambientais e resistência a químico 10. Itens Paranormais A Ordem não se dedica apenas a combater o Outro Lado, mas também a compreendê-lo. Diversos membros trabalham para pesquisar e até reproduzir as características dos elementos, mesclando tecnologia avançada e conhecimento ritualístico, o que às vezes resulta na fabricação de itens paranormais."],
+    ];
+
+    const PARANORMAIS = [
+      ["Amarras de (elemento)", "II", "1", "Itens Paranormais", "Cordas ou correntes feitas de um elemento paranormal específico. As amarras são preparadas para imobilizar criaturas do Outro Lado que sejam vulneráveis ao elemento que as compõem e podem ser usadas de duas formas. I Armadilha. Você gasta as amarras, uma ação completa e 2 PE para preparar uma armadilha de 3x3m. Uma criatura que atravesse o espaço pela primeira vez em seu turno precisa fazer um teste de de Reflexos (DT Int); se falhar, fica imóvel até o final da cena. Mesmo se passar, considera o espaço ocupado pela armadilha como terreno difícil. I Laçar. Você gasta uma ação padrão e 1 PE e escolhe uma criatura em alcance curto. Se falhar num teste de Vontade (DT Agi), a criatura fica paralisada até o início de seu próximo turno, quando pode repetir o teste. Manter a criatura enlaçada requer o gasto de 1 PE por rodada."],
+      ["Câmera de aura paranormal", "II", "1", "Itens Paranormais", "Esta câmera amaldiçoada com Energia possui sigilos de Conhecimento para capturar auras paranormais. Tirar uma foto gasta uma ação padrão e 1 PE. As fotos são instantâneas e revelam a presença de auras paranormais em pessoas e objetos. As auras são da cor associada ao elemento."],
+      ["Componentes ritualísticos de (elemento)", "0", "1", "Itens Paranormais", "Um conjunto de objetos utilizados em rituais de um elemento entre Sangue, Morte, Conhecimento ou Energia (não existem componentes ritualísticos de Medo). Componentes ritualísticos são necessários para a conjuração de rituais do elemento em questão. I Energia: eletricidade, dispositivos tecnológicos (celulares, computadores etc.), circuitos eletrônicos, fontes de calor e luz, pilhas, baterias, cabos de cobre e prata, pólvora, moedas, dados, ímãs… I Sangue: órgãos, carne, sangue, animais vivos (para sacrifício), navalhas, agulhas, arame farpado, correntes, metal enferrujado, fluidos corporais… I Morte: ossos, dentes, cinzas, fios de cabelo, cristais pretos, relógios, galhos secos, folhas secas, plantas mortas, raízes, areia, poeira, Lodo… 67 afetado por manifestações, assim como um lugar com a Membrana protegida por conter uma criatura poderosa vinda de outro lugar."],
+      ["Emissor de pulsos paranormais", "II", "1", "Itens Paranormais", "Esta pequena caixa coberta de sigilos foi desenvolvida para servir como uma “isca” de criaturas paranormais. Ativar a caixa gasta uma ação completa e 1 PE. A caixa emite um pulso de um elemento definido pelo ativador, que atrai criaturas do mesmo elemento e afasta criaturas do elemento oposto. As criaturas afetadas têm direito a um teste de Vontade (DT Pre) para evitar o efeito."],
+      ["Escuta de ruídos paranormais", "II", "1", "Itens Paranormais", "Este microfone funciona como um aparato espião, com a diferença que consegue captar ruídos paranormais. Ativar a escuta gasta uma ação completa e 2 PE e faz com que ela grave ruídos por até 24 horas. Ouvir a escuta fornece +5 em testes de Ocultismo para identificar criatura."],
+      ["Medidor de estabilidade da membrana", "II", "1", "Itens Paranormais", "Um dispositivo complexo, composto por diversos medidores — de temperatura, campo magnético, dilatação temporal… Um agente treinado em Ocultismo pode usar o medidor para avaliar o estado da Membrana em uma área (veja a página 97), o que indica a chance de uma entidade se manifestar nela. Um ambiente com valores racionais e constantes ao longo de algumas horas dificilmente originará uma criatura ou manifestação perigosa. Porém, se as leituras apresentarem dados inexplicáveis ou com grandes variações, o lugar poderá conter uma entidade. Apesar de ser um bom indicativo, o medidor não fornece respostas definitivas, já que um ambiente com a Membrana danificada ainda pode não ter sido Câmera de aura paranormal Emissor de Emissor de pulsos paranormais pulsos paranormais Medidor de estabilidade da membrana Escuta de ruídos paranormais"],
+      ["Scanner de manifestação paranormal de (elemento)", "II", "1", "Itens Paranormais", "Este item é composto por um dispositivo conectado a pequenos objetos amaldiçoados de uma entidade específica e adornado com uma série de sigilos. Ativar o scanner é uma ação padrão. Quando ativado, o scanner consome 1 PE por rodada do usuário, que sempre sabe a direção de todas as manifestações paranormais ativas (rituais, criaturas, itens amaldiçoados etc.) do elemento escolhido em alcance longo. Se o elemento principal de uma criatura for outro, mas ela tiver como complemento o elemento escolhido do scanner, também será detectada. I Conhecimento: escrituras, papéis, livros, pergaminhos, instrumentos de escrita (lápis, caneta, tinta, giz etc.), pedras preciosas, ouro, cordas, tecido, cristais brancos, vidro, máscaras…"],
+    ];
+
+    /* Catálogo único para o inventário: junta as cinco tabelas do capítulo
+       numa lista com a mesma forma, para o select e a conta de carga não
+       precisarem saber de onde cada item veio.
+       `esp` "—" (coronhada) e "*" (mochila militar) valem 0 espaços. */
+    const CATALOGO = (function () {
+      const out = [];
+      const põe = (id, nome, cat, esp, grupo, det, resumo) =>
+        out.push({ id: id, nome: nome, cat: cat, esp: esp, grupo: grupo, det: det, resumo: resumo });
+      ARMAS.forEach(a => põe("arma:" + a[0], a[0], a[1], a[6],
+        "Armas · " + (a[9] || "").replace("Armas ", ""), a[7],
+        a[2] + " · crít " + a[3] + " · " + a[5] + (a[4] !== "—" ? " · alcance " + a[4] : "")));
+      MUNICOES.forEach(m => põe("mun:" + m[0], m[0], m[1], m[2], "Munições", "", ""));
+      PROTECOES.forEach(p => põe("prot:" + p[0], "Proteção " + p[0], p[2], p[3],
+        "Proteções", "", "Defesa " + p[1]));
+      GERAIS.forEach(g => põe("ger:" + g[0], g[0], g[1], g[2], g[3] || "Equipamento geral", g[4], ""));
+      PARANORMAIS.forEach(p => põe("par:" + p[0], p[0], p[1], p[2], p[3], p[4], ""));
+      return out;
+    })();
+    const CAT_POR_ID = CATALOGO.reduce((m, i) => { m[i.id] = i; return m; }, {});
+
+    /* espaços "—" e "*" não contam na carga */
+    function espacoNum(e) { const n = parseInt(e, 10); return isNaN(n) ? 0 : n; }
+    function itemDe(l) { return CAT_POR_ID[l.id] || null; }
+
+    /* Proteções e escudo somam Defesa só enquanto estiverem em uso — o campo
+       `uso` da linha do inventário. Carregar uma proteção na mochila pesa,
+       mas não protege. */
+    const DEF_PROT = { "prot:Leve": 5, "prot:Pesada": 10, "prot:Escudo": 2 };
+    function defesaDoEquipamento() {
+      let d = 0, escudo = 0, corpo = 0;
+      (S.inv || []).forEach(l => {
+        if (!l.uso) return;
+        const b = DEF_PROT[l.id]; if (!b) return;
+        if (l.id === "prot:Escudo") escudo = Math.max(escudo, b);
+        else corpo = Math.max(corpo, b);   // duas proteções não se somam
+      });
+      d = corpo + escudo;
+      return d;
+    }
+    function cargaUsada() {
+      return (S.inv || []).reduce((t, l) => {
+        const i = itemDe(l); return t + (i ? espacoNum(i.esp) : 0) * (l.q || 1);
+      }, 0);
+    }
+    function catsUsadas() {
+      const m = { I: 0, II: 0, III: 0, IV: 0 };
+      (S.inv || []).forEach(l => {
+        const i = itemDe(l); if (i && m[i.cat] != null) m[i.cat] += (l.q || 1);
+      });
+      return m;
+    }
 
     const MODS = [
       ["Armas brancas e de disparo", [
@@ -3741,9 +4025,13 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         limitePE += 1;
       }
 
-      const defesa = 10 + a.agilidade + (fx("defesa2") ? 2 : 0);
       const cargaAtr = a.forca + (trilhaTem("Técnico") ? a.intelecto : 0);
-      const carga = cargaAtr * 5;
+      /* Livro, pág. 53: Força 0 não zera a carga, dá 2 espaços. */
+      const carga = a.forca === 0 && !trilhaTem("Técnico") ? 2 : cargaAtr * 5;
+      const cargaUso = cargaUsada();
+      const sobrecarga = cargaUso > carga;              // –5 na Defesa e nas perícias de carga
+      const defProt = defesaDoEquipamento();
+      const defesa = 10 + a.agilidade + defProt + (fx("defesa2") ? 2 : 0) - (sobrecarga ? 5 : 0);
 
       const pat = PATENTES.find(p => S.pp >= p[1] && S.pp <= p[2]) || PATENTES[0];
       let credito = pat[3];
@@ -3758,7 +4046,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
 
       return {
         nex, idx, steps, pv: Math.max(1, pv), pe: Math.max(0, pe), san: Math.max(0, san),
-        limitePE, defesa, carga, cargaAtr, pat, credito, circulo,
+        limitePE, defesa, carga, cargaAtr, cargaUso, sobrecarga, defProt, pat, credito, circulo,
         rdMental: fx("rdMentalInt") ? a.intelecto : 0
       };
     }
@@ -4006,6 +4294,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       renderOrigens();
       renderRolagem();
       renderSessao();
+      renderInventario();
     }
 
     function renderTopo() {
@@ -4049,24 +4338,256 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       $("#peTurno").innerHTML = "turno <b>" + S.peTurno + "/" + D.limitePE + "</b>";
 
       const stats = [
-        ["Defesa", D.defesa, "10 + Agilidade" + (fx("defesa2") ? " + 2 (Patrulha)" : "")],
+        ["Defesa", D.defesa, "10 + Agilidade" +
+          (D.defProt ? " + " + D.defProt + " (proteção)" : "") +
+          (fx("defesa2") ? " + 2 (Patrulha)" : "") +
+          (D.sobrecarga ? " − 5 (sobrecarga)" : "")],
         ["DT base", 10 + D.limitePE, "+ atributo-chave"],
         ["Limite PE / turno", D.limitePE, "NEX " + S.nex + "%"],
-        ["Carga", D.carga, D.cargaAtr + " × 5 espaços"],
+        ["Carga", D.cargaUso + " / " + D.carga,
+          D.sobrecarga ? "sobrecarregado" : (D.carga - D.cargaUso) + " espaço(s) livre(s)"],
         ["Iniciativa", sgn(bonusPericia("iniciativa")), S.atr.agilidade + "d20 + bônus"],
         ["Rituais", D.circulo, S.classe === "ocultista" ? "Ocultista" : "não conjura"]
       ];
       $("#derivGrid").innerHTML = stats.map(([k, v, s]) =>
         '<div><div class="k">' + esc(k) + '</div><div class="v num">' + esc(String(v)) + '</div><div class="s">' + esc(s) + '</div></div>').join("");
 
-      const lim = D.pat[4];
+      const lim = D.pat[4], usoCat = catsUsadas();
+      const acima = ["I", "II", "III", "IV"].some((c, k) => usoCat[c] > (lim[k] || 0));
       $("#invGrid").innerHTML =
+        '<div><div class="k">Ocupado</div><div class="v num' + (D.sobrecarga ? " bad" : "") + '">' + D.cargaUso +
+        '</div><div class="s">de ' + D.carga + ' espaços</div></div>' +
+        '<div><div class="k">Livre</div><div class="v num">' + Math.max(0, D.carga - D.cargaUso) +
+        '</div><div class="s">' + (D.sobrecarga ? "excedeu em " + (D.cargaUso - D.carga) : "espaços") + '</div></div>' +
         '<div><div class="k">Patente</div><div class="v" style="font-size:14px;font-family:var(--disp)">' + esc(D.pat[0]) + '</div><div class="s">' + S.pp + ' PP</div></div>' +
-        '<div><div class="k">Crédito</div><div class="v" style="font-size:14px;font-family:var(--disp)">' + esc(D.credito) + '</div><div class="s">' + (fx("creditoMais") ? "um nível acima" : "por patente") + '</div></div>' +
-        '<div><div class="k">Cat. I / II</div><div class="v num">' + lim[0] + ' / ' + lim[1] + '</div><div class="s">itens</div></div>' +
-        '<div><div class="k">Cat. III / IV</div><div class="v num">' + lim[2] + ' / ' + lim[3] + '</div><div class="s">itens</div></div>';
-      $("#invNote").textContent = "Itens de Categoria 0 são ilimitados, respeitando apenas os " + D.carga +
-        " espaços de carga. Pesados: proteções leves, armas de duas mãos e malas ocupam 2 espaços; proteções pesadas, 5; itens miúdos, 0.";
+        '<div><div class="k">Crédito</div><div class="v" style="font-size:14px;font-family:var(--disp)">' + esc(D.credito) + '</div><div class="s">' + (fx("creditoMais") ? "um nível acima" : "por patente") + '</div></div>';
+      $("#invNote").innerHTML = (S.inv || []).length
+        ? (S.inv || []).length + " item(ns) na aba <b>Inventário</b> · categorias " +
+          ["I", "II", "III", "IV"].map((c, k) => c + " " + usoCat[c] + "/" + (lim[k] || 0)).join(" · ") +
+          (acima ? " — <b>acima da patente</b>" : "")
+        : "Nada no inventário. Monte a carga na aba <b>Inventário</b>; as regras completas estão em <b>Equipamento</b>.";
+    }
+
+    /* =======================================================================
+       ABA EQUIPAMENTO — Capítulo 3 do livro de regras
+       As tabelas vêm dos mesmos catálogos que alimentam o inventário, então
+       as duas abas nunca divergem. O texto das regras é resumido do capítulo.
+       ======================================================================= */
+    const CAP3_REGRAS = [
+      ["Patente", "Sua patente é sua posição hierárquica na Ordem — diferente do NEX, que mede seu poder individual. " +
+        "Ela define quantos itens de cada categoria a Ordem libera para você em cada missão e qual seu limite de crédito. " +
+        "Você começa como recruta e sobe acumulando pontos de prestígio (PP). Benefícios de uma nova patente valem a partir da próxima missão."],
+      ["Pontos de prestígio", "Ao fim de cada missão o grupo é avaliado: +10 por solucionar o caso, +2 por pista adicional encontrada, " +
+        "−2 por morte de inocente e −5 por morte de membro do grupo. Perder PP suficiente rebaixa a patente, e você devolve os itens aos quais não tem mais acesso."],
+      ["Limite de crédito", "A Ordem cobre moradia, vestuário e alimentação. O crédito serve para compras durante a missão. " +
+        "<b>Baixo</b>: mantimentos, transporte público, hospedagem simples. <b>Médio</b>: passagens aéreas e hospedagem boa. " +
+        "<b>Alto</b>: qualquer despesa necessária, incluindo hospedagem de luxo. <b>Ilimitado</b>: sem teto, limitado apenas ao que existe no lugar."],
+      ["Capacidade de carga", "Você carrega <b>5 espaços por ponto de Força</b> (com Força 0, carrega 2). " +
+        "Um item ocupa 1 espaço por padrão. Armas de duas mãos, proteções leves e itens volumosos ocupam <b>2</b>; " +
+        "proteções pesadas e itens muito volumosos, <b>5</b>; uma pessoa inconsciente, <b>10</b>; itens de peso desprezível, <b>0</b>. " +
+        "A mochila não ocupa espaço, e recipientes cuja única função é carregar outro item (um coldre) também não."],
+      ["Sobrecarga", "Passar do limite deixa você sobrecarregado: <b>−5 na Defesa</b>, <b>−5</b> nas perícias com penalidade de carga " +
+        "(Acrobacia, Crime, Furtividade e o uso natação de Atletismo) e <b>−3m</b> de deslocamento. " +
+        "Você nunca pode carregar mais que o dobro da sua capacidade."],
+      ["Limites de uso", "Alguns itens precisam ser <b>empunhados</b> — um por mão, no máximo dois. Guardar um item empunhado é ação de movimento; " +
+        "largá-lo no chão é ação livre. Os demais são <b>vestidos</b>: vestir é ação padrão, remover é ação de movimento, e não há limite de quantos, " +
+        "além da própria capacidade de carga."],
+      ["Limite de itens por categoria", "Itens são classificados em categoria 0, I, II, III ou IV — quanto mais alta, mais caro, raro e poderoso. " +
+        "A patente diz quantos de cada categoria você requisita por missão. Categoria 0 é ilimitada, respeitando só a carga. " +
+        "Cada modificação aplicada a um item <b>aumenta sua categoria em I</b>."],
+      ["Proficiência com armas", "<b>Simples</b>: facas, bastões, revólveres — todos sabem usar. <b>Táticas</b>: espadas e fuzis — só combatentes começam proficientes. " +
+        "<b>Pesadas</b>: metralhadoras e lança-chamas — nenhuma classe começa proficiente. Atacar sem proficiência custa <b>−2 dados</b> no teste."],
+      ["Empunhadura e tipo", "<b>Leve</b>, <b>uma mão</b> ou <b>duas mãos</b>. Ataques corpo a corpo usam Luta e somam Força ao dano. " +
+        "Ataques à distância usam Pontaria: armas de <b>arremesso</b> somam Força ao dano; as de <b>disparo</b> e de <b>fogo</b> não somam atributo nenhum."],
+      ["Proteções", "A Defesa da proteção soma à sua Defesa. <b>Leve</b> (+5, cat I, 2 espaços): jaqueta de couro pesada ou colete de kevlar. " +
+        "<b>Pesada</b> (+10, cat II, 5 espaços): fornece resistência 2 a balístico, corte, impacto e perfuração, mas impõe <b>−5</b> nas perícias com penalidade de carga. " +
+        "<b>Escudo</b> (+2, cat I, 2 espaços): precisa ser empunhado e acumula com a proteção. Usar proteção sem proficiência custa −2 dados em testes de Força e Agilidade."]
+    ];
+
+    const CAP3_MODS = [
+      ["Modificações para proteções", [
+        ["Antibombas", "+5 em testes de resistência contra efeitos de área. Só em proteções pesadas."],
+        ["Blindada", "Aumenta a resistência a dano para 5 e o espaço em +1. Só em proteções pesadas."],
+        ["Discreta", "Reduz o espaço em 1 e dá +5 em Crime para ocultar (mesmo sem treinamento). Só em proteções leves."],
+        ["Reforçada", "+2 na Defesa fornecida e +1 no espaço. Não combina com discreta."]
+      ]],
+      ["Modificações para acessórios", [
+        ["Aprimorado", "O bônus de perícia do acessório sobe para +5."],
+        ["Discreto", "Miniaturizado ou disfarçado: −1 espaço e +5 em Crime para ocultar."],
+        ["Função adicional", "+2 em uma perícia adicional, à escolha e sujeita ao mestre."],
+        ["Instrumental", "O acessório também funciona como um kit de perícia específico."]
+      ]]
+    ];
+
+    function renderCap3() {
+      $("#equipRegras").innerHTML = CAP3_REGRAS.map(([t, txt]) =>
+        '<div><span class="eyebrow">' + esc(t) + '</span><p class="rules">' + txt + '</p></div>').join("");
+
+      const box = $("#equipTabelas");
+      const q = ($("#equipBusca").value || "").trim().toLowerCase();
+      const bate = i => !q || i.nome.toLowerCase().includes(q) ||
+        (i.det || "").toLowerCase().includes(q) || (i.resumo || "").toLowerCase().includes(q);
+
+      /* uma tabela por grupo do catálogo, na ordem em que aparecem no livro */
+      const grupos = [];
+      CATALOGO.filter(bate).forEach(i => {
+        let g = grupos.find(x => x[0] === i.grupo);
+        if (!g) { g = [i.grupo, []]; grupos.push(g); }
+        g[1].push(i);
+      });
+
+      box.innerHTML = "";
+      if (!grupos.length) {
+        box.innerHTML = '<div class="card"><div class="pad hint">Nenhum item com “' + esc(q) + '”.</div></div>';
+      }
+      grupos.forEach(([nome, itens]) => {
+        const c = el("div", "card");
+        c.innerHTML = '<header><h3>' + esc(nome) + '</h3><div class="grow"></div>' +
+          '<span class="hint">' + itens.length + ' item(ns)</span></header>' +
+          '<div class="tscroll"><table><thead><tr><th>Item</th><th class="n">Cat.</th><th class="n">Esp.</th>' +
+          '<th>Notas</th></tr></thead><tbody>' +
+          itens.map(i => '<tr><td><b>' + esc(i.nome) + '</b></td><td class="n">' + esc(i.cat) +
+            '</td><td class="n">' + esc(i.esp) + '</td><td class="hint">' +
+            (i.resumo ? '<b>' + esc(i.resumo) + '</b>' + (i.det ? '<br>' : "") : "") +
+            esc(i.det || "") + '</td></tr>').join("") +
+          '</tbody></table></div>';
+        box.append(c);
+      });
+
+      CAP3_MODS.forEach(([nome, itens]) => {
+        const c = el("div", "card");
+        c.innerHTML = '<header><h3>' + esc(nome) + '</h3></header><div class="tscroll"><table><tbody>' +
+          itens.map(([n, t]) => '<tr><td style="width:30%"><b>' + esc(n) + '</b></td><td class="hint">' +
+            esc(t) + '</td></tr>').join("") + '</tbody></table></div>';
+        box.append(c);
+      });
+    }
+
+    /* =======================================================================
+       INVENTÁRIO
+       ======================================================================= */
+    function nomeGrupo(i) { return i.grupo || "Outros"; }
+
+    function montarSelect() {
+      const sel = $("#invSel");
+      if (sel.options.length) return;                 // catálogo é fixo
+      const grupos = [];
+      CATALOGO.forEach(i => {
+        const g = nomeGrupo(i);
+        let b = grupos.find(x => x[0] === g);
+        if (!b) { b = [g, []]; grupos.push(b); }
+        b[1].push(i);
+      });
+      sel.innerHTML = grupos.map(([g, itens]) =>
+        '<optgroup label="' + esc(g) + '">' + itens.map(i =>
+          '<option value="' + esc(i.id) + '">' + esc(i.nome) +
+          ' — cat ' + i.cat + ' · ' + i.esp + ' esp.</option>').join("") + '</optgroup>').join("");
+    }
+
+    function renderInventario() {
+      montarSelect();
+      const D = derived(), usado = D.cargaUso, livre = D.carga - usado;
+
+      $("#cargaFlag").innerHTML = D.sobrecarga
+        ? '<span class="badge bad">sobrecarregado</span>'
+        : '<span class="hint">' + livre + ' espaço(s) livre(s)</span>';
+      const pct = D.carga > 0 ? clamp(usado / D.carga * 100, 0, 100) : 0;
+      const bar = $("#cargaBar").parentElement;
+      bar.className = "bar cargabar" + (D.sobrecarga ? " excedido" : usado === D.carga ? " cheio" : "");
+      $("#cargaBar").style.width = pct + "%";
+
+      $("#cargaGrid").innerHTML = [
+        ["Ocupado", usado, "de " + D.carga + " espaços"],
+        ["Livre", Math.max(0, livre), livre < 0 ? "excedeu em " + (-livre) : "ainda cabe"],
+        ["Capacidade", D.carga, D.cargaAtr + " × 5" + (S.atr.forca === 0 ? " (mínimo 2)" : "")],
+        ["Defesa", D.defesa, "10 + Agi" + (D.defProt ? " + " + D.defProt + " (proteção)" : "") +
+          (D.sobrecarga ? " − 5 (sobrecarga)" : "")]
+      ].map(([k, v, sub]) =>
+        '<div><div class="k">' + esc(k) + '</div><div class="v num">' + esc(String(v)) +
+        '</div><div class="s">' + esc(sub) + '</div></div>').join("");
+
+      const av = $("#cargaAviso"); av.innerHTML = "";
+      if (D.sobrecarga) {
+        av.append(notice("warn", "Sobrecarregado",
+          "−5 na Defesa, −5 nas perícias com penalidade de carga (Acrobacia, Crime, Furtividade e a natação de Atletismo) " +
+          "e deslocamento reduzido em 3m. O limite absoluto é o dobro da capacidade: <b>" + (D.carga * 2) + "</b> espaços.", true));
+      }
+
+      const lista = $("#invLista"); lista.innerHTML = "";
+      $("#invCount").textContent = (S.inv || []).length + " item(ns)";
+      if (!(S.inv || []).length) {
+        lista.innerHTML = '<div class="pad hint">Nada no inventário ainda. Escolha um item acima.</div>';
+      } else {
+        S.inv.forEach((l, idx) => {
+          const i = itemDe(l); if (!i) return;
+          const r = el("div", "invrow");
+          const podeUsar = DEF_PROT[l.id] != null;
+          r.innerHTML =
+            '<span class="nm"><b>' + esc(i.nome) + '</b>' +
+            (i.resumo ? '<span class="sub">' + esc(i.resumo) + '</span>' : "") + '</span>' +
+            '<span class="cat">cat ' + i.cat + '</span>' +
+            (podeUsar ? '<label class="uso"><input type="checkbox" data-uso="' + idx + '"' +
+              (l.uso ? " checked" : "") + '> usando</label>' : "") +
+            '<span class="esp">' + (espacoNum(i.esp) * (l.q || 1)) + ' esp.</span>';
+          const st = el("div", "stepper");
+          st.innerHTML = '<button data-inv="-1" data-i="' + idx + '">−</button>' +
+            '<button disabled style="min-width:34px">' + (l.q || 1) + '</button>' +
+            '<button data-inv="1" data-i="' + idx + '">+</button>';
+          r.append(st);
+          const del = el("button", "btn ghost sm", "Remover");
+          del.dataset.del = idx;
+          r.append(del);
+          lista.append(r);
+        });
+      }
+
+      const lim = D.pat[4], uso = catsUsadas();
+      $("#invCats").innerHTML = ["I", "II", "III", "IV"].map((c, k) =>
+        '<div><div class="k">Categoria ' + c + '</div><div class="v num' +
+        (uso[c] > (lim[k] || 0) ? " bad" : "") + '">' + uso[c] + ' / ' + (lim[k] || 0) +
+        '</div><div class="s">' + (uso[c] > (lim[k] || 0) ? "acima da patente" : "dentro do limite") +
+        '</div></div>').join("");
+      $("#invCatNota").textContent = "Limites da patente " + D.pat[0] + ". Itens de categoria 0 são ilimitados — " +
+        "só pesam na carga. Cada modificação aplicada a um item aumenta a categoria dele em I.";
+
+      $("#tnInv").textContent = (S.inv || []).length || "";
+      const pv = $("#invPrev"); pv.innerHTML = "";
+      const sel = CAT_POR_ID[$("#invSel").value];
+      if (sel) pv.append(notice("", sel.nome,
+        (sel.resumo ? "<b>" + esc(sel.resumo) + "</b> · " : "") +
+        "categoria " + sel.cat + " · " + sel.esp + " espaço(s)" +
+        (sel.det ? "<br>" + esc(sel.det) : ""), true));
+    }
+
+    function bindInventario() {
+      $("#invSel").onchange = renderInventario;
+      $("#invAdd").onclick = () => {
+        if (!podeEditar) return;
+        const id = $("#invSel").value; if (!CAT_POR_ID[id]) return;
+        const q = Math.max(1, parseInt($("#invQtd").value, 10) || 1);
+        const ja = S.inv.find(l => l.id === id);
+        if (ja) ja.q = (ja.q || 1) + q; else S.inv.push({ id: id, q: q, uso: false });
+        $("#invQtd").value = 1;
+        render(); save();
+      };
+      $("#invLista").addEventListener("click", ev => {
+        if (!podeEditar) return;
+        const b = ev.target.closest("button"); if (!b) return;
+        if (b.dataset.del != null) { S.inv.splice(+b.dataset.del, 1); render(); save(); return; }
+        if (b.dataset.inv != null) {
+          const l = S.inv[+b.dataset.i]; if (!l) return;
+          l.q = (l.q || 1) + (+b.dataset.inv);
+          if (l.q < 1) S.inv.splice(+b.dataset.i, 1);
+          render(); save();
+        }
+      });
+      $("#invLista").addEventListener("change", ev => {
+        if (!podeEditar) return;
+        const c = ev.target.closest("[data-uso]"); if (!c) return;
+        const l = S.inv[+c.dataset.uso]; if (!l) return;
+        l.uso = c.checked;
+        render(); save();
+      });
     }
 
     /* ---------- Agente ---------- */
@@ -4736,7 +5257,11 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
             const p = $("#" + o.getAttribute("aria-controls"));
             if (p) p.hidden = !on;
           });
-          if (bar.id === "tabsBar") window.scrollTo({ top: 0, behavior: "smooth" });
+          if (bar.id === "tabsBar") {
+            // o CSS do telefone usa isto para mostrar o rail só na aba Agente
+            $("#scr-ficha").dataset.aba = t.id.replace("tab-", "");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
         });
       });
     }
@@ -4786,7 +5311,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         const dn = $("#dNotes"); dn.innerHTML = "";
         if (i === "") { $("#dExpr").value = ""; return; }
         const a = ARMAS[parseInt(i, 10)];
-        $("#dExpr").value = a[2].replace("×", "x");
+        $("#dExpr").value = a[2].split("/")[0].replace("×", "x");
         let extra = 0; const why = [];
         if (a[8] === "branca" && fx("danoCaC2")) { extra += 2; why.push("Mão Pesada +2 (corpo a corpo)"); }
         if (a[8] === "fogo" && fx("danoFogo2")) { extra += 2; why.push("Para Bellum +2 (arma de fogo)"); }
@@ -4989,7 +5514,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       PERICIAS.forEach(p => per[p[0]] = { grau: "Leigo", outros: 0 });
       return {
         nome: "", jogador: "", conceito: "", token: "", classe: "combatente", origem: ORIGENS[0].n,
-        trilha: "", nex: 5, pp: 0, afinidade: "",
+        trilha: "", nex: 5, pp: 0, afinidade: "", inv: [],
         atr: { agilidade: 1, forca: 1, intelecto: 1, presenca: 1, vigor: 1 },
         per: per, perNexAttr: true,
         pv: null, pe: null, san: null, tpv: 0, tpe: 0, rd: 0,
@@ -5153,6 +5678,10 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       N.afinidade = row.afinidade || "";
       const f = row.ficha || {};
       N.token = typeof f.token === "string" ? f.token : "";
+      N.inv = Array.isArray(f.inv)
+        ? f.inv.filter(l => l && CAT_POR_ID[l.id])
+            .map(l => ({ id: l.id, q: Math.max(1, parseInt(l.q, 10) || 1), uso: !!l.uso }))
+        : [];
       ATRS.forEach(k => { if (f.atr && typeof f.atr[k] === "number") N.atr[k] = clamp(f.atr[k], 0, 5); });
       if (f.per) Object.keys(N.per).forEach(k => {
         const p = f.per[k]; if (!p) return;
@@ -5189,7 +5718,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         nex: S.nex,
         pp: S.pp,
         afinidade: S.afinidade || null,
-        ficha: { atr: S.atr, per: S.per, perNexAttr: !!S.perNexAttr, token: S.token || "" },
+        ficha: { atr: S.atr, per: S.per, perNexAttr: !!S.perNexAttr, token: S.token || "", inv: S.inv || [] },
         sessao: {
           pv: S.pv, pe: S.pe, san: S.san, tpv: S.tpv, tpe: S.tpe, rd: S.rd,
           falhas: S.falhas, morrendo: S.morrendo, cond: S.cond, peTurno: S.peTurno, notas: S.notas,
@@ -5702,7 +6231,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
     const CONTROLES_EDICAO = [
       "#fNome", "#fJogador", "#fConceito", "#fNex", "#fClasse", "#fOrigem", "#fTrilha", "#fPP", "#fNotas",
       "#fPerNex", "#sVal", "#sTipo", "#sTpv", "#sTpe", "#sRd", "#impBtn", "#delBtn", "#logClear",
-      "#tokenBtn", "#tokenDel"
+      "#tokenBtn", "#tokenDel", "#invSel", "#invQtd", "#invAdd"
     ];
     function aplicarPermissao() {
       const ro = !podeEditar;
@@ -5847,6 +6376,9 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       loginHTML = $("#gLogin").innerHTML;
       bindTema();
       bindTabs(); bindCampos(); bindVitais(); bindRolagem(); bindSessao(); bindDados(); bindBusca();
+      bindInventario();
+      $("#equipBusca").oninput = renderCap3;
+      renderCap3();
       ligarToken();
       bindApp();
       renderRef();

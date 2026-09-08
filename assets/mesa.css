@@ -325,12 +325,32 @@ body.palco{
   background:linear-gradient(to top, rgba(8,11,9,.96), rgba(8,11,9,.72));
   border-top:1px solid #16201B;
 }
-.faixa .ag{border:0; padding:0; flex:1; max-width:340px}
+.faixa .ag{border:0; padding:0; flex:1 1 0; min-width:0; max-width:340px}
 .faixa .ag h4{font-size:19px; color:#E8EBE7}
-.faixa .ag .nex{font-size:12px; color:#6F7A73}
+.faixa .ag h4 .nome{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.faixa .ag .nex{font-size:12px; color:#6F7A73; flex:none}
 .faixa .barra{height:19px; background:#141C18}
 .faixa .barra span{font-size:12px; color:#DDE3DE}
-.faixa .rodape{margin-left:auto; max-width:330px; text-align:right}
+.faixa .rodape{margin-left:auto; max-width:330px; text-align:right; flex:none}
+
+/* grupo grande: aperta para caber todo mundo sem rolagem */
+.faixa.densa{gap:16px; padding:10px 18px 12px}
+.faixa.densa .ag{max-width:none}
+.faixa.densa .ag h4{font-size:16px}
+.faixa.densa .barra{height:16px}
+.faixa.densa .barra span{font-size:11px; padding:0 5px}
+.faixa.densa .rodape{max-width:210px}
+.faixa.muitos{gap:11px; padding:8px 12px 10px}
+.faixa.muitos .ag h4{font-size:14px}
+.faixa.muitos .ag .nex{font-size:10px}
+.faixa.muitos .barra{height:14px}
+.faixa.muitos .barra span{font-size:10px; padding:0 4px}
+.faixa.muitos .barras{gap:2px; margin-top:3px}
+.faixa.muitos .rodape{display:none}
+
+/* na TV o nome do token só ocupa espaço e some atrás da arte dos vizinhos:
+   quem é quem se lê pelo retrato e pela faixa de baixo */
+.palco-mapa .token .nm{display:none}
 .faixa .rodape .tt{font-family:var(--mono); font-size:11px; color:#6F7A73; letter-spacing:.05em}
 .faixa .rodape .ul{font-size:14px; color:#C8D0CA; margin-top:2px; line-height:1.35}
 
