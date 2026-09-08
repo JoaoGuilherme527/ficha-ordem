@@ -360,6 +360,26 @@
       }
     }
 
+    tr.clicavel {
+      cursor: pointer
+    }
+
+    tr.clicavel:hover td {
+      background: var(--surface-2)
+    }
+
+    tr.clicavel td:nth-child(2) {
+      color: var(--accent-ink);
+      text-decoration: underline;
+      text-underline-offset: 2px
+    }
+
+    .card.realce {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      transition: outline-color .4s ease
+    }
+
     /* ---------- inventário ---------- */
     .expl {
       border-top: 1px solid var(--line);
@@ -3223,7 +3243,12 @@
             <div class="pad stack">
               <span class="lab">Do livro de regras</span>
               <div class="row">
-                <select id="invSel" style="flex:1;min-width:0"></select>
+                <input type="text" id="invBusca" placeholder="buscar item… (ex.: pistola, granada, kit)"
+                  style="flex:1;min-width:0" autocomplete="off">
+                <span class="chip" id="invAchados"></span>
+              </div>
+              <div class="row">
+                <select id="invSel" size="1" style="flex:1;min-width:0"></select>
                 <input type="number" id="invQtd" min="1" step="1" value="1" style="max-width:78px"
                   aria-label="quantidade">
                 <button class="btn primary sm" type="button" id="invAdd">Adicionar</button>
@@ -3950,41 +3975,41 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
 
     /* nome, categoria, espaços, grupo, descrição */
     const GERAIS = [
-      ["Kit de perícia", "0", "1", "Acessórios", "Um conjunto de ferramentas necessárias para algumas perícias ou usos de perícias. Sem o kit, você sofre –5 no teste. Existe um kit de perícia para cada perícia que exige este item."],
-      ["Utensílio", "I", "1", "Acessórios", "Um item comum que tenha uma utilidade específica, como um canivete, uma lupa, um smartphone ou um notebook. Um utensílio fornece +2 em uma perícia (exceto Luta e Pontaria). Por exemplo, um smartphone pode ser usado para acessar a internet e fornecer bônus em Ciências, enquanto um notebook pode ser preparado para invadir sistemas e fornecer bônus em Tecnologia. Você pode inventar itens menos realistas, como um “detector de mentiras portátil” que fornece +2 em Intuição, mas o mestre tem a palavra final se o utensílio é apropriado ou não. Utensílios sempre ocupam 1 espaço e precisam ser empunhados para que o bônus seja aplicado."],
-      ["Vestimenta", "I", "1", "Acessórios", "Uma peça de vestuário que fornece +2 em uma perícia (exceto Luta ou Pontaria). Por exemplo, um par de botas militares pode fornecer +2 em Atletismo, um terno ou vestido elegante pode fornecer +2 em Diplomacia e um manto com glifos pode fornecer +2 em Ocultismo. Assim como utensílios, o benefício de cada vestimenta deve ser aprovado pelo mestre. Você pode receber os bônus de no máximo duas vestimentas ao mesmo tempo. Vestir ou despir uma vestimenta é uma ação completa. TABELA 3.8: EQUIPAMENTOS GERAIS Nome Categoria Espaços Acessórios Kit de perícia 0 1 Utensílio I 1 Vestimenta I 1 Explosivos Granada de atordoamento 0 1 Granada de fragmentação I 1 Granada de fumaça 0 1 Granada incendiária I 1 Mina antipessoal I 1 Itens Operacionais Algemas 0 1 Arpéu 0 1 Bandoleira I 1 Binóculos 0 1 Bloqueador de sinal I 1 Cicatrizante I 1 Corda 0 1 Equipamento de sobrevivência 0 2 Lanterna tática I 1 Máscara de gás 0 1 Mochila militar I * Óculos de visão térmica I 1 Pé de cabra 0 1 Pistola de dardos I 1 Pistola sinalizadora 0 1 Soqueira 0 1 Spray de pimenta I 1 Taser I 1 Traje hazmat I 2 64 Explosivos Granadas. Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. I Atordoamento. Também chamadas de flash-bang, por criarem um estouro barulhento e luminoso. Seres na área ficam atordoados por 1 rodada (Fortitude DT Agi reduz para ofuscado e surdo por uma rodada). I Fragmentação. Espalha fragmentos perfurantes. Seres na área sofrem 8d6 pontos de dano de perfuração (Reflexos DT Agi reduz à metade). I Fumaça. Produz uma fumaça espessa e escura. Seres na área ficam cegos e sob camuflagem total. A fumaça dura 2 rodadas. I Incendiária. Espalha labaredas incandescentes. Seres na área sofrem 6d6 pontos de dano de fogo e ficam em chamas (Reflexos DT Agi reduz o dano à metade e evita a condição em chamas)."],
+      ["Kit de perícia", "0", "1", "Acessórios", "Um conjunto de ferramentas necessárias para algumas perícias ou usos de perícias. Sem o kit, você sofre –5 no teste. Existe um kit de perícia para cada perícia que exige este item"],
+      ["Utensílio", "I", "1", "Acessórios", "Um item comum que tenha uma utilidade específica, como um canivete, uma lupa, um smartphone ou um notebook. Um utensílio fornece +2 em uma perícia (exceto Luta e Pontaria). Por exemplo, um smartphone pode ser usado para acessar a internet e fornecer bônus em Ciências, enquanto um notebook pode ser preparado para invadir sistemas e fornecer bônus em Tecnologia. Você pode inventar itens menos realistas, como um “detector de mentiras portátil” que fornece +2 em Intuição, mas o mestre tem a palavra final se o utensílio é apropriado ou não. Utensílios sempre ocupam 1 espaço e precisam ser empunhados para que o bônus seja aplicado"],
+      ["Vestimenta", "I", "1", "Acessórios", "Uma peça de vestuário que fornece +2 em uma perícia (exceto Luta ou Pontaria). Por exemplo, um par de botas militares pode fornecer +2 em Atletismo, um terno ou vestido elegante pode fornecer +2 em Diplomacia e um manto com glifos pode fornecer +2 em Ocultismo. Assim como utensílios, o benefício de cada vestimenta deve ser aprovado pelo mestre. Você pode receber os bônus de no máximo duas vestimentas ao mesmo tempo. Vestir ou despir uma vestimenta é uma ação completa. TABELA 3.8: EQUIPAMENTOS GERAIS Nome Categoria Espaços Acessórios Kit de perícia 0 1 Utensílio I 1 Vestimenta I 1"],
       ["Granada de atordoamento", "0", "1", "Explosivos", "Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. Também chamadas de flash-bang, por criarem um estouro barulhento e luminoso. Seres na área ficam atordoados por 1 rodada (Fortitude DT Agi reduz para ofuscado e surdo por uma rodada). I"],
       ["Granada de fragmentação", "I", "1", "Explosivos", "Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. Espalha fragmentos perfurantes. Seres na área sofrem 8d6 pontos de dano de perfuração (Reflexos DT Agi reduz à metade). I"],
       ["Granada de fumaça", "0", "1", "Explosivos", "Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. Produz uma fumaça espessa e escura. Seres na área ficam cegos e sob camuflagem total. A fumaça dura 2 rodadas. I"],
-      ["Granada incendiária", "I", "1", "Explosivos", "Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. Espalha labaredas incandescentes. Seres na área sofrem 6d6 pontos de dano de fogo e ficam em chamas (Reflexos DT Agi reduz o dano à metade e evita a condição em chamas). Mina Antipessoal. Esta mina é ativada por controle remoto. Se você estiver a até alcance longo dela, pode gastar uma ação padrão para detoná-la. Ao explodir, a mina dispara centenas de bolas de aço em um cone de 6m, causando 12d6 pontos de dano de perfuração em todos os seres na área (Reflexos DT Int reduz à metade). Você define a direção do cone quando posiciona a mina no chão. Instalar a mina exige uma ação completa e um teste de Tática contra DT 15. Caso falhe, você gasta a mina, mas ela não funciona. Encontrar uma mina instalada exige um teste de Percepção (DT igual ao resultado do seu teste para instalá-la). Itens Operacionais Algemas. Um par de algemas de aço. Para prender uma pessoa que não esteja indefesa você precisa empunhar a algema, agarrar a pessoa (veja “Manobras de Combate”, no Capítulo 4) e então vencer um novo teste de agarrar contra ela. Você pode prender os dois pulsos da pessoa (–5 em testes que exijam o uso das mãos, impede conjuração) ou um dos pulsos dela em um objeto imóvel adjacente, caso haja, para impedir que ela se mova. Escapar das algemas exige um teste de Acrobacia contra DT 30 (ou ter as chaves…). TABELA 3.9: MODIFICAÇÕES PARA ACESSÓRIOS Modificação Efeito Aprimorado Aumenta um dos bônus em perícia para +5. Discreto +5 em testes de ocultar e reduz o espaço em –1. Função adicional Concede +2 a uma perícia adicional. Instrumental O acessório funciona como um kit de perícia. Modificações para Acessórios Assim como armas, itens da categoria acessórios podem ser modificados. Cada modificação aumenta a categoria do item em I e fornece certos benefícios. Usando modificações, é possível criar itens variados. Por exemplo, para criar um “smartphone hacker”, podemos começar com um utensílio que concede +2 em Atualidades, com aplicativos personalizados para hackear outros aparelhos (modificação função adicional, fornecendo +2 em Tecnologia) e que funciona como um kit de tecnologia (modificação instrumental). Este será um item de categoria III. Cada modificação só pode ser aplicada ao mesmo acessório uma vez. Descrição das Modificações Aprimorado. O bônus em perícia concedido pelo acessório aumenta para +5. Se o item tiver função adicional, esta modificação poderá ser escolhida uma segunda vez para esta função. Discreto. O item é miniaturizado ou disfarçado como outro item inócuo (como um relógio). Reduz o número de espaços ocupados em 1, fornece +5 em testes de Crime para ser ocultado e permite que você faça esse teste mesmo que não seja treinado na perícia. Função Adicional. O acessório fornece +2 em uma perícia adicional à sua escolha, sujeita à aprovação do mestre. Instrumental. O acessório pode ser usado como um kit de perícia específico (escolhido ao aplicar esta modificação)."],
+      ["Granada incendiária", "I", "1", "Explosivos", "Para usar uma granada, você precisa empunhá-la e então gastar uma ação padrão para arremessá-la em um ponto à sua escolha em alcance médio. A granada afeta um raio de 6m a partir do ponto de impacto. O efeito que ela causa varia conforme o tipo de granada. Espalha labaredas incandescentes. Seres na área sofrem 6d6 pontos de dano de fogo e ficam em chamas (Reflexos DT Agi reduz o dano à metade e evita a condição em chamas)"],
       ["Mina antipessoal", "I", "1", "Explosivos", "Esta mina é ativada por controle remoto. Se você estiver a até alcance longo dela, pode gastar uma ação padrão para detoná-la. Ao explodir, a mina dispara centenas de bolas de aço em um cone de 6m, causando 12d6 pontos de dano de perfuração em todos os seres na área (Reflexos DT Int reduz à metade). Você define a direção do cone quando posiciona a mina no chão. Instalar a mina exige uma ação completa e um teste de Tática contra DT 15. Caso falhe, você gasta a mina, mas ela não funciona. Encontrar uma mina instalada exige um teste de Percepção (DT igual ao resultado do seu teste para instalá-la). Itens Operacionais"],
-      ["Algemas", "0", "1", "Itens Operacionais", "Um par de algemas de aço. Para prender uma pessoa que não esteja indefesa você precisa empunhar a algema, agarrar a pessoa (veja “Manobras de Combate”, no Capítulo 4) e então vencer um novo teste de agarrar contra ela. Você pode prender os dois pulsos da pessoa (–5 em testes que exijam o uso das mãos, impede conjuração) ou um dos pulsos dela em um objeto imóvel adjacente, caso haja, para impedir que ela se mova. Escapar das algemas exige um teste de Acrobacia contra DT 30 (ou ter as chaves…). TABELA 3.9: MODIFICAÇÕES PARA ACESSÓRIOS Modificação Efeito Aprimorado Aumenta um dos bônus em perícia para +5. Discreto +5 em testes de ocultar e reduz o espaço em –1. Função adicional Concede +2 a uma perícia adicional. Instrumental O acessório funciona como um kit de perícia. Modificações para Acessórios Assim como armas, itens da categoria acessórios podem ser modificados. Cada modificação aumenta a categoria do item em I e fornece certos benefícios. Usando modificações, é possível criar itens variados. Por exemplo, para criar um “smartphone hacker”, podemos começar com um utensílio que concede +2 em Atualidades, com aplicativos personalizados para hackear outros aparelhos (modificação função adicional, fornecendo +2 em Tecnologia) e que funciona como um kit de tecnologia (modificação instrumental). Este será um item de categoria III. Cada modificação só pode ser aplicada ao mesmo acessório uma vez. Descrição das Modificações Aprimorado. O bônus em perícia concedido pelo acessório aumenta para +5. Se o item tiver função adicional, esta modificação poderá ser escolhida uma segunda vez para esta função. Discreto. O item é miniaturizado ou disfarçado como outro item inócuo (como um relógio). Reduz o número de espaços ocupados em 1, fornece +5 em testes de Crime para ser ocultado e permite que você faça esse teste mesmo que não seja treinado na perícia. Função Adicional. O acessório fornece +2 em uma perícia adicional à sua escolha, sujeita à aprovação do mestre. Instrumental. O acessório pode ser usado como um kit de perícia específico (escolhido ao aplicar esta modificação). 65"],
-      ["Arpéu", "0", "1", "Itens Operacionais", "Um gancho de aço que pode ser amarrado na ponta de uma corda para se fixar em muros, janelas, parapeitos de prédios… Prender um arpéu exige um teste de Pontaria (DT 15). Subir um muro com a ajuda de uma corda fornece +5 no teste de Atletismo."],
-      ["Bandoleira", "I", "1", "Itens Operacionais", "Um cinto com bolsos e alças. Uma vez por rodada, você pode sacar ou guardar um item em seu inventário como uma ação livre."],
-      ["Binóculos", "0", "1", "Itens Operacionais", "Estes binóculos militares fornecem +5 em testes de Percepção para observar coisas distantes."],
-      ["Bloqueador de sinal", "I", "1", "Itens Operacionais", "Este dispositivo compacto emite ondas que “poluem” a frequência de rádio usada por celulares, impedindo que qualquer aparelho desse tipo em alcance médio se conecte."],
-      ["Cicatrizante", "I", "1", "Itens Operacionais", "Um spray contendo um remédio com potente efeito cicatrizante. Você pode gastar uma ação padrão e este item para curar 2d8+2 PV em você ou em um ser adjacente."],
-      ["Corda", "0", "1", "Itens Operacionais", "Um rolo com 10 metros de corda resistente. Possui diversas utilidades: pode ajudar a descer um buraco ou prédio (+5 em testes de Atletismo nessas situações), amarrar pessoas inconscientes etc."],
-      ["Equipamento de sobrevivência", "0", "2", "Itens Operacionais", "Uma mochila com saco de dormir, panelas, GPS e outros itens úteis para sobreviver no mato. Fornece +5 em testes de Sobrevivência para acampar e orientar-se e permite que você faça esses testes sem treinamento."],
+      ["Algemas", "0", "1", "Itens Operacionais", "Um par de algemas de aço. Para prender uma pessoa que não esteja indefesa você precisa empunhar a algema, agarrar a pessoa (veja “Manobras de Combate”, no Capítulo 4) e então vencer um novo teste de agarrar contra ela. Você pode prender os dois pulsos da pessoa (–5 em testes que exijam o uso das mãos, impede conjuração) ou um dos pulsos dela em um objeto imóvel adjacente, caso haja, para impedir que ela se mova. Escapar das algemas exige um teste de Acrobacia contra DT 30 (ou ter as chaves…). TABELA 3.9: MODIFICAÇÕES PARA ACESSÓRIOS Modificação Efeito Aprimorado Aumenta um dos bônus em perícia para +5. Discreto +5 em testes de ocultar e reduz o espaço em –1. Função adicional Concede +2 a uma perícia adicional. Instrumental O acessório funciona como um kit de perícia"],
+      ["Arpéu", "0", "1", "Itens Operacionais", "Um gancho de aço que pode ser amarrado na ponta de uma corda para se fixar em muros, janelas, parapeitos de prédios… Prender um arpéu exige um teste de Pontaria (DT 15). Subir um muro com a ajuda de uma corda fornece +5 no teste de Atletismo"],
+      ["Bandoleira", "I", "1", "Itens Operacionais", "Um cinto com bolsos e alças. Uma vez por rodada, você pode sacar ou guardar um item em seu inventário como uma ação livre"],
+      ["Binóculos", "0", "1", "Itens Operacionais", "Estes binóculos militares fornecem +5 em testes de Percepção para observar coisas distantes"],
+      ["Bloqueador de sinal", "I", "1", "Itens Operacionais", "Este dispositivo compacto emite ondas que “poluem” a frequência de rádio usada por celulares, impedindo que qualquer aparelho desse tipo em alcance médio se conecte"],
+      ["Cicatrizante", "I", "1", "Itens Operacionais", "Um spray contendo um remédio com potente efeito cicatrizante. Você pode gastar uma ação padrão e este item para curar 2d8+2 PV em você ou em um ser adjacente"],
+      ["Corda", "0", "1", "Itens Operacionais", "Um rolo com 10 metros de corda resistente. Possui diversas utilidades: pode ajudar a descer um buraco ou prédio (+5 em testes de Atletismo nessas situações), amarrar pessoas inconscientes etc"],
+      ["Equipamento de sobrevivência", "0", "2", "Itens Operacionais", "Uma mochila com saco de dormir, panelas, GPS e outros itens úteis para sobreviver no mato. Fornece +5 em testes de Sobrevivência para acampar e orientar-se e permite que você faça esses testes sem treinamento"],
       ["Lanterna tática", "I", "1", "Itens Operacionais", "Ilumina um cone de 9m. Além disso, você pode gastar uma ação de movimento para mirar a luz nos olhos de um ser em alcance curto. Ele fica ofuscado por 1 rodada, mas imune à lanterna pelo resto da cena. 66"],
-      ["Máscara de gás", "0", "1", "Itens Operacionais", "Uma máscara com filtro que cobre o rosto inteiro. Fornece +10 em testes de Fortitude contra efeitos que dependam de respiração."],
-      ["Mochila militar", "I", "*", "Itens Operacionais", "Uma mochila leve e de alta qualidade. Ela não usa nenhum espaço e aumenta sua capacidade de carga em 2 espaços."],
-      ["Óculos de visão térmica", "I", "1", "Itens Operacionais", "Estes óculos eliminam a penalidade em testes por camuflagem."],
-      ["Pé de cabra", "0", "1", "Itens Operacionais", "Esta barra de ferro fornece +5 em testes de Força para arrombar portas. Pode ser usada em combate como um bastão."],
-      ["Pistola de dardos", "I", "1", "Itens Operacionais", "Esta arma leve dispara dardos com um sonífero em alcance curto. Para disparar em um ser, faça um ataque à distância contra ele. Se acertá-lo, ele fica inconsciente até o fim da cena (Fortitude DT Agi reduz para desprevenido e lento por uma rodada). A pistola vem com 2 dardos. Uma caixa adicional com 2 dardos é um item de categoria 0 que ocupa 1 espaço."],
-      ["Pistola sinalizadora", "0", "1", "Itens Operacionais", "Esta pistola dispara um sinalizador luminoso, útil para chamar outras pessoas para sua localização. Pode ser usada como uma arma de disparo leve com alcance curto que causa 2d6 pontos de dano de fogo. A pistola vem com 2 cargas. Uma caixa adicional com 2 cargas é um item de categoria 0 que ocupa 1 espaço."],
-      ["Soqueira", "0", "1", "Itens Operacionais", "Esta peça de metal é usada entre os dedos e permite socos mais perigosos — fornece +1 em rolagens de dano desarmado e os torna letal. Uma soqueira pode receber modificações e maldições de armas corpo a corpo e aplica os efeitos delas em seus ataques desarmados."],
-      ["Spray de pimenta", "I", "1", "Itens Operacionais", "Este spray dispara um composto químico que causa dor e lacrimação. Você pode gastar uma ação padrão para atingir um ser adjacente. O ser fica cego por 1d4 rodadas (Fortitude DT Agi evita). A carga do spray dura dois usos."],
-      ["Taser", "I", "1", "Itens Operacionais", "Um dispositivo de eletrochoque capaz de atordoar ou até incapacitar um alvo. Você pode gastar uma ação padrão para atingir um ser adjacente. O alvo sofre 1d6 pontos de dano de eletricidade e fica atordoado por uma rodada (Fortitude DT Agi evita). A bateria do taser dura dois usos."],
-      ["Traje hazmat", "I", "2", "Itens Operacionais", "Uma roupa impermeável e que cobre o corpo inteiro, usada para impedir o contato do usuário com materiais tóxicos. Fornece +5 em testes de resistência contra efeitos ambientais e resistência a químico 10. Itens Paranormais A Ordem não se dedica apenas a combater o Outro Lado, mas também a compreendê-lo. Diversos membros trabalham para pesquisar e até reproduzir as características dos elementos, mesclando tecnologia avançada e conhecimento ritualístico, o que às vezes resulta na fabricação de itens paranormais."],
+      ["Máscara de gás", "0", "1", "Itens Operacionais", "Uma máscara com filtro que cobre o rosto inteiro. Fornece +10 em testes de Fortitude contra efeitos que dependam de respiração"],
+      ["Mochila militar", "I", "*", "Itens Operacionais", "Uma mochila leve e de alta qualidade. Ela não usa nenhum espaço e aumenta sua capacidade de carga em 2 espaços"],
+      ["Óculos de visão térmica", "I", "1", "Itens Operacionais", "Estes óculos eliminam a penalidade em testes por camuflagem"],
+      ["Pé de cabra", "0", "1", "Itens Operacionais", "Esta barra de ferro fornece +5 em testes de Força para arrombar portas. Pode ser usada em combate como um bastão"],
+      ["Pistola de dardos", "I", "1", "Itens Operacionais", "Esta arma leve dispara dardos com um sonífero em alcance curto. Para disparar em um ser, faça um ataque à distância contra ele. Se acertá-lo, ele fica inconsciente até o fim da cena (Fortitude DT Agi reduz para desprevenido e lento por uma rodada). A pistola vem com 2 dardos. Uma caixa adicional com 2 dardos é um item de categoria 0 que ocupa 1 espaço"],
+      ["Pistola sinalizadora", "0", "1", "Itens Operacionais", "Esta pistola dispara um sinalizador luminoso, útil para chamar outras pessoas para sua localização. Pode ser usada como uma arma de disparo leve com alcance curto que causa 2d6 pontos de dano de fogo. A pistola vem com 2 cargas. Uma caixa adicional com 2 cargas é um item de categoria 0 que ocupa 1 espaço"],
+      ["Soqueira", "0", "1", "Itens Operacionais", "Esta peça de metal é usada entre os dedos e permite socos mais perigosos — fornece +1 em rolagens de dano desarmado e os torna letal. Uma soqueira pode receber modificações e maldições de armas corpo a corpo e aplica os efeitos delas em seus ataques desarmados"],
+      ["Spray de pimenta", "I", "1", "Itens Operacionais", "Este spray dispara um composto químico que causa dor e lacrimação. Você pode gastar uma ação padrão para atingir um ser adjacente. O ser fica cego por 1d4 rodadas (Fortitude DT Agi evita). A carga do spray dura dois usos"],
+      ["Taser", "I", "1", "Itens Operacionais", "Um dispositivo de eletrochoque capaz de atordoar ou até incapacitar um alvo. Você pode gastar uma ação padrão para atingir um ser adjacente. O alvo sofre 1d6 pontos de dano de eletricidade e fica atordoado por uma rodada (Fortitude DT Agi evita). A bateria do taser dura dois usos"],
+      ["Traje hazmat", "I", "2", "Itens Operacionais", "Uma roupa impermeável e que cobre o corpo inteiro, usada para impedir o contato do usuário com materiais tóxicos. Fornece +5 em testes de resistência contra efeitos ambientais e resistência a químico 10"],
     ];
 
     const PARANORMAIS = [
-      ["Amarras de (elemento)", "II", "1", "Itens Paranormais", "Cordas ou correntes feitas de um elemento paranormal específico. As amarras são preparadas para imobilizar criaturas do Outro Lado que sejam vulneráveis ao elemento que as compõem e podem ser usadas de duas formas. I Armadilha. Você gasta as amarras, uma ação completa e 2 PE para preparar uma armadilha de 3x3m. Uma criatura que atravesse o espaço pela primeira vez em seu turno precisa fazer um teste de de Reflexos (DT Int); se falhar, fica imóvel até o final da cena. Mesmo se passar, considera o espaço ocupado pela armadilha como terreno difícil. I Laçar. Você gasta uma ação padrão e 1 PE e escolhe uma criatura em alcance curto. Se falhar num teste de Vontade (DT Agi), a criatura fica paralisada até o início de seu próximo turno, quando pode repetir o teste. Manter a criatura enlaçada requer o gasto de 1 PE por rodada."],
-      ["Câmera de aura paranormal", "II", "1", "Itens Paranormais", "Esta câmera amaldiçoada com Energia possui sigilos de Conhecimento para capturar auras paranormais. Tirar uma foto gasta uma ação padrão e 1 PE. As fotos são instantâneas e revelam a presença de auras paranormais em pessoas e objetos. As auras são da cor associada ao elemento."],
-      ["Componentes ritualísticos de (elemento)", "0", "1", "Itens Paranormais", "Um conjunto de objetos utilizados em rituais de um elemento entre Sangue, Morte, Conhecimento ou Energia (não existem componentes ritualísticos de Medo). Componentes ritualísticos são necessários para a conjuração de rituais do elemento em questão. I Energia: eletricidade, dispositivos tecnológicos (celulares, computadores etc.), circuitos eletrônicos, fontes de calor e luz, pilhas, baterias, cabos de cobre e prata, pólvora, moedas, dados, ímãs… I Sangue: órgãos, carne, sangue, animais vivos (para sacrifício), navalhas, agulhas, arame farpado, correntes, metal enferrujado, fluidos corporais… I Morte: ossos, dentes, cinzas, fios de cabelo, cristais pretos, relógios, galhos secos, folhas secas, plantas mortas, raízes, areia, poeira, Lodo… 67 afetado por manifestações, assim como um lugar com a Membrana protegida por conter uma criatura poderosa vinda de outro lugar."],
-      ["Emissor de pulsos paranormais", "II", "1", "Itens Paranormais", "Esta pequena caixa coberta de sigilos foi desenvolvida para servir como uma “isca” de criaturas paranormais. Ativar a caixa gasta uma ação completa e 1 PE. A caixa emite um pulso de um elemento definido pelo ativador, que atrai criaturas do mesmo elemento e afasta criaturas do elemento oposto. As criaturas afetadas têm direito a um teste de Vontade (DT Pre) para evitar o efeito."],
-      ["Escuta de ruídos paranormais", "II", "1", "Itens Paranormais", "Este microfone funciona como um aparato espião, com a diferença que consegue captar ruídos paranormais. Ativar a escuta gasta uma ação completa e 2 PE e faz com que ela grave ruídos por até 24 horas. Ouvir a escuta fornece +5 em testes de Ocultismo para identificar criatura."],
+      ["Amarras de (elemento)", "II", "1", "Itens Paranormais", "Cordas ou correntes feitas de um elemento paranormal específico. As amarras são preparadas para imobilizar criaturas do Outro Lado que sejam vulneráveis ao elemento que as compõem e podem ser usadas de duas formas. I Armadilha. Você gasta as amarras, uma ação completa e 2 PE para preparar uma armadilha de 3x3m. Uma criatura que atravesse o espaço pela primeira vez em seu turno precisa fazer um teste de de Reflexos (DT Int); se falhar, fica imóvel até o final da cena. Mesmo se passar, considera o espaço ocupado pela armadilha como terreno difícil. I Laçar. Você gasta uma ação padrão e 1 PE e escolhe uma criatura em alcance curto. Se falhar num teste de Vontade (DT Agi), a criatura fica paralisada até o início de seu próximo turno, quando pode repetir o teste. Manter a criatura enlaçada requer o gasto de 1 PE por rodada"],
+      ["Câmera de aura paranormal", "II", "1", "Itens Paranormais", "Esta câmera amaldiçoada com Energia possui sigilos de Conhecimento para capturar auras paranormais. Tirar uma foto gasta uma ação padrão e 1 PE. As fotos são instantâneas e revelam a presença de auras paranormais em pessoas e objetos. As auras são da cor associada ao elemento"],
+      ["Componentes ritualísticos de (elemento)", "0", "1", "Itens Paranormais", "Um conjunto de objetos utilizados em rituais de um elemento entre Sangue, Morte, Conhecimento ou Energia (não existem componentes ritualísticos de Medo). Componentes ritualísticos são necessários para a conjuração de rituais do elemento em questão. I Energia: eletricidade, dispositivos tecnológicos (celulares, computadores etc.), circuitos eletrônicos, fontes de calor e luz, pilhas, baterias, cabos de cobre e prata, pólvora, moedas, dados, ímãs… I Sangue: órgãos, carne, sangue, animais vivos (para sacrifício), navalhas, agulhas, arame farpado, correntes, metal enferrujado, fluidos corporais… I Morte: ossos, dentes, cinzas, fios de cabelo, cristais pretos, relógios, galhos secos, folhas secas, plantas mortas, raízes, areia, poeira, Lodo… 67 afetado por manifestações, assim como um lugar com a Membrana protegida por conter uma criatura poderosa vinda de outro lugar"],
+      ["Emissor de pulsos paranormais", "II", "1", "Itens Paranormais", "Esta pequena caixa coberta de sigilos foi desenvolvida para servir como uma “isca” de criaturas paranormais. Ativar a caixa gasta uma ação completa e 1 PE. A caixa emite um pulso de um elemento definido pelo ativador, que atrai criaturas do mesmo elemento e afasta criaturas do elemento oposto. As criaturas afetadas têm direito a um teste de Vontade (DT Pre) para evitar o efeito"],
+      ["Escuta de ruídos paranormais", "II", "1", "Itens Paranormais", "Este microfone funciona como um aparato espião, com a diferença que consegue captar ruídos paranormais. Ativar a escuta gasta uma ação completa e 2 PE e faz com que ela grave ruídos por até 24 horas. Ouvir a escuta fornece +5 em testes de Ocultismo para identificar criatura"],
       ["Medidor de estabilidade da membrana", "II", "1", "Itens Paranormais", "Um dispositivo complexo, composto por diversos medidores — de temperatura, campo magnético, dilatação temporal… Um agente treinado em Ocultismo pode usar o medidor para avaliar o estado da Membrana em uma área (veja a página 97), o que indica a chance de uma entidade se manifestar nela. Um ambiente com valores racionais e constantes ao longo de algumas horas dificilmente originará uma criatura ou manifestação perigosa. Porém, se as leituras apresentarem dados inexplicáveis ou com grandes variações, o lugar poderá conter uma entidade. Apesar de ser um bom indicativo, o medidor não fornece respostas definitivas, já que um ambiente com a Membrana danificada ainda pode não ter sido Câmera de aura paranormal Emissor de Emissor de pulsos paranormais pulsos paranormais Medidor de estabilidade da membrana Escuta de ruídos paranormais"],
       ["Scanner de manifestação paranormal de (elemento)", "II", "1", "Itens Paranormais", "Este item é composto por um dispositivo conectado a pequenos objetos amaldiçoados de uma entidade específica e adornado com uma série de sigilos. Ativar o scanner é uma ação padrão. Quando ativado, o scanner consome 1 PE por rodada do usuário, que sempre sabe a direção de todas as manifestações paranormais ativas (rituais, criaturas, itens amaldiçoados etc.) do elemento escolhido em alcance longo. Se o elemento principal de uma criatura for outro, mas ela tiver como complemento o elemento escolhido do scanner, também será detectada. I Conhecimento: escrituras, papéis, livros, pergaminhos, instrumentos de escrita (lápis, caneta, tinta, giz etc.), pedras preciosas, ouro, cordas, tecido, cristais brancos, vidro, máscaras…"],
     ];
@@ -4575,24 +4600,60 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       "Apenas o fim das coisas deve ser celebrado. E você precisa dar fim."
     ];
 
-    /* Índice completo: onde cada tabela do livro está nesta ficha. */
+    /* Índice completo: onde cada tabela do livro está nesta ficha. O quarto
+       campo é o título do card aqui dentro — o id do alvo sai dele, então não
+       há lista paralela de ids para sair de sincronia. */
     const TAB_INDICE = [
-      ["1.1", "Origens", "aba Origens"], ["1.2", "Progressão de personagem (NEX)", "aba Progressão"],
-      ["1.3", "O Combatente", "aba Progressão"], ["1.4", "O Especialista", "aba Progressão"],
-      ["1.5", "O Ocultista", "aba Progressão"], ["2.1", "Perícias", "aba Perícias"],
-      ["3.1", "Patentes", "aqui"], ["3.2", "Pontos de prestígio por missão", "aqui"],
-      ["3.3", "Armas", "aqui e na aba Equipamento"], ["3.4", "Munições", "aqui e na aba Equipamento"],
-      ["3.5", "Modificações para armas", "aba Referência"], ["3.6", "Proteções", "aqui e na aba Equipamento"],
-      ["3.7", "Modificações para proteções", "aba Equipamento"],
-      ["3.8", "Equipamentos gerais", "aqui e na aba Equipamento"],
-      ["3.9", "Modificações para acessórios", "aba Equipamento"],
-      ["3.10", "Itens paranormais", "aqui e na aba Equipamento"],
-      ["4.1", "Dificuldades (DT)", "aqui"], ["4.2", "Testes estendidos", "não incluída"],
-      ["4.3", "Urgência de investigações", "aqui"], ["4.4", "Situações especiais", "aqui"],
-      ["4.5", "Estatísticas de objetos", "aqui"], ["5.1", "Efeitos de insanidade", "aqui"],
-      ["5.2", "Custo de rituais", "aqui"], ["6.1", "Nomes de NPCs", "não incluída"],
-      ["6.2", "Características descritivas", "não incluída"], ["7.1", "Tamanho de seres", "aqui"]
+      ["1.1", "Origens", "aba Origens", null],
+      ["1.2", "Progressão de personagem (NEX)", "aba Progressão", null],
+      ["1.3", "O Combatente", "aba Progressão", null],
+      ["1.4", "O Especialista", "aba Progressão", null],
+      ["1.5", "O Ocultista", "aba Progressão", null],
+      ["2.1", "Perícias", "aba Perícias", null],
+      ["3.1", "Patentes", "nesta aba", "Patentes e limite de itens"],
+      ["3.2", "Pontos de prestígio por missão", "nesta aba", "Pontos de prestígio por missão"],
+      ["3.3", "Armas", "nesta aba e em Equipamento", "Armas"],
+      ["3.4", "Munições", "nesta aba e em Equipamento", "Munições"],
+      ["3.5", "Modificações para armas", "aba Referência", null],
+      ["3.6", "Proteções", "nesta aba e em Equipamento", "Proteções"],
+      ["3.7", "Modificações para proteções", "aba Equipamento", null],
+      ["3.8", "Equipamentos gerais", "nesta aba e em Equipamento", "Equipamentos gerais"],
+      ["3.9", "Modificações para acessórios", "aba Equipamento", null],
+      ["3.10", "Itens paranormais", "nesta aba e em Equipamento", "Itens paranormais"],
+      ["4.1", "Dificuldades (DT)", "nesta aba", "Dificuldades"],
+      ["4.2", "Testes estendidos", "não incluída", null],
+      ["4.3", "Urgência de investigações", "nesta aba", "Urgência de investigações"],
+      ["4.4", "Situações especiais — atacante", "nesta aba", "Situações especiais — atacante"],
+      ["4.4", "Situações especiais — alvo", "nesta aba", "Situações especiais — alvo"],
+      ["4.5", "Estatísticas de objetos", "nesta aba", "Estatísticas de objetos"],
+      ["5.1", "Efeitos de insanidade", "nesta aba", "Efeitos de insanidade"],
+      ["5.2", "Custo de rituais", "nesta aba", "Custo de rituais"],
+      ["6.1", "Nomes de NPCs", "não incluída", null],
+      ["6.2", "Características descritivas", "não incluída", null],
+      ["7.1", "Tamanho de seres", "nesta aba", "Tamanho de seres"],
+      ["—", "Condições", "nesta aba", "Condições"],
+      ["—", "Elementos e a Membrana", "nesta aba", "Elementos"]
     ];
+
+    /* Um id por card para o índice conseguir rolar até ele. Dois cards
+       dividem o número 4.4 (atacante e alvo), por isso o título entra na
+       chave. */
+    function idTabela(num, titulo) {
+      return "tb-" + (num + "-" + titulo).toLowerCase()
+        .normalize("NFD").replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    /* Rola até a tabela e pisca a borda, senão em tela cheia o usuário não
+       percebe que a página andou. */
+    function irParaTabela(id) {
+      const alvo = document.getElementById(id);
+      if (!alvo) return false;
+      alvo.scrollIntoView({ behavior: "smooth", block: "start" });
+      alvo.classList.add("realce");
+      setTimeout(() => alvo.classList.remove("realce"), 1600);
+      return true;
+    }
 
     function renderTabelas() {
       const box = $("#tabBox");
@@ -4603,6 +4664,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         const alvo = (num + " " + titulo + " " + linhas.map(l => l.join(" ")).join(" ")).toLowerCase();
         if (q && !alvo.includes(q)) return;
         const c = el("div", "card");
+        c.id = idTabela(num, titulo);          // alvo do clique no índice
         c.innerHTML = '<header><h3>' + esc(titulo) + '</h3><div class="grow"></div>' +
           '<span class="chip">Tabela ' + num + '</span></header>' +
           '<div class="tscroll"><table><thead><tr>' +
@@ -4742,11 +4804,36 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
        ======================================================================= */
     function nomeGrupo(i) { return i.grupo || "Outros"; }
 
+    /* busca sem acento e sem caixa: "utensilio" acha "Utensílio" */
+    function chave(t) {
+      return String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    /* O catálogo tem 78 itens: rolar um select desse tamanho é ruim. A busca
+       filtra as opções, e o select vira só a escolha final entre os poucos
+       que sobraram. Só remonta quando o texto muda, para não perder a seleção
+       do usuário a cada render. */
+    let buscaAnterior = null;
     function montarSelect() {
-      const sel = $("#invSel");
-      if (sel.options.length) return;                 // catálogo é fixo
+      const sel = $("#invSel"), q = chave($("#invBusca").value);
+      if (buscaAnterior === q && sel.options.length) return;
+      buscaAnterior = q;
+      const antes = sel.value;
+
+      const achados = CATALOGO.filter(i => !q ||
+        chave(i.nome).includes(q) || chave(i.grupo).includes(q) ||
+        chave(i.resumo).includes(q) || chave(i.det).includes(q));
+
+      $("#invAchados").textContent = q
+        ? achados.length + (achados.length === 1 ? " item" : " itens")
+        : CATALOGO.length + " itens";
+
+      if (!achados.length) {
+        sel.innerHTML = '<option value="">nenhum item com “' + esc($("#invBusca").value) + '”</option>';
+        return;
+      }
       const grupos = [];
-      CATALOGO.forEach(i => {
+      achados.forEach(i => {
         const g = nomeGrupo(i);
         let b = grupos.find(x => x[0] === g);
         if (!b) { b = [g, []]; grupos.push(b); }
@@ -4756,6 +4843,8 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         '<optgroup label="' + esc(g) + '">' + itens.map(i =>
           '<option value="' + esc(i.id) + '">' + esc(i.nome) +
           ' — cat ' + i.cat + ' · ' + i.esp + ' esp.</option>').join("") + '</optgroup>').join("");
+      // mantém o que estava escolhido se ele sobreviveu ao filtro
+      if (antes && achados.some(i => i.id === antes)) sel.value = antes;
     }
 
     function renderInventario() {
@@ -4843,6 +4932,12 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
 
     function bindInventario() {
       $("#invSel").onchange = renderInventario;
+      /* a busca não entra em CONTROLES_EDICAO: consultar o catálogo vale
+         mesmo em ficha de outro jogador, aberta como somente leitura */
+      $("#invBusca").oninput = renderInventario;
+      $("#invBusca").onkeydown = ev => {
+        if (ev.key === "Enter" && $("#invSel").value) { ev.preventDefault(); $("#invAdd").click(); }
+      };
       $("#invAdd").onclick = () => {
         if (!podeEditar) return;
         const id = $("#invSel").value; if (!CAT_POR_ID[id]) return;
@@ -6698,8 +6793,20 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       $("#tabBusca").oninput = renderTabelas;
       $("#tabIndice").innerHTML =
         '<thead><tr><th class="n">Tabela</th><th>Nome</th><th>Onde está</th></tr></thead><tbody>' +
-        TAB_INDICE.map(([n, t, o]) => '<tr><td class="n">' + n + '</td><td>' + esc(t) +
+        TAB_INDICE.map(([n, t, o, tit]) => '<tr' + (tit ? ' class="clicavel" data-ir="' + idTabela(n, tit) + '"' : "") +
+          '><td class="n">' + n + '</td><td>' + esc(t) +
           '</td><td class="hint">' + esc(o) + '</td></tr>').join("") + '</tbody>';
+      /* clicar na linha do índice rola até a tabela; a busca é limpa antes,
+         senão o filtro pode ter escondido justamente o card procurado */
+      $("#tabIndice").addEventListener("click", ev => {
+        const tr = ev.target.closest("[data-ir]");
+        if (!tr) return;
+        const id = tr.dataset.ir;
+        if (!document.getElementById(id) && $("#tabBusca").value) {
+          $("#tabBusca").value = ""; renderTabelas();
+        }
+        irParaTabela(id);
+      });
       renderTabelas();
       ligarToken();
       bindApp();
