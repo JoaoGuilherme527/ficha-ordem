@@ -361,6 +361,64 @@
     }
 
     /* ---------- inventário ---------- */
+    .expl {
+      border-top: 1px solid var(--line);
+      font-size: 12.5px
+    }
+
+    .expl summary {
+      padding: 8px 14px;
+      cursor: pointer;
+      color: var(--ink-3);
+      font-family: var(--disp);
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      font-weight: 600
+    }
+
+    .expl summary:hover {
+      color: var(--ink-2)
+    }
+
+    .ajuda {
+      padding: 7px 14px;
+      border-top: 1px solid var(--line);
+      line-height: 1.45
+    }
+
+    .ajuda b {
+      display: block;
+      font-family: var(--disp);
+      font-size: 12px;
+      color: var(--ink)
+    }
+
+    .ajuda span {
+      color: var(--ink-2)
+    }
+
+    hr.sep {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 2px 0
+    }
+
+    /* título em cima do texto, não ao lado */
+    .notice.col {
+      flex-direction: column;
+      gap: 3px
+    }
+
+    .notice.col .ni {
+      font-family: var(--disp);
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      font-weight: 600
+    }
+
     .cargabar {
       height: 12px
     }
@@ -2525,6 +2583,7 @@
       <button role="tab" id="tab-inv" aria-selected="false" aria-controls="p-inv">Inventário<span class="tnum"
           id="tnInv"></span></button>
       <button role="tab" id="tab-equip" aria-selected="false" aria-controls="p-equip">Equipamento</button>
+      <button role="tab" id="tab-tabelas" aria-selected="false" aria-controls="p-tabelas">Tabelas</button>
       <button role="tab" id="tab-dados" aria-selected="false" aria-controls="p-dados">Dados</button>
     </div>
   </div>
@@ -2745,6 +2804,10 @@
             <h3>Derivados</h3>
           </header>
           <div class="statgrid" id="derivGrid"></div>
+          <details class="expl">
+            <summary>o que é cada um</summary>
+            <div id="derivAjuda"></div>
+          </details>
         </div>
 
         <div class="card">
@@ -3158,6 +3221,7 @@
               <h3>Adicionar item</h3>
             </header>
             <div class="pad stack">
+              <span class="lab">Do livro de regras</span>
               <div class="row">
                 <select id="invSel" style="flex:1;min-width:0"></select>
                 <input type="number" id="invQtd" min="1" step="1" value="1" style="max-width:78px"
@@ -3165,6 +3229,23 @@
                 <button class="btn primary sm" type="button" id="invAdd">Adicionar</button>
               </div>
               <div id="invPrev"></div>
+              <hr class="sep">
+              <span class="lab">Item livre</span>
+              <p class="hint">Qualquer coisa que não esteja no livro — um objeto da aventura, um achado da cena,
+                um item que o mestre inventou. Você define o nome, quantos espaços ocupa e a categoria.</p>
+              <div class="row">
+                <input type="text" id="invLivreNome" placeholder="ex.: caderno do Felipe" style="flex:1;min-width:0">
+                <input type="number" id="invLivreEsp" min="0" step="1" value="1" style="max-width:78px"
+                  aria-label="espaços" title="espaços que ocupa">
+                <select id="invLivreCat" style="max-width:96px" aria-label="categoria">
+                  <option value="0">cat 0</option>
+                  <option value="I">cat I</option>
+                  <option value="II">cat II</option>
+                  <option value="III">cat III</option>
+                  <option value="IV">cat IV</option>
+                </select>
+                <button class="btn sm" type="button" id="invLivreAdd">Adicionar</button>
+              </div>
             </div>
           </div>
 
@@ -3182,6 +3263,21 @@
             </header>
             <div class="statgrid" id="invCats"></div>
             <div class="pad hint" id="invCatNota"></div>
+            <details class="expl">
+              <summary>o que é categoria de item</summary>
+              <div class="pad stack">
+                <p class="rules">Todo item que a Ordem fornece tem uma <b>categoria</b>: <b>0</b>, <b>I</b>, <b>II</b>,
+                  <b>III</b> ou <b>IV</b>. Ela mede o quanto o item é caro, raro e poderoso — uma faca é categoria 0,
+                  um fuzil de precisão é categoria III.</p>
+                <p class="rules">A sua <b>patente</b> diz quantos itens de cada categoria a Ordem libera para você
+                  <b>por missão</b>. Um recruta leva 2 itens de categoria I e nada acima disso; um agente de elite leva
+                  3 de I, 3 de II, 3 de III e 2 de IV. Itens de <b>categoria 0 são ilimitados</b> — só pesam na carga.</p>
+                <p class="rules">Os números acima são <b>usados / permitidos</b>. Passar do limite não é proibido pela
+                  ficha, mas significa que você está com equipamento que a sua patente não requisita.</p>
+                <p class="rules">Cada <b>modificação</b> aplicada a um item sobe a categoria dele em I. Uma katana
+                  (categoria I) com a modificação certeira vira categoria II.</p>
+              </div>
+            </details>
           </div>
         </section>
 
@@ -3196,6 +3292,24 @@
             <div class="pad stack" id="equipRegras"></div>
           </div>
           <div id="equipTabelas"></div>
+        </section>
+
+        <!-- ---------- TABELAS ---------- -->
+        <section id="p-tabelas" role="tabpanel" aria-labelledby="tab-tabelas" hidden>
+          <div class="card">
+            <header>
+              <h3>Tabelas do livro de regras</h3>
+              <div class="grow"></div><input type="text" id="tabBusca" placeholder="filtrar…"
+                style="max-width:190px">
+            </header>
+            <div class="pad hint">As tabelas de equipamento, patentes, perícias e origens saem dos mesmos dados que a
+              ficha usa para calcular, então não divergem do resto do app. O índice abaixo diz onde cada tabela do livro
+              está.</div>
+            <div class="tscroll">
+              <table id="tabIndice"></table>
+            </div>
+          </div>
+          <div id="tabBox"></div>
         </section>
 
         <section id="p-dados" role="tabpanel" aria-labelledby="tab-dados" hidden>
@@ -3897,7 +4011,17 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
 
     /* espaços "—" e "*" não contam na carga */
     function espacoNum(e) { const n = parseInt(e, 10); return isNaN(n) ? 0 : n; }
-    function itemDe(l) { return CAT_POR_ID[l.id] || null; }
+    /* Item livre não está em catálogo nenhum: os dados moram na própria linha
+       do inventário, e aqui ele ganha a mesma forma dos itens do livro para o
+       resto do código não precisar saber a diferença. */
+    function itemDe(l) {
+      if (l && l.livre) return {
+        id: l.id, nome: l.nome || "Item", cat: l.cat || "0",
+        esp: String(l.esp == null ? 1 : l.esp), grupo: "Itens livres",
+        det: "", resumo: "item livre"
+      };
+      return CAT_POR_ID[l.id] || null;
+    }
 
     /* Proteções e escudo somam Defesa só enquanto estiverem em uso — o campo
        `uso` da linha do inventário. Carregar uma proteção na mochila pesa,
@@ -4026,8 +4150,10 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       }
 
       const cargaAtr = a.forca + (trilhaTem("Técnico") ? a.intelecto : 0);
-      /* Livro, pág. 53: Força 0 não zera a carga, dá 2 espaços. */
-      const carga = a.forca === 0 && !trilhaTem("Técnico") ? 2 : cargaAtr * 5;
+      /* Livro, pág. 53: Força 0 não zera a carga, dá 2 espaços. Como o valor
+         do atributo agora é livre, o piso vale também para negativos — senão
+         a capacidade ficaria negativa e o agente nasceria sobrecarregado. */
+      const carga = Math.max(2, cargaAtr * 5);
       const cargaUso = cargaUsada();
       const sobrecarga = cargaUso > carga;              // –5 na Defesa e nas perícias de carga
       const defProt = defesaDoEquipamento();
@@ -4345,12 +4471,15 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         ["DT base", 10 + D.limitePE, "+ atributo-chave"],
         ["Limite PE / turno", D.limitePE, "NEX " + S.nex + "%"],
         ["Carga", D.cargaUso + " / " + D.carga,
-          D.sobrecarga ? "sobrecarregado" : (D.carga - D.cargaUso) + " espaço(s) livre(s)"],
+          "Força " + S.atr.forca + (trilhaTem("Técnico") ? " + Int " + S.atr.intelecto : "") + " × 5"],
         ["Iniciativa", sgn(bonusPericia("iniciativa")), S.atr.agilidade + "d20 + bônus"],
         ["Rituais", D.circulo, S.classe === "ocultista" ? "Ocultista" : "não conjura"]
       ];
       $("#derivGrid").innerHTML = stats.map(([k, v, s]) =>
-        '<div><div class="k">' + esc(k) + '</div><div class="v num">' + esc(String(v)) + '</div><div class="s">' + esc(s) + '</div></div>').join("");
+        '<div title="' + esc(DERIV_AJUDA[k] || "") + '"><div class="k">' + esc(k) +
+        '</div><div class="v num">' + esc(String(v)) + '</div><div class="s">' + esc(s) + '</div></div>').join("");
+      $("#derivAjuda").innerHTML = stats.map(([k]) =>
+        '<div class="ajuda"><b>' + esc(k) + '</b><span>' + esc(DERIV_AJUDA[k] || "") + '</span></div>').join("");
 
       const lim = D.pat[4], usoCat = catsUsadas();
       const acima = ["I", "II", "III", "IV"].some((c, k) => usoCat[c] > (lim[k] || 0));
@@ -4366,6 +4495,151 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
           ["I", "II", "III", "IV"].map((c, k) => c + " " + usoCat[c] + "/" + (lim[k] || 0)).join(" · ") +
           (acima ? " — <b>acima da patente</b>" : "")
         : "Nada no inventário. Monte a carga na aba <b>Inventário</b>; as regras completas estão em <b>Equipamento</b>.";
+    }
+
+    /* =======================================================================
+       ABA TABELAS — as tabelas de referência do livro num lugar só
+       As que a ficha já guarda como dado (armas, patentes, perícias…) são
+       desenhadas a partir dele, então nunca divergem. As demais foram
+       transcritas do PDF e vivem nas constantes abaixo.
+       ======================================================================= */
+    const TAB_PP = [
+      ["Solução do caso", "+10"], ["Pista adicional encontrada", "+2"],
+      ["Morte de inocente", "−2"], ["Morte de membro do grupo", "−5"]
+    ];
+
+    const TAB_DT = [
+      ["Fácil*", "5", "Escutar uma conversa atrás da porta (Percepção)"],
+      ["Média", "10", "Subir um barranco (Atletismo)"],
+      ["Difícil", "15", "Montar acampamento no campo (Sobrevivência)"],
+      ["Muito difícil", "20", "Estancar um sangramento fatal (Medicina)"],
+      ["Formidável", "25", "Hackear um servidor do Pentágono (Tecnologia)"],
+      ["Heroica", "30", "Decifrar um pergaminho contendo um ritual ancestral (Ocultismo)"],
+      ["Quase impossível", "35", "Convencer alguém que não gosta de você a lutar para protegê-lo (Diplomacia)"]
+    ];
+
+    const TAB_URGENCIA = [
+      ["Muito baixo", "6"], ["Baixo", "5"], ["Médio", "4"], ["Alto", "3"], ["Muito alto", "2"]
+    ];
+
+    const TAB_ATAQUE = [
+      ["Caído", "−2 dados"], ["Cego", "50% de chance de falha"],
+      ["Em posição elevada", "+1 dado"], ["Flanqueando o alvo", "+1 dado (apenas corpo a corpo)"],
+      ["Invisível", "+2 dados (não se aplica a alvos cegos)"], ["Ofuscado", "−1 dado"]
+    ];
+    const TAB_DEFESA_SIT = [
+      ["Caído", "−5 contra corpo a corpo, +5 contra ataques à distância"],
+      ["Cego", "−5"], ["Desprevenido", "−5"],
+      ["Camuflagem leve", "20% de chance de falha"], ["Camuflagem total", "50% de chance de falha"]
+    ];
+
+    const TAB_OBJETOS = [
+      ["Folha de papel", "Minúsculo", "15", "0", "1"], ["Corda", "Minúsculo", "15", "0", "2"],
+      ["Algemas", "Minúsculo", "15", "10", "2"], ["Cadeira", "Pequeno", "12", "5", "5"],
+      ["Caixote", "Médio", "10", "5", "10"], ["Porta de madeira", "Grande", "8", "5", "20"],
+      ["Porta de metal", "Grande", "8", "8", "50"], ["Portão de grades", "Grande", "8", "10", "50"],
+      ["Carro", "Enorme", "5", "10", "100"], ["Ônibus", "Enorme", "5", "20", "300"]
+    ];
+
+    const TAB_TAMANHO = [
+      ["Minúsculo", "Pombo, rato", "1,5m", "+5 / −5"],
+      ["Pequeno", "Cão, criança", "1,5m", "+2 / −2"],
+      ["Médio", "Humano adulto", "1,5m", "0"],
+      ["Grande", "Aberração de sangue, cavalo", "3m", "−2 / +2"],
+      ["Enorme", "Elefante, titã de sangue", "4,5m", "−5 / +5"],
+      ["Colossal", "Aniquilação, baleia", "9m", "−10 / +10"]
+    ];
+
+    const TAB_RITUAIS = [["1º", "1 PE"], ["2º", "3 PE"], ["3º", "6 PE"], ["4º", "10 PE"]];
+
+    const TAB_INSANIDADE = [
+      "Você busca dor. Seja sentir dor ou causar dor.",
+      "Quando você olha o rosto de uma pessoa, vê sua imagem distorcida, com pedaços de animais ou monstros mesclados à face dela.",
+      "Todas as vozes ficam deturpadas, como se fossem faladas por um monstro.",
+      "Você fica escutando uma voz na sua cabeça, que repete constantemente que você está mentindo.",
+      "O seu sangue parece estar quente, como se quisesse sair de dentro do seu corpo.",
+      "Você vê rostos humanos e monstruosos nas sombras, sempre encarando você.",
+      "Uma fome constante domina seu corpo, como se você não pudesse ser saciado.",
+      "Um gosto permanente de ferro domina seu paladar, como se sua boca estivesse tomada por sangue.",
+      "A luz incomoda seus olhos a ponto de você precisar escondê-los o tempo todo. É como se seus olhos queimassem.",
+      "Falar é praticamente impossível. É como se algo externo estivesse controlando o que você fala.",
+      "Seus olhos coçam violentamente, e só parece que vão parar quando forem arrancados de sua cabeça.",
+      "Sua memória começa a falhar, lentamente. Qualquer evento ocorrido há mais de uma hora começa a ficar nebuloso.",
+      "As emoções começam a se tornar confusas. Algo feliz desperta raiva e algo dolorido desperta felicidade.",
+      "Você sente a necessidade constante de descrever todas as ações da maneira mais grotesca possível.",
+      "Existem vermes dentro de seu corpo, correndo por suas veias e órgãos. Você tem certeza disso. Você sente debaixo de sua pele.",
+      "Você acha que está sob efeito constante de um ritual que o deixa mais poderoso.",
+      "Suas mãos estão furadas e as coisas caem de seus bolsos.",
+      "Você acredita puramente que tudo é fruto da sorte, deixando suas decisões para o acaso.",
+      "As coisas estão fervendo, mas você gosta da dor.",
+      "Apenas o fim das coisas deve ser celebrado. E você precisa dar fim."
+    ];
+
+    /* Índice completo: onde cada tabela do livro está nesta ficha. */
+    const TAB_INDICE = [
+      ["1.1", "Origens", "aba Origens"], ["1.2", "Progressão de personagem (NEX)", "aba Progressão"],
+      ["1.3", "O Combatente", "aba Progressão"], ["1.4", "O Especialista", "aba Progressão"],
+      ["1.5", "O Ocultista", "aba Progressão"], ["2.1", "Perícias", "aba Perícias"],
+      ["3.1", "Patentes", "aqui"], ["3.2", "Pontos de prestígio por missão", "aqui"],
+      ["3.3", "Armas", "aqui e na aba Equipamento"], ["3.4", "Munições", "aqui e na aba Equipamento"],
+      ["3.5", "Modificações para armas", "aba Referência"], ["3.6", "Proteções", "aqui e na aba Equipamento"],
+      ["3.7", "Modificações para proteções", "aba Equipamento"],
+      ["3.8", "Equipamentos gerais", "aqui e na aba Equipamento"],
+      ["3.9", "Modificações para acessórios", "aba Equipamento"],
+      ["3.10", "Itens paranormais", "aqui e na aba Equipamento"],
+      ["4.1", "Dificuldades (DT)", "aqui"], ["4.2", "Testes estendidos", "não incluída"],
+      ["4.3", "Urgência de investigações", "aqui"], ["4.4", "Situações especiais", "aqui"],
+      ["4.5", "Estatísticas de objetos", "aqui"], ["5.1", "Efeitos de insanidade", "aqui"],
+      ["5.2", "Custo de rituais", "aqui"], ["6.1", "Nomes de NPCs", "não incluída"],
+      ["6.2", "Características descritivas", "não incluída"], ["7.1", "Tamanho de seres", "aqui"]
+    ];
+
+    function renderTabelas() {
+      const box = $("#tabBox");
+      const q = ($("#tabBusca").value || "").trim().toLowerCase();
+      box.innerHTML = "";
+
+      const card = (num, titulo, cols, linhas, nota) => {
+        const alvo = (num + " " + titulo + " " + linhas.map(l => l.join(" ")).join(" ")).toLowerCase();
+        if (q && !alvo.includes(q)) return;
+        const c = el("div", "card");
+        c.innerHTML = '<header><h3>' + esc(titulo) + '</h3><div class="grow"></div>' +
+          '<span class="chip">Tabela ' + num + '</span></header>' +
+          '<div class="tscroll"><table><thead><tr>' +
+          cols.map((h, i) => '<th' + (i ? ' class="n"' : '') + '>' + esc(h) + '</th>').join("") +
+          '</tr></thead><tbody>' + linhas.map(l => '<tr>' +
+            l.map((v, i) => '<td' + (i ? ' class="rules"' : '') + '>' + (i ? esc(v) : '<b>' + esc(v) + '</b>') + '</td>').join("") +
+            '</tr>').join("") + '</tbody></table></div>' +
+          (nota ? '<div class="pad hint">' + nota + '</div>' : "");
+        box.append(c);
+      };
+
+      card("3.1", "Patentes e limite de itens", ["Patente", "PP", "Crédito", "I", "II", "III", "IV"],
+        PATENTES.map(p => [p[0], p[1] + (p[2] === Infinity ? "+" : "–" + p[2]), p[3],
+          ...p[4].map(v => String(v || "—"))]));
+      card("3.2", "Pontos de prestígio por missão", ["Evento", "PP"], TAB_PP);
+      card("4.1", "Dificuldades", ["Tarefa", "DT", "Exemplo"], TAB_DT,
+        "*Testes fáceis existem para dar noção de escala; em geral o mestre considera sucesso automático.");
+      card("4.3", "Urgência de investigações", ["Grau de urgência", "Rodadas disponíveis"], TAB_URGENCIA);
+      card("4.4", "Situações especiais — atacante", ["O atacante está…", "Modificador no ataque"], TAB_ATAQUE);
+      card("4.4", "Situações especiais — alvo", ["O alvo está…", "Modificador na Defesa"], TAB_DEFESA_SIT);
+      card("4.5", "Estatísticas de objetos", ["Exemplo", "Tamanho", "Defesa", "RD", "PV"], TAB_OBJETOS);
+      card("5.1", "Efeitos de insanidade", ["1d20", "Efeito"],
+        TAB_INSANIDADE.map((t, i) => [String(i + 1), t]),
+        "Role 1d20 nesta tabela ao chegar a 0 de Sanidade.");
+      card("5.2", "Custo de rituais", ["Círculo", "Custo"], TAB_RITUAIS);
+      card("7.1", "Tamanho de seres", ["Categoria", "Exemplos", "Espaço / alcance", "Furtividade / manobras"], TAB_TAMANHO);
+      card("3.3", "Armas", ["Arma", "Cat.", "Dano", "Crítico", "Alcance", "Tipo", "Esp."],
+        ARMAS.map(a => [a[0], a[1], a[2], a[3], a[4], a[5], a[6]]));
+      card("3.4", "Munições", ["Munição", "Cat.", "Esp."], MUNICOES);
+      card("3.6", "Proteções", ["Proteção", "Defesa", "Cat.", "Esp."], PROTECOES);
+      card("3.8", "Equipamentos gerais", ["Nome", "Cat.", "Esp.", "Grupo"],
+        GERAIS.map(g => [g[0], g[1], g[2], g[3] || "—"]));
+      card("3.10", "Itens paranormais", ["Nome", "Cat.", "Esp."], PARANORMAIS.map(p => [p[0], p[1], p[2]]));
+      card("—", "Condições", ["Condição", "Efeito"], CONDICOES.map(c => [c.n, c.t]));
+      card("—", "Elementos", ["Elemento", "Oposto", "Domínio"], ELEMENTOS.map(e => [e[0], e[1] || "—", e[2]]));
+
+      if (!box.children.length) box.innerHTML = '<div class="card"><div class="pad hint">Nada com “' + esc(q) + '”.</div></div>';
     }
 
     /* =======================================================================
@@ -4488,9 +4762,17 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       montarSelect();
       const D = derived(), usado = D.cargaUso, livre = D.carga - usado;
 
-      $("#cargaFlag").innerHTML = D.sobrecarga
-        ? '<span class="badge bad">sobrecarregado</span>'
-        : '<span class="hint">' + livre + ' espaço(s) livre(s)</span>';
+      /* "como estou com aquela carga" em uma palavra, além do número cru */
+      const frac = D.carga > 0 ? usado / D.carga : 0;
+      const estado = D.sobrecarga ? ["Sobrecarregado", "bad"]
+        : usado === 0 ? ["De mãos livres", ""]
+          : frac >= 1 ? ["No limite", "warn"]
+            : frac >= 0.75 ? ["Pesado", "warn"]
+              : frac >= 0.4 ? ["Carregado", ""]
+                : ["Leve", "ok"];
+      $("#cargaFlag").innerHTML = '<span class="badge ' + estado[1] + '">' + estado[0] + '</span>' +
+        '<span class="hint" style="margin-left:8px">' +
+        (D.sobrecarga ? (usado - D.carga) + " espaço(s) além do limite" : livre + " espaço(s) livre(s)") + '</span>';
       const pct = D.carga > 0 ? clamp(usado / D.carga * 100, 0, 100) : 0;
       const bar = $("#cargaBar").parentElement;
       bar.className = "bar cargabar" + (D.sobrecarga ? " excedido" : usado === D.carga ? " cheio" : "");
@@ -4570,6 +4852,21 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         $("#invQtd").value = 1;
         render(); save();
       };
+      $("#invLivreAdd").onclick = () => {
+        if (!podeEditar) return;
+        const nome = ($("#invLivreNome").value || "").trim();
+        if (!nome) { toast("Dê um nome ao item.", true); $("#invLivreNome").focus(); return; }
+        S.inv.push({
+          id: "livre:" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+          livre: true, nome: nome,
+          esp: Math.max(0, parseInt($("#invLivreEsp").value, 10) || 0),
+          cat: $("#invLivreCat").value || "0", q: 1, uso: false
+        });
+        $("#invLivreNome").value = ""; $("#invLivreEsp").value = 1; $("#invLivreCat").value = "0";
+        render(); save();
+      };
+      $("#invLivreNome").onkeydown = ev => { if (ev.key === "Enter") $("#invLivreAdd").click(); };
+
       $("#invLista").addEventListener("click", ev => {
         if (!podeEditar) return;
         const b = ev.target.closest("button"); if (!b) return;
@@ -4590,6 +4887,18 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       });
     }
 
+    /* O que cada número derivado quer dizer. Aparece como dica no card e
+       escrito por extenso embaixo dele — "2 × 5 espaços" não explica nada
+       sozinho. */
+    const DERIV_AJUDA = {
+      "Defesa": "O quão difícil é te acertar. Um ataque precisa igualar ou superar este número. Começa em 10, soma sua Agilidade, mais o bônus da proteção que você estiver usando; sobrecarga tira 5.",
+      "DT base": "A dificuldade padrão dos seus efeitos: quem resiste a algo causado por você rola contra este número, somado ao atributo-chave do efeito.",
+      "Limite PE / turno": "Quantos pontos de esforço você consegue gastar dentro de um único turno, por mais PE que ainda tenha na reserva. Sobe com o NEX.",
+      "Carga": "Espaços de item que você aguenta carregar. São 5 espaços por ponto de Força (a trilha Técnico soma Intelecto também). Um item comum ocupa 1 espaço; arma de duas mãos e proteção leve ocupam 2; proteção pesada, 5. Passar do limite deixa você sobrecarregado.",
+      "Iniciativa": "O bônus que você soma ao teste de Iniciativa, que define a ordem dos turnos no combate. Você rola um dado por ponto de Agilidade e fica com o maior.",
+      "Rituais": "Até que círculo de ritual você consegue conjurar. Só ocultistas conjuram; as demais classes ficam em zero."
+    };
+
     /* ---------- Agente ---------- */
     function renderAgente() {
       renderToken();
@@ -4601,26 +4910,28 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       const box = $("#attrBox"); box.innerHTML = "";
       ATRS.forEach(k => {
         const v = S.atr[k];
-        const c = el("div", "attr" + (v === 0 ? " zero" : ""));
+        const c = el("div", "attr" + (v <= 0 ? " zero" : ""));
         c.innerHTML =
           '<div class="an">' + ATR_LABEL[k] + '</div>' +
           '<div class="av">' + v + '</div>' +
-          '<div class="adice">' + (v === 0 ? "2d20 pior" : v + "d20 melhor") + '</div>';
+          '<div class="adice">' + (v <= 0 ? (2 - v) + "d20 pior" : v + "d20 melhor") + '</div>';
         const ctrl = el("div", "ctrl");
-        const podeZerar = v > 1 || P.zerados === 0;                     // um único atributo pode chegar a 0
-        const bMinus = el("button", null, "−"); bMinus.disabled = v <= 0 || !podeZerar; bMinus.setAttribute("aria-label", "Reduzir " + ATR_LABEL[k]);
-        const bPlus = el("button", null, "+"); bPlus.disabled = v >= teto; bPlus.setAttribute("aria-label", "Aumentar " + ATR_LABEL[k]);
-        bMinus.onclick = () => { S.atr[k] = Math.max(0, v - 1); render(); save(); };
-        bPlus.onclick = () => { S.atr[k] = Math.min(teto, v + 1); render(); save(); };
+        /* Sem trava: o valor é livre para cima e para baixo. As regras do livro
+           viram aviso e não bloqueio — quem manda na mesa é o mestre. */
+        const bMinus = el("button", null, "−"); bMinus.setAttribute("aria-label", "Reduzir " + ATR_LABEL[k]);
+        const bPlus = el("button", null, "+"); bPlus.setAttribute("aria-label", "Aumentar " + ATR_LABEL[k]);
+        bMinus.onclick = () => { S.atr[k] = v - 1; render(); save(); };
+        bPlus.onclick = () => { S.atr[k] = v + 1; render(); save(); };
         ctrl.append(bMinus, bPlus); c.append(ctrl);
         box.append(c);
       });
 
       const notes = $("#attrNotes"); notes.innerHTML = "";
-      if (P.sobra > 0) notes.append(notice("warn", "Atenção", "Ainda há " + P.sobra + " ponto(s) de atributo para distribuir."));
-      if (P.sobra < 0) notes.append(notice("bad", "Inválido", "Você distribuiu " + (-P.sobra) + " ponto(s) além do permitido."));
-      if (P.zerado) notes.append(notice("", "Nota", "Um atributo em 0 concedeu +1 ponto. Testes com esse atributo rolam 2d20 e mantêm o pior resultado. Só um atributo pode ser reduzido a 0."));
-      if (P.zerados > 1) notes.append(notice("bad", "Inválido", "Apenas um atributo pode ser reduzido a 0 na criação; há " + P.zerados + " zerados e apenas um deles concede o ponto extra."));
+      if (P.sobra > 0) notes.append(notice("warn", "Pela regra", "Ainda há " + P.sobra + " ponto(s) de atributo para distribuir."));
+      if (P.sobra < 0) notes.append(notice("warn", "Pela regra", "Você distribuiu " + (-P.sobra) + " ponto(s) além do que o livro concede. A ficha deixa passar — combine com o mestre."));
+      if (ATRS.some(k => S.atr[k] > teto)) notes.append(notice("warn", "Pela regra",
+        "O teto do livro no seu NEX é <b>" + teto + "</b>, e algum atributo passou disso. A ficha não impede.", true));
+      if (P.zerado) notes.append(notice("", "Nota", "Atributo 0 ou negativo rola 2d20 (ou mais) e mantém o <b>pior</b> resultado. Pelo livro só um atributo pode chegar a 0.", true));
       if (P.marcos) notes.append(notice("ok", "Marcos", "Os marcos de aumento de atributo já alcançados somam +" + P.marcos + " ponto(s). Cada marco eleva o teto em +1: o teto atual é " + teto + " (máximo 5)."));
 
       /* origem e classe */
@@ -5187,7 +5498,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       t3.innerHTML = '<table><thead><tr><th>Elemento</th><th>Oposto</th><th>Domínio</th></tr></thead><tbody>' +
         ELEMENTOS.map(([n, op, txt]) => '<tr><td><b>' + esc(n) + '</b></td><td>' + esc(op || "—") + '</td><td class="rules">' + esc(txt) + '</td></tr>').join("") + '</tbody></table>';
       er.append(t3);
-      er.append(notice("", "Membrana", "A barreira entre a Realidade e o Outro Lado tem quatro estados — <b>" + MEMBRANA.join(" → ") +
+      er.append(notice("col", "Membrana", "A barreira entre a Realidade e o Outro Lado tem quatro estados — <b>" + MEMBRANA.join(" → ") +
         "</b>. Quanto mais enfraquecida, menor a DT dos rituais e mais fáceis as manifestações paranormais.", true));
 
       const nr = $("#notasRegras"); nr.innerHTML = "";
@@ -5198,7 +5509,7 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
         ["Perícias com uso restrito", "Pela Tabela 2.1 do livro básico, as perícias <i>somente treinada</i> são Adestramento, Artes, Ciências, Crime, Ocultismo, Pilotagem, Profissão, Religião, Tática e Tecnologia — marcadas com <b>T</b>. Medicina <b>não</b> é uma delas (exige apenas kit). A habilidade Eclético do Especialista contorna essa restrição."],
         ["Tabela de Efeitos de Loucura", "A especificação manda rolar 1d20 na tabela ao chegar a 0 de Sanidade, mas não reproduz as entradas. A ficha rola o d20 e registra o resultado; consulte a tabela no livro."],
         ["Rituais e poderes paranormais", "O catálogo de rituais e de poderes paranormais não faz parte da especificação, então a ficha acompanha apenas o círculo liberado e o limite de PE por turno."]
-      ].forEach(([a, b]) => nr.append(notice("", a, b, true)));
+      ].forEach(([a, b]) => nr.append(notice("col", a, b, true)));
     }
 
 
@@ -5679,10 +5990,15 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       const f = row.ficha || {};
       N.token = typeof f.token === "string" ? f.token : "";
       N.inv = Array.isArray(f.inv)
-        ? f.inv.filter(l => l && CAT_POR_ID[l.id])
-            .map(l => ({ id: l.id, q: Math.max(1, parseInt(l.q, 10) || 1), uso: !!l.uso }))
+        ? f.inv.filter(l => l && (l.livre ? l.id : CAT_POR_ID[l.id]))
+            .map(l => l.livre
+              ? { id: l.id, livre: true, nome: String(l.nome || "Item"),
+                  esp: Math.max(0, parseInt(l.esp, 10) || 0), cat: l.cat || "0",
+                  q: Math.max(1, parseInt(l.q, 10) || 1), uso: false }
+              : { id: l.id, q: Math.max(1, parseInt(l.q, 10) || 1), uso: !!l.uso })
         : [];
-      ATRS.forEach(k => { if (f.atr && typeof f.atr[k] === "number") N.atr[k] = clamp(f.atr[k], 0, 5); });
+      // valor livre: só garante que é inteiro, sem cortar em 0..5
+      ATRS.forEach(k => { if (f.atr && typeof f.atr[k] === "number") N.atr[k] = Math.round(f.atr[k]); });
       if (f.per) Object.keys(N.per).forEach(k => {
         const p = f.per[k]; if (!p) return;
         if (GRAUS[p.grau] != null) N.per[k].grau = p.grau;
@@ -6082,17 +6398,16 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       const ab = $("#cAttrs"); ab.innerHTML = "";
       ATRS.forEach(k => {
         const v = novo.atr[k];
-        const c = el("div", "attr" + (v === 0 ? " zero" : ""));
+        const c = el("div", "attr" + (v <= 0 ? " zero" : ""));
         c.innerHTML = '<div class="an">' + ATR_LABEL[k] + '</div><div class="av">' + v +
-          '</div><div class="adice">' + (v === 0 ? "2d20 pior" : v + "d20 melhor") + '</div>';
+          '</div><div class="adice">' + (v <= 0 ? (2 - v) + "d20 pior" : v + "d20 melhor") + '</div>';
         const ctrl = el("div", "ctrl");
         const menos = el("button", null, "−"), mais = el("button", null, "+");
-        const podeZerar = v > 1 || pv.P.zerados === 0;                  // um único atributo pode chegar a 0
-        menos.disabled = v <= 0 || !podeZerar; mais.disabled = v >= pv.teto;
+        // livre também na criação: o pool vira referência, não trava
         menos.setAttribute("aria-label", "Reduzir " + ATR_LABEL[k]);
         mais.setAttribute("aria-label", "Aumentar " + ATR_LABEL[k]);
-        menos.onclick = () => { novo.atr[k] = Math.max(0, v - 1); renderCriar(); };
-        mais.onclick = () => { novo.atr[k] = Math.min(pv.teto, v + 1); renderCriar(); };
+        menos.onclick = () => { novo.atr[k] = v - 1; renderCriar(); };
+        mais.onclick = () => { novo.atr[k] = v + 1; renderCriar(); };
         ctrl.append(menos, mais); c.append(ctrl); ab.append(c);
       });
 
@@ -6231,7 +6546,8 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
     const CONTROLES_EDICAO = [
       "#fNome", "#fJogador", "#fConceito", "#fNex", "#fClasse", "#fOrigem", "#fTrilha", "#fPP", "#fNotas",
       "#fPerNex", "#sVal", "#sTipo", "#sTpv", "#sTpe", "#sRd", "#impBtn", "#delBtn", "#logClear",
-      "#tokenBtn", "#tokenDel", "#invSel", "#invQtd", "#invAdd"
+      "#tokenBtn", "#tokenDel", "#invSel", "#invQtd", "#invAdd",
+      "#invLivreNome", "#invLivreEsp", "#invLivreCat", "#invLivreAdd"
     ];
     function aplicarPermissao() {
       const ro = !podeEditar;
@@ -6379,6 +6695,12 @@ Resources:`; for (let t of c) { if (!t || typeof t != `string`) throw Error(`@su
       bindInventario();
       $("#equipBusca").oninput = renderCap3;
       renderCap3();
+      $("#tabBusca").oninput = renderTabelas;
+      $("#tabIndice").innerHTML =
+        '<thead><tr><th class="n">Tabela</th><th>Nome</th><th>Onde está</th></tr></thead><tbody>' +
+        TAB_INDICE.map(([n, t, o]) => '<tr><td class="n">' + n + '</td><td>' + esc(t) +
+          '</td><td class="hint">' + esc(o) + '</td></tr>').join("") + '</tbody>';
+      renderTabelas();
       ligarToken();
       bindApp();
       renderRef();
