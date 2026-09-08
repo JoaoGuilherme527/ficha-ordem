@@ -586,17 +586,21 @@ const CENARIOS = [
       ]
     },
     imagem: {
-      url: "/mapas/m1-c4-casebre.jpg",
-      w: 19, h: 14,
+      /* Casebre em imagem, 1195x896 px. Escala ~198 px por metro, medida em
+         três objetos que convergiram: a privada (0,38 x 0,7 m), a pia da
+         cozinha (0,5 x 0,9 m) e o vão da porta dos fundos (0,8 m). Dá uma
+         casa de 6 x 4,5 m — apertado, que é o que a arte mostra. */
+      url: "/mapas/casebre.png",
+      w: 6.04, h: 4.53,
       escuridao: 0.25,
       credito: "battlemap de terceiros — uso na mesa",
       pontos: [
-        { n: 1, x: 10.35, y: 5.75, nome: "Geladeira", detalhe: "Tomada por fotos presas com ímãs. Investigação DT 15 identifica Gustavo, a esposa e um menino de 5 ou 6 anos — e uma foto das costas marcadas de Jônata. Medicina DT 15 bate as manchas com os prontuários. Intuição DT 10 percebe a distância entre o casal. Percepção DT 10 sente o cheiro: a comida apodreceu." },
-        { n: 2, x: 7.3, y: 7.45, nome: "Móvel da televisão", detalhe: "Papéis acumulados em volta. Percepção DT 10: não sobra espaço para escrever e não há um lápis sequer. Investigação DT 10: contas e documentos endereçados a Jairo Braga, nenhum aberto. Ciência DT 10: a TV está na tomada mas não liga — a tela sai. Ocultismo DT 15: as marcas por dentro são sigilos de Conhecimento ligados a rituais de transformação." },
-        { n: 3, x: 5.4, y: 3.35, nome: "Área de serviço", detalhe: "O puxado dos fundos, cheio de ferramenta velha e tralha. Investigação ou Percepção DT 15 acha ataduras e pomadas no meio da bagunça. Medicina DT 10: são pomadas para queimadura." },
-        { n: 4, x: 13.2, y: 6.4, nome: "Cama", detalhe: "Investigação ou Percepção DT 15 nota o alçapão embaixo. Atletismo DT 10 move a cama, mas o alçapão está trancado. Crime DT 15 destranca; falhar aumenta o grau de urgência em 1. Arrombar acorda o que está lá embaixo." },
-        { n: 5, x: 9.6, y: 7.95, nome: "Porta de entrada", detalhe: "Vidro quebrado, abre por dentro pelo buraco. Nenhum outro sinal de arrombamento." },
-        { n: 6, x: 13.3, y: 1.4, nome: "Gerador", detalhe: "Fora do texto da missão, mas útil: ligar o gerador acende a casa e faz um barulho dos diabos. Aumente o grau de urgência em 1 se usarem." }
+        { n: 1, x: 0.76, y: 2.31, nome: "Geladeira", detalhe: "Tomada por fotos presas com ímãs. Investigação DT 15 identifica Gustavo, a esposa e um menino de 5 ou 6 anos — e uma foto das costas marcadas de Jônata. Medicina DT 15 bate as manchas com os prontuários. Intuição DT 10 percebe a distância entre o casal. Percepção DT 10 sente o cheiro: a comida apodreceu." },
+        { n: 2, x: 5.36, y: 2.43, nome: "Móvel da televisão", detalhe: "Papéis acumulados em volta. Percepção DT 10: não sobra espaço para escrever e não há um lápis sequer. Investigação DT 10: contas e documentos endereçados a Jairo Braga, nenhum aberto. Ciência DT 10: a TV está na tomada mas não liga — a tela sai. Ocultismo DT 15: as marcas por dentro são sigilos de Conhecimento ligados a rituais de transformação." },
+        { n: 3, x: 2.88, y: 0.93, nome: "Banheiro", detalhe: "A pia, o varal improvisado e a privada. Investigação ou Percepção DT 15 acha ataduras e pomadas no meio da bagunça. Medicina DT 10: são pomadas para queimadura." },
+        { n: 4, x: 4.77, y: 3.72, nome: "Cama", detalhe: "Investigação ou Percepção DT 15 nota o alçapão embaixo. Atletismo DT 10 move a cama, mas o alçapão está trancado. Crime DT 15 destranca; falhar aumenta o grau de urgência em 1. Arrombar acorda o que está lá embaixo." },
+        { n: 5, x: 2.88, y: 4.24, nome: "Porta de entrada", detalhe: "Vidro quebrado, abre por dentro pelo buraco. Nenhum outro sinal de arrombamento." },
+        { n: 6, x: 2.99, y: 0.31, nome: "Lâmpada do teto", detalhe: "A única luz da casa, pendurada num fio sobre o banheiro. Acender ilumina os cômodos e estala alto no silêncio: aumente o grau de urgência em 1 se usarem." }
       ],
       tokens: []
     },

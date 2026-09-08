@@ -893,6 +893,36 @@
       align-items: center
     }
 
+    /* .row era usada em 4 lugares (token e inventário) sem nenhuma regra:
+       os controles ficavam colados e sem alinhamento. */
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .row>.btn {
+      flex: none
+    }
+
+    /* Containers preenchidos por JS: `.card + .card` não atravessa o
+       container, então o primeiro card de dentro colava no card de cima.
+       Vale para as quatro abas que montam cards fora do painel. */
+    #equipTabelas,
+    #tabBox,
+    #trBox,
+    #orBox {
+      margin-top: 14px
+    }
+
+    #equipTabelas:empty,
+    #tabBox:empty,
+    #trBox:empty,
+    #orBox:empty {
+      margin-top: 0
+    }
+
     /* ---------- attributes ---------- */
     .attrs {
       display: grid;
