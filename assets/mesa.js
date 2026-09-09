@@ -267,7 +267,7 @@ function montarMapa(caixa, cen, opcoes) {
     b.style.top = (t.y / v.h * 100) + "%";
     b.style.setProperty("--cor", corDoElemento(t.elemento));
     b.setAttribute("aria-label", t.nome);
-    if (o.selecionado === t.id) b.classList.add("sel");
+    if (o.selecao && o.selecao.indexOf(t.id) >= 0) b.classList.add("sel");
     if (t.oculto) b.classList.add("oculto");
 
     const ag = t.agenteId ? agentePorId(t.agenteId) : null;
@@ -304,8 +304,14 @@ function montarMapa(caixa, cen, opcoes) {
     if (o.arrastavel) {
       b.addEventListener("pointerdown", ev => {
         ev.preventDefault();
+        /* A origem fica registrada antes de avisar a seleção, porque
+           `aoSelecionar` dispara um render() que troca este botão por outro.
+           Como as variáveis de arrasto moram no módulo, elas atravessam o
+           repinte — é o mesmo motivo de `arrastando` já viver lá fora. */
         arrastando = t.id;
-        o.aoSelecionar && o.aoSelecionar(t.id);
+        arrastePtr = posNoMapa(caixa, v, ev);
+        arrasteRef = null;
+        o.aoSelecionar && o.aoSelecionar(t.id, ev.ctrlKey || ev.metaKey || ev.shiftKey);
         b.setPointerCapture(ev.pointerId);
       });
     } else b.tabIndex = -1;
@@ -334,6 +340,10 @@ function montarMapa(caixa, cen, opcoes) {
 }
 
 let arrastando = null;
+/* Ponto onde o arrasto começou e de onde cada peça do grupo saiu. Guardar a
+   origem é o que faz o grupo andar pelo mesmo deslocamento em vez de
+   empilhar todo mundo embaixo do cursor. */
+let arrastePtr = null, arrasteRef = null;
 
 /* Converte um evento de ponteiro para unidades de grid da vista. O retângulo
    medido é o do <svg>, não o da caixa: no palco a caixa pode sobrar dos lados
@@ -347,11 +357,15 @@ function posNoMapa(caixa, v, ev) {
   };
 }
 
-function ligarArraste(caixa, v, aoMover, aoSoltar) {
-  caixa.onpointerdown = null;
+function ligarArraste(caixa, v, aoMover, aoSoltar, aoFundo) {
+  /* Clique no vazio do mapa desfaz o grupo. Sem isso não haveria como voltar
+     a uma peça só depois de juntar várias. */
+  caixa.onpointerdown = aoFundo
+    ? ev => { if (!(ev.target.closest && ev.target.closest(".token,.pi,.veu"))) aoFundo(); }
+    : null;
   caixa.onpointermove = ev => { if (arrastando) aoMover(arrastando, posNoMapa(caixa, v, ev)); };
   caixa.onpointerup = caixa.onpointercancel = () => {
-    if (arrastando) { arrastando = null; aoSoltar && aoSoltar(); }
+    if (arrastando) { arrastando = null; arrastePtr = null; arrasteRef = null; aoSoltar && aoSoltar(); }
   };
 }
 
@@ -470,7 +484,12 @@ function fichaCurta(a) {
    ======================================================================= */
 
 let ehMestre = false;
+/* `selecionado` é a peça principal — a que os painéis de vínculo e de
+   monstro descrevem. `selecao` é o grupo inteiro e sempre contém a
+   principal; as ações em lote (esconder, lanterna, remover, arrastar) valem
+   para ele. */
 let selecionado = null;
+let selecao = [];
 let painelPonto = null;
 
 function telaMestre() {
@@ -516,6 +535,7 @@ function telaMestre() {
               <button class="btn sm" id="btnAgentes">Trazer agentes</button>
               <button class="btn sm" id="btnRepor">Repor posições</button>
               <button class="btn ghost sm" id="btnReporTudo">Repor todas as cenas</button>
+              <span class="hint" id="selInfo"></span>
               <div class="grow"></div>
               <div class="row" id="cores"></div>
             </div>
@@ -617,7 +637,7 @@ function telaMestre() {
   };
   $("#btnVeus").onclick = () => {
     modoVeu = !modoVeu;
-    if (modoVeu) { modoComodos = false; selecionado = null; } else veuSel = null;
+    if (modoVeu) { modoComodos = false; selecionado = null; selecao = []; } else veuSel = null;
     render();
   };
   $("#btnVeuTira").onclick = () => {
@@ -640,7 +660,7 @@ function telaMestre() {
     const novo = { id: uid(), arte: m.id, nome: m.nome, elemento: m.elemento || "neutro",
                    x: v.w / 2, y: v.h / 2 };
     tokensDaVista(v).push(novo);
-    selecionado = novo.id;
+    selecionado = novo.id; selecao = [novo.id];
     transmitir(); render();
   };
   $("#btnMostrarMonstro").onclick = () => {
@@ -657,21 +677,28 @@ function telaMestre() {
     t.morto = !t.morto;
     transmitir(); render();
   };
-  $("#btnLanterna").onclick = () => {
+  /* Lanterna e "esconder na TV" valem para o grupo todo, e o novo valor sai
+     do estado da peça principal — assim o botão liga tudo ou desliga tudo,
+     em vez de inverter cada peça para um lado. */
+  const emLote = (campo) => () => {
     if (!selecionado) return;
-    const t = tokensDaVista(vistaAtual()).find(t => t.id === selecionado);
-    if (t) { t.luz = !t.luz; transmitir(); render(); }
+    const lista = tokensDaVista(vistaAtual());
+    const alvo = lista.find(t => t.id === selecionado);
+    if (!alvo) return;
+    const valor = !alvo[campo];
+    (selecao.length ? selecao : [selecionado]).forEach(id => {
+      const t = lista.find(t => t.id === id);
+      if (t) t[campo] = valor;
+    });
+    transmitir(); render();
   };
-  $("#btnOculto").onclick = () => {
-    if (!selecionado) return;
-    const t = tokensDaVista(vistaAtual()).find(t => t.id === selecionado);
-    if (t) { t.oculto = !t.oculto; transmitir(); render(); }
-  };
+  $("#btnLanterna").onclick = emLote("luz");
+  $("#btnOculto").onclick = emLote("oculto");
 
   $("#btnVista").onclick = () => {
     const id = cenarioAtual().id;
     estado.usarDesenho[id] = !estado.usarDesenho[id];
-    selecionado = null; veuSel = null; transmitir(); render();
+    selecionado = null; selecao = []; veuSel = null; transmitir(); render();
   };
   $("#btnCalib").onclick = () => {
     const w = parseFloat(($("#calW").value || "").replace(",", "."));
@@ -752,12 +779,13 @@ function telaMestre() {
   $("#btnRemover").onclick = () => {
     if (!selecionado) return;
     const v = vistaAtual();
-    estado.tokens[v.chave] = tokensDaVista(v).filter(t => t.id !== selecionado);
-    selecionado = null; transmitir(); render();
+    const fora = selecao.length ? selecao : [selecionado];
+    estado.tokens[v.chave] = tokensDaVista(v).filter(t => fora.indexOf(t.id) < 0);
+    selecionado = null; selecao = []; transmitir(); render();
   };
   $("#btnRepor").onclick = () => {
     delete estado.tokens[vistaAtual().chave];
-    selecionado = null; transmitir(); render();
+    selecionado = null; selecao = []; transmitir(); render();
   };
   /* Escotilha de emergência. As peças ficam guardadas por vista no
      `localStorage`, então quando o repositório ganha arte nova ou perde um
@@ -767,7 +795,7 @@ function telaMestre() {
   $("#btnReporTudo").onclick = () => {
     if (!confirm("Remontar as peças de todas as cenas pelo repositório?\nBlocos, cômodos escondidos e calibração continuam como estão.")) return;
     estado.tokens = {};
-    selecionado = null; transmitir(); render();
+    selecionado = null; selecao = []; transmitir(); render();
   };
 
   const cores = $("#cores");
@@ -819,7 +847,7 @@ function montarLista() {
     b.onclick = () => {
       estado.cenarioId = c.id;
       estado.pontosAbertos = [];
-      selecionado = null; painelPonto = null; veuSel = null;
+      selecionado = null; selecao = []; painelPonto = null; veuSel = null;
       transmitir(); render();
     };
     box.appendChild(b);
@@ -883,6 +911,12 @@ function render() {
   $("#btnVista").textContent = estado.usarDesenho[cen.id] ? "Ver imagem" : "Ver desenho";
   $("#btnVista").classList.toggle("on", !estado.usarDesenho[cen.id]);
   const tSel = selecionado ? tokensDaVista(v).find(t => t.id === selecionado) : null;
+  /* Deixa claro quantas peças a próxima ação vai pegar, e ensina o gesto:
+     sem isso a seleção múltipla fica escondida. */
+  $("#selInfo").textContent = selecao.length > 1
+    ? selecao.length + " peças selecionadas — arraste uma para mover todas"
+    : (tSel ? "ctrl+clique para selecionar mais de uma" : "");
+
   const bo = $("#btnOculto");
   bo.disabled = !tSel;
   bo.classList.toggle("on", !!(tSel && tSel.oculto));
@@ -934,7 +968,22 @@ function render() {
     veuSel,
     aoMudar: render,
     selecionado,
-    aoSelecionar: id => { selecionado = id; render(); },
+    selecao,
+    aoSelecionar: (id, juntar) => {
+      if (juntar) {
+        const i = selecao.indexOf(id);
+        if (i >= 0) {
+          selecao.splice(i, 1);
+          if (selecionado === id) selecionado = selecao[selecao.length - 1] || null;
+        } else { selecao.push(id); selecionado = id; }
+      } else {
+        /* Clicar numa peça que já está no grupo mantém o grupo: é assim que
+           se pega o conjunto para arrastar sem desfazer a seleção. */
+        if (selecao.indexOf(id) < 0) selecao = [id];
+        selecionado = id;
+      }
+      render();
+    },
     aoTocarPonto: p => {
       painelPonto = painelPonto && painelPonto.n === p.n ? null : p;
       const i = estado.pontosAbertos.indexOf(p.n);
@@ -945,16 +994,35 @@ function render() {
   caixa.classList.toggle("veuando", modoVeu);
   if (modoVeu) ligarVeus(caixa, v, render);
   else ligarArraste(caixa, v, (id, pos) => {
-    const t = tokensDaVista(v).find(t => t.id === id);
-    if (!t) return;
-    t.x = pos.x; t.y = pos.y;
-    /* Procura pelo id, não pela posição na lista: peça oculta não é desenhada
-       no palco, então índice de lista e índice de botão deixaram de casar. */
-    const b = caixa.querySelector('[data-token="' + id + '"]');
-    if (b) { b.style.left = (pos.x / v.w * 100) + "%"; b.style.top = (pos.y / v.h * 100) + "%"; }
+    const lista = tokensDaVista(v);
+    /* Na primeira mexida anota de onde cada peça do grupo saiu. Daí em diante
+       todas andam pelo mesmo deslocamento, mantendo a formação — arrastar
+       peça a peça para debaixo do cursor amontoaria o grupo num ponto só. */
+    if (!arrasteRef) {
+      const alvos = selecao.indexOf(id) >= 0 ? selecao.slice() : [id];
+      arrasteRef = {
+        ptr: arrastePtr || pos,
+        itens: alvos.map(i => {
+          const t = lista.find(t => t.id === i);
+          return t ? { id: i, x: t.x, y: t.y } : null;
+        }).filter(Boolean)
+      };
+    }
+    const dx = pos.x - arrasteRef.ptr.x, dy = pos.y - arrasteRef.ptr.y;
+    arrasteRef.itens.forEach(o0 => {
+      const t = lista.find(t => t.id === o0.id);
+      if (!t) return;
+      t.x = clamp(o0.x + dx, 0, v.w);
+      t.y = clamp(o0.y + dy, 0, v.h);
+      /* Procura pelo id, não pela posição na lista: peça oculta não é
+         desenhada no palco, então índice de lista e de botão não casam. */
+      const b = caixa.querySelector('[data-token="' + o0.id + '"]');
+      if (b) { b.style.left = (t.x / v.w * 100) + "%"; b.style.top = (t.y / v.h * 100) + "%"; }
+    });
     const agora = Date.now();
     if (agora - ultimaTransmissao > 90) { ultimaTransmissao = agora; transmitir(); }
-  }, () => { transmitir(); render(); });
+  }, () => { transmitir(); render(); },
+    () => { if (selecao.length) { selecao = []; selecionado = null; render(); } });
 
   const det = $("#detPonto");
   det.innerHTML = "";

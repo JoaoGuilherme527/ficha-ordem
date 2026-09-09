@@ -370,10 +370,17 @@ body.palco{
    mapa. Só a arte no escuro, que é o ponto do susto. */
 .revelacao{
   position:fixed; inset:0; z-index:60; background:#05070C;
-  display:grid; place-items:center; padding:2.5vh 2.5vw;
+  padding:2.5vh 2.5vw;
 }
+/* A arte da maioria das criaturas e retrato (1024x1536, por exemplo). O
+   `max-height:100%` de antes nao segurava nada: a caixa era um grid de
+   trilha automatica, entao a altura do item vinha do proprio item e a
+   porcentagem nao tinha contra o que resolver. Resultado: retrato estourava
+   a tela e so aparecia a metade de cima. Agora a caixa e um bloco de altura
+   definida (fixed + inset), a img ocupa 100% dela e o object-fit:contain
+   encaixa a arte inteira dentro, sem corte. */
 .revelacao img{
-  max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain;
+  width:100%; height:100%; object-fit:contain; object-position:center;
   filter:drop-shadow(0 24px 70px rgba(0,0,0,.95));
   animation:revEntra .55s cubic-bezier(.2,.9,.3,1);
 }

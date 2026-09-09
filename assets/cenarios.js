@@ -797,9 +797,10 @@ const CENARIOS = [
     /* Pousada em imagem, 1392x1130 px. Escala pelas camas (2,15 x 1,35 m em
        117 x 75 px) e conferida na porta dupla da frente (1,35 m em 76 px):
        ~56 px por metro, o que dá 17,9 x 14,53 — a proporção do arquivo, senão
-       o `slice` cortaria a varanda de entrada. A arte tem quatro quartos de
-       uma cama cada, recepção e sala comum, tudo aceso por lampião. Interlúdio
-       de descanso: nenhuma escuridão por cima. */
+       o `slice` cortaria a varanda de entrada. A arte tem oito quartos de uma
+       cama cada em duas fileiras, o salão de estar à esquerda, os banheiros à
+       direita e a escada de entrada embaixo. Interlúdio de descanso: nenhuma
+       escuridão por cima. */
     imagem: {
       url: "/mapas/m1-interludio-pousada.png",
       w: 17.9, h: 14.53,
@@ -807,10 +808,10 @@ const CENARIOS = [
       credito: "battlemap de terceiros — uso na mesa",
       pontos: [
         { n: 1, x: 3.6, y: 3.6, nome: "Recepção", detalhe: "Ponto de encontro do grupo. Boa hora para revisitar o caso antes de decidir." },
-        { n: 2, x: 5.2, y: 9.4, nome: "Sala comum", detalhe: "Ações de interlúdio: descanso e recuperação antes da fábrica." },
+        { n: 2, x: 2.2, y: 8.5, nome: "Sala comum", detalhe: "Ações de interlúdio: descanso e recuperação antes da fábrica." },
         { n: 3, x: 3.7, y: 5.6, nome: "A decisão", detalhe: "Chamar Caio encerra a missão e pula direto para o Epílogo. Seguir investigando leva à fábrica abandonada." },
-        { n: 4, x: 8.6, y: 3.7, nome: "Os quartos", detalhe: "Quatro quartos, uma cama em cada. Divida o grupo como quiserem — quem dormir sozinho é quem o mestre pode usar para um pesadelo antes da fábrica." },
-        { n: 5, x: 5.7, y: 11.7, nome: "Varanda da frente", detalhe: "Onde os agentes chegam. O lampião aceso é a única luz do lado de fora — quem ficar de vigia passa a noite aqui." }
+        { n: 4, x: 8.6, y: 3.7, nome: "Os quartos", detalhe: "Oito quartos, uma cama em cada. Divida o grupo como quiserem — quem dormir sozinho é quem o mestre pode usar para um pesadelo antes da fábrica." },
+        { n: 5, x: 2.4, y: 11.6, nome: "Varanda da frente", detalhe: "Onde os agentes chegam. O lampião aceso é a única luz do lado de fora — quem ficar de vigia passa a noite aqui." }
       ],
       tokens: []
     },
@@ -875,12 +876,12 @@ const CENARIOS = [
       ]
     },
     imagem: {
-      url: "/mapas/m1-c7-fabrica.jpg",
+      url: "/mapas/m1-c7-fabrica.png",
       w: 24, h: 17.6,
       escuridao: 0.6,
       credito: "battlemap de terceiros — uso na mesa",
       pontos: [
-        { n: 1, x: 5.4, y: 7, nome: "Entrada", detalhe: "Os agentes cruzam o pátio das caçambas e entram por aqui. Tudo calmo — até demais. O barulho vem como se uma multidão corresse na direção deles, e por um segundo se vê só um par de olhos dourados no escuro." },
+        { n: 1, x: 4.9, y: 11.5, nome: "Entrada", detalhe: "Os agentes cruzam o pátio das caçambas e entram por aqui. Tudo calmo — até demais. O barulho vem como se uma multidão corresse na direção deles, e por um segundo se vê só um par de olhos dourados no escuro." },
         { n: 2, x: 13, y: 7.4, nome: "Esteiras e maquinário", detalhe: "Cobertura no meio do salão. Enferrujado e coberto pelo que sobrou do incêndio." },
         { n: 3, x: 19.5, y: 3.2, nome: "Escritório de vidro", detalhe: "Vidraça estilhaçada, cadeira caída. Documentos da fábrica, se você quiser adiantar parte do que está no diário." },
         { n: 4, x: 22.8, y: 2, nome: "Passarela e dutos", detalhe: "A passarela suspensa dá altura à criatura. É pela boca de duto no fim dela que ela leva as crianças — os agentes são grandes demais para passar e precisam seguir os dutos por fora." },
@@ -961,7 +962,7 @@ const CENARIOS = [
         { n: 2, x: 17, y: 10.3, nome: "Papéis sobre os destroços", detalhe: "Entradas de um diário sem identificação, empilhadas na madeira quebrada. Jairo não morreu no incêndio: ficou preso nos escombros, com medo constante de que o filho tivesse morrido nas chamas. Ele ouvia algo se aproximando, pedindo ajuda." },
         { n: 3, x: 17.2, y: 11.8, nome: "As duas consciências", detalhe: "Jairo viu o próprio filho no bicho papão e passou a cuidar dele. Começou a se confundir com a criatura, a ponto de não separar mais os dois no diário. As marcas nas costas das crianças são as mãos dele, e aparecem algum tempo antes do ataque." },
         { n: 4, x: 2.6, y: 6.9, nome: "Corredor de acesso", detalhe: "Caminho apertado desde a saída dos dutos, ~2 m de largura. Boa hora para tensão antes da revelação." },
-        { n: 5, x: 15.9, y: 13.1, nome: "Mancha de sangue", detalhe: "Fora do texto da missão, mas a arte entrega: Medicina DT 15 diz que é humano, antigo e de mais de uma pessoa. Não é de nenhuma das seis crianças — são de antes." },
+        { n: 5, x: 15.4, y: 12.25, nome: "Mancha de sangue", detalhe: "Fora do texto da missão, mas a arte entrega: Medicina DT 15 diz que é humano, antigo e de mais de uma pessoa. Não é de nenhuma das seis crianças — são de antes." },
         { n: 6, x: 17.6, y: 3.2, nome: "Teto desabado", detalhe: "A única luz do lugar entra por aqui. Escalar os escombros exige Atletismo DT 15 e é a saída mais rápida com as crianças — mas faz barulho." }
       ],
       tokens: [],
