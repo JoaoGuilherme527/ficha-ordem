@@ -11,8 +11,9 @@
      <id>-normal.png    a arte cheia, para a revelação   (opcional)
      <id>-morto.png     a mesma criatura depois de cair  (opcional)
 
-   Sem `-normal`, a revelação usa o próprio token — é o caso do bicho papão
-   e da Dra. Ruth. Sem `-morto`, o botão de versão morta fica desligado.
+   Sem `-normal`, a revelação usa o próprio token — é o caso da Dra. Ruth,
+   do Euclides e do Felipe. Sem `-morto`, o botão de versão morta fica
+   desligado.
 
    `cenas` diz a que cenas a peça pertence, e serve para o `select` marcar
    "(desta cena)" e já vir escolhida. Quem entra posicionado está nos `tokens`
@@ -45,7 +46,11 @@ const ELENCO = [
     tipo: "monstro",
     nome: "Bicho papão",
     elemento: "conhecimento",
-    token: "/tokens/bicho-papao-token.png",
+    /* O `-token.png` saiu do repositório; a arte cheia é recortada em fundo
+       transparente, então serve de peça no mapa e de revelação na TV. */
+    token:  "/tokens/bicho-papao-normal.png",
+    normal: "/tokens/bicho-papao-normal.png",
+    morto:  "/tokens/bicho-papao-morto.png",
     tam: 2.1,
     cenas: ["m1-c7-fabrica"],
     nota: "Jairo e o filho na mesma carne. Entra só quando o mestre chamar."
