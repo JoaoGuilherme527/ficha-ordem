@@ -532,7 +532,8 @@ function telaMestre() {
               <button class="btn sm" id="btnRemover">Remover</button>
               <button class="btn sm" id="btnOculto">Esconder na TV</button>
               <button class="btn sm" id="btnLanterna">Lanterna</button>
-              <button class="btn sm" id="btnAgentes">Trazer agentes</button>
+              <select id="selTrazer" style="max-width:190px" aria-label="qual agente trazer"></select>
+              <button class="btn sm" id="btnAgentes">Trazer</button>
               <button class="btn sm" id="btnRepor">Repor posições</button>
               <button class="btn ghost sm" id="btnReporTudo">Repor todas as cenas</button>
               <span class="hint" id="selInfo"></span>
@@ -709,16 +710,27 @@ function telaMestre() {
   };
   $("#btnAgentes").onclick = () => {
     const v = vistaAtual(), lista = tokensDaVista(v);
-    let n = 0;
-    agentes.forEach((a, i) => {
+    /* Sem escolha no select traz o grupo inteiro; com um agente escolhido
+       traz só ele. Antes só existia o "todos", que enchia o mapa de peça
+       mesmo quando o mestre queria colocar um agente por vez. */
+    const alvo = $("#selTrazer").value;
+    const querem = alvo ? agentes.filter(a => a.id === alvo) : agentes;
+    /* A fila começa depois de quem já está no mapa, senão trazer um de cada
+       vez empilharia todos no mesmo ponto. */
+    let posto = lista.filter(t => t.agenteId).length, n = 0;
+    querem.forEach(a => {
       if (lista.some(t => t.agenteId === a.id)) return;
+      const k = posto++;
       lista.push({ id: uid(), agenteId: a.id, nome: a.nome, elemento: "neutro",
-                   x: clamp(v.w * .5 + (i - agentes.length / 2) * 1.2, 1, v.w - 1),
+                   x: clamp(v.w * .5 + (k - 1.5) * 1.2, 1, v.w - 1),
                    y: clamp(v.h - 1.5, 1, v.h - 1) });
       n++;
     });
     if (n) { transmitir(); render(); }
   };
+
+  // trocar o alvo muda se o botão está habilitado
+  $("#selTrazer").onchange = render;
 
   $("#selAgente").onchange = ev => {
     const t = tokensDaVista(vistaAtual()).find(t => t.id === selecionado);
@@ -911,6 +923,22 @@ function render() {
   $("#btnVista").textContent = estado.usarDesenho[cen.id] ? "Ver imagem" : "Ver desenho";
   $("#btnVista").classList.toggle("on", !estado.usarDesenho[cen.id]);
   const tSel = selecionado ? tokensDaVista(v).find(t => t.id === selecionado) : null;
+  /* Select de quem trazer. Remontado a cada render porque a lista de
+     agentes chega do banco depois e muda ao longo da sessão; o "(no mapa)"
+     evita o clique que não faz nada. */
+  const selT = $("#selTrazer");
+  const noMapa = id => tokensDaVista(v).some(t => t.agenteId === id);
+  const antesT = selT.value;
+  const faltam = agentes.filter(a => !noMapa(a.id)).length;
+  selT.innerHTML = '<option value="">todos os agentes' +
+    (agentes.length ? " (" + faltam + " fora do mapa)" : "") + '</option>' +
+    agentes.map(a => '<option value="' + esc(a.id) + '">' + esc(a.nome) +
+      (noMapa(a.id) ? " — já no mapa" : "") + '</option>').join("");
+  selT.value = agentes.some(a => a.id === antesT) ? antesT : "";
+  selT.disabled = !agentes.length;
+  $("#btnAgentes").disabled = !agentes.length ||
+    (selT.value ? noMapa(selT.value) : !faltam);
+
   /* Deixa claro quantas peças a próxima ação vai pegar, e ensina o gesto:
      sem isso a seleção múltipla fica escondida. */
   $("#selInfo").textContent = selecao.length > 1
